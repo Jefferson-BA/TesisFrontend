@@ -1,17 +1,17 @@
 ---
-
+// Importamos el CSS y el componente de React
+import '@/styles/globals.css';
+import { LoginForm } from '@/auth/components/LoginForm';
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Javier Kbro</h1>
-	</body>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>Login | Panel Super Admin</title>
+  </head>
+  <body class="flex min-h-screen items-center justify-center bg-zinc-950 p-4">
+    <main>
+      <LoginForm client:load />
+    </main>
+  </body>
 </html>
