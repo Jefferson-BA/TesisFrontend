@@ -1,0 +1,16 @@
+---
+import '@/styles/globals.css';
+import { RegisterForm } from '@/modules/auth/components/RegisterForm';
+---
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>Registro | Hojas de Parra Spitz</title>
+  </head>
+  <body class="flex min-h-screen items-center justify-center bg-zinc-950 p-4">
+    <main>
+      <RegisterForm client:only="react" />
+    </main>
+  </body>
+</html>
