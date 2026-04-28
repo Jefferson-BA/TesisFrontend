@@ -1,20 +1,53 @@
+// src/lib/axios.ts
 import axios from 'axios';
+import { useAuthStore } from '@/modules/auth/store/authStore';
 
-const api = axios.create({
-  // Asegúrate de que este puerto sea el de tu NestJS
-  baseURL: 'http://localhost:3000', 
-  headers: {
-    'Content-Type': 'application/json',
+// 1. Creamos la instancia base
+export const api = axios.create({
+  baseURL: 'http://localhost:3000', // La URL raíz de tu backend
+  // withCredentials: true, // Descomenta esto si a futuro usas Cookies HTTP-Only en NestJS
+});
+
+// 2. Interceptor de Peticiones (Request) -> "El Mensajero"
+api.interceptors.request.use(
+  (config) => {
+    // Obtenemos el token directamente del estado global de Zustand
+    const token = useAuthStore.getState().token;
+    
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    
+    return config;
   },
-});
-
-// Interceptor para inyectar el token automáticamente en el futuro
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  if (token && config.headers) {
-    config.headers.Authorization = `Bearer ${token}`;
+  (error) => {
+    return Promise.reject(error);
   }
-  return config;
-});
+);
 
-export default api;
+// 3. Interceptor de Respuestas (Response) -> "El Guardia de Seguridad"
+api.interceptors.response.use(
+  (response) => {
+    // Si la petición sale bien, simplemente la devolvemos
+    return response;
+  },
+  (error) => {
+    // Si el backend nos devuelve un 401 (No autorizado / Token caducado)
+    if (error.response?.status === 401) {
+      console.warn("Sesión expirada o inválida. Cerrando sesión automáticamente...");
+      
+      // Limpiamos el estado global
+      useAuthStore.getState().logout();
+      
+      // Limpiamos la cookie de middleware
+      document.cookie = "user-role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+      
+      // Redirigimos al login si no estamos ya ahí
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
+    }
+    
+    return Promise.reject(error);
+  }
+);

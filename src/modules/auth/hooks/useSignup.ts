@@ -4,11 +4,11 @@ import { authService } from "../services/auth.service";
 export const useSignup = () => {
   return useMutation({
     mutationFn: (data: any) => {
+      // Quitamos el roleId, enviamos solo lo que el SignupDto acepta
       const payload = {
         name: data.name,
         email: data.email,
         password: data.password,
-        roleId: 3 
       };
       return authService.signup(payload);
     },
@@ -17,7 +17,12 @@ export const useSignup = () => {
       window.location.href = "/login";
     },
     onError: (error: any) => {
-      alert(error.response?.data?.message || "Hubo un error al crear la cuenta");
+      const message = error.response?.data?.message;
+      if (Array.isArray(message)) {
+        alert("Corrije esto:\n- " + message.join("\n- "));
+      } else {
+        alert(message || "Hubo un error al crear la cuenta");
+      }
     }
   });
 };

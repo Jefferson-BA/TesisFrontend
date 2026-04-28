@@ -4,7 +4,7 @@ import { loginSchema, type LoginFormData } from "../schemas/auth.schema";
 import { useLogin } from "../hooks/useLogin";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
@@ -52,6 +52,14 @@ function LoginFormInner() {
           </Button>
         </form>
       </CardContent>
+      <CardFooter className="justify-center border-t border-zinc-800 pt-4">
+        <p className="text-sm text-zinc-400">
+          ¿No tienes una cuenta?{" "}
+          <a href="/register" className="text-emerald-500 hover:underline font-medium">
+            Regístrate aquí
+          </a>
+        </p>
+      </CardFooter>
     </Card>
   );
 }

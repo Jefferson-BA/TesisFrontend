@@ -1,19 +1,22 @@
-// 1. Asegúrate de que la ruta sea @/api/axios (sin .ts al final)
-import api from "@/api/axios"; 
-import axios from "axios";
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
-
-// 2. Agrega la palabra "type" para que TS esté feliz
-import type { LoginFormData } from "../schemas/auth.schema"; 
+// src/modules/auth/services/auth.service.ts
+import { api } from '@/api/axios';
 
 export const authService = {
-  login: async (data: LoginFormData) => {
-    const response = await api.post("/auth/login", data);
+  login: async (data: any) => {
+    // Ya no necesitamos poner la URL completa, el interceptor sabe que es localhost:3000
+    const response = await api.post('/auth/login', data);
     return response.data;
   },
-  // Dentro de tu authService
+
   signup: async (data: any) => {
-    const response = await axios.post(`${API_URL}/signup`, data);
+    const response = await api.post('/auth/signup', data);
     return response.data;
   },
+
+  // Ejemplo futuro: Obtener el perfil. 
+  // Fíjate que NO le pasamos el token, el interceptor lo hará por nosotros.
+  getProfile: async () => {
+    const response = await api.get('/auth/profile');
+    return response.data;
+  }
 };
