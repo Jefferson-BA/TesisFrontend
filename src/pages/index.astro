@@ -1,7 +1,7 @@
 ---
-// Importamos el CSS y el componente de React
 import '@/styles/globals.css';
-import { LoginForm } from '@/auth/components/LoginForm';
+import { LoginForm } from '@/modules/auth/components/LoginForm';
+import { QueryProvider } from '@/components/shared/QueryProvider'; // <-- Importamos el provider
 ---
 
 <html lang="es">
@@ -11,7 +11,9 @@ import { LoginForm } from '@/auth/components/LoginForm';
   </head>
   <body class="flex min-h-screen items-center justify-center bg-zinc-950 p-4">
     <main>
-      <LoginForm client:load />
+      <QueryProvider client:load>
+        <LoginForm client:load />
+      </QueryProvider>
     </main>
   </body>
 </html>
