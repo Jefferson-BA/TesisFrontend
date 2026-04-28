@@ -1,22 +1,32 @@
 import { useMutation } from "@tanstack/react-query";
 import { authService } from "../services/auth.service";
 import { useAuthStore } from "../store/authStore";
-import type { LoginFormData } from "../schemas/auth.schema";
 
 export const useLogin = () => {
   const setAuth = useAuthStore((state) => state.setAuth);
 
   return useMutation({
-    mutationFn: (data: LoginFormData) => authService.login(data),
+    mutationFn: (data: any) => authService.login(data),
     onSuccess: (response) => {
-      // Guardamos en el store global
+      // 1. Guardamos en el Store (Zustand)
       setAuth(response.user, response.accessToken);
       
-      // Redirección profesional según el rol (o directo al admin por ahora)
-      window.location.href = "/admin/dashboard";
+      const role = response.user.role; 
+
+      // 2. CREAMOS LA COOKIE para que el Middleware la pueda leer (Válida por 1 día)
+      document.cookie = `user-role=${role}; path=/; max-age=86400`;
+
+      // 3. Redirección inteligente
+      if (role === 'superadmin') {
+        window.location.href = "/superadmin/dashboard";
+      } else if (role === 'admin') {
+        window.location.href = "/admin/dashboard";
+      } else {
+        window.location.href = "/"; 
+      }
     },
     onError: (error: any) => {
-      alert(error.response?.data?.message || "Error al iniciar sesión");
+      alert(error.response?.data?.message || "Credenciales incorrectas");
     }
   });
 };
