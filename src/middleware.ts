@@ -1,28 +1,27 @@
 // src/middleware.ts
 import type { APIContext, MiddlewareNext } from "astro";
 
-export async function onRequest(
-  { url, cookies, redirect }: APIContext,
-  next: MiddlewareNext
-) {
-  // 1. Definimos qué rutas son protegidas
+export async function onRequest({ url, cookies, redirect }: APIContext, next: MiddlewareNext) {
   const isAdminPage = url.pathname.startsWith("/admin");
   const isSuperAdminPage = url.pathname.startsWith("/superadmin");
 
-  // 2. Leemos la cookie que guardará el rol del usuario
-  const userRole = cookies.get("user-role")?.value;
+  // Obtenemos el rol y lo pasamos a minúsculas por seguridad
+  const userRole = cookies.get("user-role")?.value?.toLowerCase();
 
-  // 3. Reglas de seguridad
-  if (isAdminPage && userRole !== "admin" && userRole !== "superadmin") {
-    // Si intenta entrar al admin y no es admin, lo pateamos al login
-    return redirect("/login");
+  // Bloqueo para Admin
+  if (isAdminPage) {
+    if (userRole !== "admin" && userRole !== "superadmin") {
+      return redirect("/login");
+    }
   }
 
-  if (isSuperAdminPage && userRole !== "superadmin") {
-    // Si intenta entrar al superadmin y no lo es, lo mandamos al panel normal
-    return redirect("/admin/dashboard");
+  // Bloqueo para Superadmin
+  if (isSuperAdminPage) {
+    if (userRole !== "superadmin") {
+      // Si es admin pero no superadmin, lo mandamos a su panel
+      return userRole === "admin" ? redirect("/admin/dashboard") : redirect("/login");
+    }
   }
 
-  // Si todo está bien, lo dejamos pasar
   return next();
 }
