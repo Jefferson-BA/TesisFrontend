@@ -1,7 +1,10 @@
 ---
 import AdminLayout from "@/layouts/AdminLayout.astro";
 import "../../styles/globals.css";
-import AdminUsersTable from "@/modules/auth/components/AdminUsersTable";---
+
+import AdminUsersTable from "@/modules/auth/components/AdminUsersTable";
+import AdminOrdersTable from "@/modules/auth/components/AdminOrdersTable";
+---
 
 <AdminLayout>
   <section class="admin-panel">
@@ -13,24 +16,35 @@ import AdminUsersTable from "@/modules/auth/components/AdminUsersTable";---
 
     <div class="admin-tabs">
       <a class="tab-resumen" href="#resumen">▦ Resumen</a>
-      <a class="tab-pedidos" href="#pedidos">▣ Pedidos</a>
+
+      <a class="tab-pedidos" href="#pedidos">
+        ▣ Pedidos
+      </a>
 
       <a class="tab-productos" href="/admin/productos">
         ▧ Productos
       </a>
 
-      <a class="tab-promociones" href="#promociones">◇ Promociones</a>
-      <a class="tab-perfil" href="#perfil">♙ Perfil</a>
+      <a class="tab-promociones" href="#promociones">
+        ◇ Promociones
+      </a>
+
+      <a class="tab-perfil" href="#perfil">
+        ♙ Perfil
+      </a>
     </div>
 
     <!-- RESUMEN -->
     <section id="resumen" class="tab-section default-section">
+
       <div class="stats-grid">
+
         <div class="stat-card">
           <div>
             <p>Ventas Totales Históricas</p>
             <h2>S/ 4280.00</h2>
           </div>
+
           <span>S/</span>
         </div>
 
@@ -39,6 +53,7 @@ import AdminUsersTable from "@/modules/auth/components/AdminUsersTable";---
             <p>Ingresos del Mes</p>
             <h2>S/ 0.00</h2>
           </div>
+
           <span>↗</span>
         </div>
 
@@ -47,6 +62,7 @@ import AdminUsersTable from "@/modules/auth/components/AdminUsersTable";---
             <p>Pedidos de Hoy</p>
             <h2>0</h2>
           </div>
+
           <span>▣</span>
         </div>
 
@@ -55,52 +71,28 @@ import AdminUsersTable from "@/modules/auth/components/AdminUsersTable";---
             <p>Total Pedidos</p>
             <h2>1</h2>
           </div>
+
           <span>▤</span>
         </div>
+
       </div>
+
     </section>
 
     <!-- PEDIDOS -->
-    <section id="pedidos" class="tab-section admin-card">
-      <h2>Gestión de Pedidos</h2>
-
-      <table>
-        <thead>
-          <tr>
-            <th>N° Pedido</th>
-            <th>Cliente</th>
-            <th>Fecha Evento</th>
-            <th>Total</th>
-            <th>Método Pago</th>
-            <th>Estado</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          <tr>
-            <td>3xx38o287gkpy6q</td>
-            <td>
-              <strong>ELIAS</strong>
-              <small>3600267</small>
-            </td>
-            <td>24/4/2026</td>
-            <td>S/ 4280.00</td>
-            <td>Tarjeta</td>
-            <td>
-              <button class="status">Pendiente</button>
-            </td>
-            <td>👁</td>
-          </tr>
-        </tbody>
-      </table>
+    <section id="pedidos" class="tab-section">
+      <AdminOrdersTable client:load />
     </section>
 
     <!-- PROMOCIONES -->
     <section id="promociones" class="tab-section admin-card">
+
       <div class="card-head">
         <h2>Promociones Activas</h2>
-        <button class="yellow-btn">Nueva Promoción</button>
+
+        <button class="yellow-btn">
+          Nueva Promoción
+        </button>
       </div>
 
       <table>
@@ -114,11 +106,14 @@ import AdminUsersTable from "@/modules/auth/components/AdminUsersTable";---
           </tr>
         </thead>
       </table>
+
     </section>
 
     <!-- PERFIL -->
     <section id="perfil" class="tab-section">
+
       <div class="profile-card">
+
         <h2>Perfil de Administrador</h2>
 
         <p>Email de acceso</p>
@@ -130,9 +125,11 @@ import AdminUsersTable from "@/modules/auth/components/AdminUsersTable";---
         <button>
           Cerrar Sesión
         </button>
+
       </div>
 
       <AdminUsersTable client:load />
+
     </section>
 
   </section>

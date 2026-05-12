@@ -1,12 +1,13 @@
 ---
 import AdminLayout from "@/layouts/AdminLayout.astro";
+import "@/styles/globals.css";
 
 import ProductForm from "@/modules/auth/components/ProductForm";
 import ProductTable from "@/modules/auth/components/ProductTable";
 ---
+
 <AdminLayout>
   <main class="max-w-7xl mx-auto px-6 py-10 space-y-8">
-    
     <div>
       <h1 class="text-5xl font-bold text-white">
         Gestión de Productos
@@ -20,6 +21,5 @@ import ProductTable from "@/modules/auth/components/ProductTable";
     <ProductForm client:load />
 
     <ProductTable client:load />
-
   </main>
 </AdminLayout>

@@ -1,0 +1,17 @@
+---
+import "@/styles/globals.css";
+import { PublicNavbar } from "@/modules/user/components/PublicNavbar";
+import CartPage from "@/modules/auth/components/CartPage";
+---
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>Carrito | DeParraSpitz</title>
+  </head>
+
+  <body class="min-h-screen bg-black text-white">
+    <PublicNavbar client:only="react" />
+    <CartPage client:load />
+  </body>
+</html>
