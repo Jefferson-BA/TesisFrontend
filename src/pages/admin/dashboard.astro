@@ -1,33 +1,121 @@
 ---
 import AdminLayout from "@/layouts/AdminLayout.astro";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import "../../styles/globals.css";
 ---
 
 <AdminLayout>
-  <div class="space-y-6">
-    <h2 class="text-3xl font-bold tracking-tight text-white">Resumen General</h2>
-    
-    <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      <Card className="bg-zinc-900 border-zinc-800">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium text-zinc-400">Ventas Totales</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div class="text-2xl font-bold text-cyan-500">$12,450.00</div>
-          <p class="text-xs text-zinc-500">+20.1% respecto al mes pasado</p>
-        </CardContent>
-      </Card>
+  <section class="admin-panel">
 
-      <Card className="bg-zinc-900 border-zinc-800">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium text-zinc-400">Usuarios Activos</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div class="text-2xl font-bold text-white">+573</div>
-          <p class="text-xs text-zinc-500">+12 nuevos hoy</p>
-        </CardContent>
-      </Card>
-      
+    <div class="admin-header">
+      <h1>Panel de Administración</h1>
+      <p>Bienvenido, admin@deparraspitz.com</p>
+    </div>
+
+    <div class="admin-tabs">
+      <a class="tab-resumen" href="#resumen">▦ Resumen</a>
+      <a class="tab-pedidos" href="#pedidos">▣ Pedidos</a>
+
+      <!-- BOTÓN CORREGIDO -->
+      <a class="tab-productos" href="/admin/productos">
+        ▧ Productos
+      </a>
+
+      <a class="tab-promociones" href="#promociones">◇ Promociones</a>
+      <a class="tab-perfil" href="#perfil">♙ Perfil</a>
+    </div>
+
+    <!-- RESUMEN -->
+    <section id="resumen" class="tab-section default-section">
+      <!-- SOLO cards resumen -->
+    </section>
+
+    <!-- PEDIDOS -->
+    <section id="pedidos" class="admin-card">
+
+      <h2>Gestión de Pedidos</h2>
+
+      <table>
+        <thead>
+          <tr>
+            <th>N° Pedido</th>
+            <th>Cliente</th>
+            <th>Fecha Evento</th>
+            <th>Total</th>
+            <th>Método Pago</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            <td>3xx38o287gkpy6q</td>
+
+            <td>
+              <strong>ELIAS</strong>
+              <small>3600267</small>
+            </td>
+
+            <td>24/4/2026</td>
+
+            <td>S/ 4280.00</td>
+
+            <td>Tarjeta</td>
+
+            <td>
+              <button class="status">
+                Pendiente
+              </button>
+            </td>
+
+            <td>👁</td>
+          </tr>
+        </tbody>
+      </table>
+
+    </section>
+
+    <!-- PROMOCIONES -->
+    <section id="promociones" class="admin-card">
+
+      <div class="card-head">
+        <h2>Promociones Activas</h2>
+
+        <button class="yellow-btn">
+          Nueva Promoción
+        </button>
       </div>
-  </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Título</th>
+            <th>Descuento</th>
+            <th>Inicio</th>
+            <th>Fin</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+      </table>
+
+    </section>
+
+    <!-- PERFIL -->
+    <section id="perfil" class="profile-card">
+
+      <h2>Perfil de Administrador</h2>
+
+      <p>Email de acceso</p>
+
+      <strong>
+        admin@deparraspitz.com
+      </strong>
+
+      <button>
+        Cerrar Sesión
+      </button>
+
+    </section>
+
+  </section>
 </AdminLayout>

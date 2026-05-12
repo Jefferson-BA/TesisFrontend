@@ -1,0 +1,31 @@
+---
+import "@/styles/globals.css";
+
+import { PublicNavbar } from "@/modules/user/components/PublicNavbar";
+import {MenuProducts} from "@/modules/auth/components/MenuProducts";
+---
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>Menú | DeParraSpitz</title>
+  </head>
+
+  <body class="min-h-screen bg-[#0b0806] text-white">
+    <PublicNavbar client:only="react" />
+
+    <main class="max-w-7xl mx-auto px-6 py-20">
+      <section class="text-center mb-16">
+        <h1 class="text-6xl font-bold">
+          Nuestro Menú
+        </h1>
+
+        <p class="text-zinc-300 mt-4">
+          Descubre nuestra selección de productos premium para tu evento
+        </p>
+      </section>
+
+      <MenuProducts client:load />
+    </main>
+  </body>
+</html>
