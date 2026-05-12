@@ -1,7 +1,7 @@
 ---
 import AdminLayout from "@/layouts/AdminLayout.astro";
 import "../../styles/globals.css";
----
+import AdminUsersTable from "@/modules/auth/components/AdminUsersTable";---
 
 <AdminLayout>
   <section class="admin-panel">
@@ -15,7 +15,6 @@ import "../../styles/globals.css";
       <a class="tab-resumen" href="#resumen">▦ Resumen</a>
       <a class="tab-pedidos" href="#pedidos">▣ Pedidos</a>
 
-      <!-- BOTÓN CORREGIDO -->
       <a class="tab-productos" href="/admin/productos">
         ▧ Productos
       </a>
@@ -26,12 +25,43 @@ import "../../styles/globals.css";
 
     <!-- RESUMEN -->
     <section id="resumen" class="tab-section default-section">
-      <!-- SOLO cards resumen -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div>
+            <p>Ventas Totales Históricas</p>
+            <h2>S/ 4280.00</h2>
+          </div>
+          <span>S/</span>
+        </div>
+
+        <div class="stat-card">
+          <div>
+            <p>Ingresos del Mes</p>
+            <h2>S/ 0.00</h2>
+          </div>
+          <span>↗</span>
+        </div>
+
+        <div class="stat-card">
+          <div>
+            <p>Pedidos de Hoy</p>
+            <h2>0</h2>
+          </div>
+          <span>▣</span>
+        </div>
+
+        <div class="stat-card">
+          <div>
+            <p>Total Pedidos</p>
+            <h2>1</h2>
+          </div>
+          <span>▤</span>
+        </div>
+      </div>
     </section>
 
     <!-- PEDIDOS -->
-    <section id="pedidos" class="admin-card">
-
+    <section id="pedidos" class="tab-section admin-card">
       <h2>Gestión de Pedidos</h2>
 
       <table>
@@ -50,40 +80,27 @@ import "../../styles/globals.css";
         <tbody>
           <tr>
             <td>3xx38o287gkpy6q</td>
-
             <td>
               <strong>ELIAS</strong>
               <small>3600267</small>
             </td>
-
             <td>24/4/2026</td>
-
             <td>S/ 4280.00</td>
-
             <td>Tarjeta</td>
-
             <td>
-              <button class="status">
-                Pendiente
-              </button>
+              <button class="status">Pendiente</button>
             </td>
-
             <td>👁</td>
           </tr>
         </tbody>
       </table>
-
     </section>
 
     <!-- PROMOCIONES -->
-    <section id="promociones" class="admin-card">
-
+    <section id="promociones" class="tab-section admin-card">
       <div class="card-head">
         <h2>Promociones Activas</h2>
-
-        <button class="yellow-btn">
-          Nueva Promoción
-        </button>
+        <button class="yellow-btn">Nueva Promoción</button>
       </div>
 
       <table>
@@ -97,24 +114,25 @@ import "../../styles/globals.css";
           </tr>
         </thead>
       </table>
-
     </section>
 
     <!-- PERFIL -->
-    <section id="perfil" class="profile-card">
+    <section id="perfil" class="tab-section">
+      <div class="profile-card">
+        <h2>Perfil de Administrador</h2>
 
-      <h2>Perfil de Administrador</h2>
+        <p>Email de acceso</p>
 
-      <p>Email de acceso</p>
+        <strong>
+          admin@deparraspitz.com
+        </strong>
 
-      <strong>
-        admin@deparraspitz.com
-      </strong>
+        <button>
+          Cerrar Sesión
+        </button>
+      </div>
 
-      <button>
-        Cerrar Sesión
-      </button>
-
+      <AdminUsersTable client:load />
     </section>
 
   </section>
