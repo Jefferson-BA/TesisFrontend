@@ -1,0 +1,20 @@
+---
+import '@/styles/globals.css';
+import { RegisterForm } from '@/modules/auth/components/RegisterForm';
+// 👇 1. Asegúrate de tener esta importación
+import { Toaster } from 'sonner'; 
+---
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>Registro | Hojas de Parra Spitz</title>
+  </head>
+  <body class="flex min-h-screen items-center justify-center bg-zinc-950 p-4">
+    <main>
+      <RegisterForm client:only="react" />
+    </main>
+    
+    <Toaster client:only="react" richColors position="top-right" />
+  </body>
+</html>

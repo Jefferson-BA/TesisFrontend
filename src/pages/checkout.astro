@@ -1,0 +1,21 @@
+---
+import { Toaster } from "sonner";
+import "@/styles/globals.css";
+import { PublicNavbar } from "@/modules/user/components/PublicNavbar";
+import CheckoutPage from "@/modules/auth/components/CheckoutPage";---
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>Checkout | DeParraSpitz</title>
+  </head>
+
+  <body class="min-h-screen bg-[#0b0806] text-white">
+    <PublicNavbar client:only="react" />
+
+    <main class="max-w-6xl mx-auto px-6 py-16">
+      <CheckoutPage client:load />
+    </main>
+      <Toaster richColors position="top-right" client:load />
+  </body>
+</html>
