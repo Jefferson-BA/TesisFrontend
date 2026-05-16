@@ -2,8 +2,10 @@
 import AdminLayout from "@/layouts/AdminLayout.astro";
 import "../../styles/globals.css";
 
-import AdminUsersTable from "@/modules/auth/components/AdminUsersTable";
+import AdminStatsCharts from "@/modules/auth/components/AdminStatsCharts";
 import AdminOrdersTable from "@/modules/auth/components/AdminOrdersTable";
+import PromoForm from "@/modules/auth/components/PromoForm";
+import CategoryForm from "@/modules/auth/components/CategoryForm";
 ---
 
 <AdminLayout>
@@ -11,7 +13,6 @@ import AdminOrdersTable from "@/modules/auth/components/AdminOrdersTable";
 
     <div class="admin-header">
       <h1>Panel de Administración</h1>
-      <p>Bienvenido, admin@deparraspitz.com</p>
     </div>
 
     <div class="admin-tabs">
@@ -29,14 +30,12 @@ import AdminOrdersTable from "@/modules/auth/components/AdminOrdersTable";
         ◇ Promociones
       </a>
 
-      <a class="tab-perfil" href="#perfil">
-        ♙ Perfil
+   
       </a>
     </div>
 
     <!-- RESUMEN -->
     <section id="resumen" class="tab-section default-section">
-
       <div class="stats-grid">
 
         <div class="stat-card">
@@ -44,39 +43,36 @@ import AdminOrdersTable from "@/modules/auth/components/AdminOrdersTable";
             <p>Ventas Totales Históricas</p>
             <h2>S/ 4280.00</h2>
           </div>
-
           <span>S/</span>
         </div>
 
         <div class="stat-card">
           <div>
-            <p>Ingresos del Mes</p>
-            <h2>S/ 0.00</h2>
+            <p>Promociones Activas</p>
+            <h2 id="promo-count">1</h2>
           </div>
-
-          <span>↗</span>
+          <span>◇</span>
         </div>
 
         <div class="stat-card">
           <div>
-            <p>Pedidos de Hoy</p>
-            <h2>0</h2>
+            <p>Usuarios Registrados</p>
+            <h2 id="user-count">4</h2>
           </div>
-
-          <span>▣</span>
+          <span>♙</span>
         </div>
 
         <div class="stat-card">
           <div>
             <p>Total Pedidos</p>
-            <h2>1</h2>
+            <h2 id="order-count">1</h2>
           </div>
-
           <span>▤</span>
         </div>
 
       </div>
 
+      <AdminStatsCharts client:load />
     </section>
 
     <!-- PEDIDOS -->
@@ -86,51 +82,9 @@ import AdminOrdersTable from "@/modules/auth/components/AdminOrdersTable";
 
     <!-- PROMOCIONES -->
     <section id="promociones" class="tab-section admin-card">
-
-      <div class="card-head">
-        <h2>Promociones Activas</h2>
-
-        <button class="yellow-btn">
-          Nueva Promoción
-        </button>
-      </div>
-
-      <table>
-        <thead>
-          <tr>
-            <th>Título</th>
-            <th>Descuento</th>
-            <th>Inicio</th>
-            <th>Fin</th>
-            <th>Estado</th>
-          </tr>
-        </thead>
-      </table>
-
+      <PromoForm client:load />
     </section>
 
-    <!-- PERFIL -->
-    <section id="perfil" class="tab-section">
-
-      <div class="profile-card">
-
-        <h2>Perfil de Administrador</h2>
-
-        <p>Email de acceso</p>
-
-        <strong>
-          admin@deparraspitz.com
-        </strong>
-
-        <button>
-          Cerrar Sesión
-        </button>
-
-      </div>
-
-      <AdminUsersTable client:load />
-
-    </section>
-
+  
   </section>
 </AdminLayout>

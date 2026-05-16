@@ -1,71 +1,81 @@
 import { create } from "zustand";
 
-interface CartItem {
+export interface CartItem {
   id: string;
   name: string;
   price: number;
   quantity: number;
   imageUrl?: string;
+  image?: string;
+  category?: string;
 }
 
 interface CartStore {
   cart: CartItem[];
-
-  addToCart: (product: CartItem) => void;
-
+  addToCart: (product: Omit<CartItem, "quantity">) => void;
   removeFromCart: (id: string) => void;
-
   clearCart: () => void;
-
-  increaseQuantity: (id: string) => void;
-
-  decreaseQuantity: (id: string) => void;
+  updateQuantity: (id: string, quantity: number) => void;
 }
 
+const getCartFromStorage = (): CartItem[] => {
+  if (typeof window === "undefined") return [];
+
+  const savedCart = localStorage.getItem("cart");
+  return savedCart ? JSON.parse(savedCart) : [];
+};
+
+const saveCartToStorage = (cart: CartItem[]) => {
+  if (typeof window !== "undefined") {
+    localStorage.setItem("cart", JSON.stringify(cart));
+  }
+};
+
 export const useCartStore = create<CartStore>((set) => ({
-  cart: [],
+  cart: getCartFromStorage(),
 
   addToCart: (product) =>
     set((state) => {
       const existing = state.cart.find((p) => p.id === product.id);
 
+      let updatedCart: CartItem[];
+
       if (existing) {
-        return {
-          cart: state.cart.map((p) =>
-            p.id === product.id
-              ? { ...p, quantity: p.quantity + 1 }
-              : p
-          ),
-        };
+        updatedCart = state.cart.map((p) =>
+          p.id === product.id
+            ? { ...p, quantity: p.quantity + 1 }
+            : p
+        );
+      } else {
+        updatedCart = [...state.cart, { ...product, quantity: 1 }];
       }
 
-      return {
-        cart: [...state.cart, { ...product, quantity: 1 }],
-      };
+      saveCartToStorage(updatedCart);
+      return { cart: updatedCart };
     }),
 
   removeFromCart: (id) =>
-    set((state) => ({
-      cart: state.cart.filter((p) => p.id !== id),
-    })),
+    set((state) => {
+      const updatedCart = state.cart.filter((p) => p.id !== id);
+      saveCartToStorage(updatedCart);
+      return { cart: updatedCart };
+    }),
 
-  clearCart: () => set({ cart: [] }),
+  clearCart: () => {
+    saveCartToStorage([]);
+    return set({ cart: [] });
+  },
 
-  increaseQuantity: (id) =>
-    set((state) => ({
-      cart: state.cart.map((p) =>
-        p.id === id
-          ? { ...p, quantity: p.quantity + 1 }
-          : p
-      ),
-    })),
+  updateQuantity: (id, quantity) =>
+    set((state) => {
+      const updatedCart = state.cart
+        .map((p) =>
+          p.id === id
+            ? { ...p, quantity: Math.max(1, quantity) }
+            : p
+        );
 
-  decreaseQuantity: (id) =>
-    set((state) => ({
-      cart: state.cart.map((p) =>
-        p.id === id && p.quantity > 1
-          ? { ...p, quantity: p.quantity - 1 }
-          : p
-      ),
-    })),
+      saveCartToStorage(updatedCart);
+      return { cart: updatedCart };
+    }),
 }));

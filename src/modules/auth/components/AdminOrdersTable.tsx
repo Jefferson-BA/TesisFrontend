@@ -1,19 +1,16 @@
 import { useEffect, useState } from "react";
-import {
-  getOrders,
-  updateOrderStatus,
-} from "@/modules/auth/services/order.service";
+import { getOrders } from "@/modules/auth/services/order.service";
 
 export default function AdminOrdersTable() {
   const [orders, setOrders] = useState<any[]>([]);
 
   const loadOrders = async () => {
     try {
-      const res = await getOrders();
-      setOrders(Array.isArray(res) ? res : res.data || []);
+      const data = await getOrders();
+      setOrders(Array.isArray(data) ? data : data.data || []);
     } catch (error) {
       console.error(error);
-      setOrders([]);
+      alert("Error al cargar pedidos");
     }
   };
 
@@ -21,69 +18,98 @@ export default function AdminOrdersTable() {
     loadOrders();
   }, []);
 
-  const changeStatus = async (id: string | number, status: string) => {
-    await updateOrderStatus(id, status);
-    loadOrders();
-  };
-
   return (
-    <section className="admin-card">
+    <div className="admin-card">
       <h2>Gestión de Pedidos</h2>
 
-      <table>
-        <thead>
-          <tr>
-            <th>N° Pedido</th>
-            <th>Cliente</th>
-            <th>Fecha Evento</th>
-            <th>Total</th>
-            <th>Método Pago</th>
-            <th>Estado</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {orders.length === 0 ? (
+      <div style={{ overflowX: "auto" }}>
+        <table>
+          <thead>
             <tr>
-              <td colSpan={6} className="text-center py-6">
-                No hay pedidos registrados
-              </td>
+              <th>N° Pedido</th>
+              <th>Nombre</th>
+              <th>Correo</th>
+              <th>Teléfono</th>
+              <th>Ciudad</th>
+              <th>Dirección</th>
+              <th>Código Postal</th>
+              <th>Fecha Evento</th>
+              <th>Notas</th>
+              <th>Total</th>
+              <th>Método Pago</th>
+              <th>Estado</th>
             </tr>
-          ) : (
-            orders.map((order) => (
+          </thead>
+
+          <tbody>
+            {orders.map((order) => (
               <tr key={order.id}>
                 <td>{order.id}</td>
 
                 <td>
-                  <strong>{order.customerName}</strong>
-                  <small>{order.phone}</small>
+                  {order.fullName ||
+                    order.customerName ||
+                    order.name ||
+                    "Sin nombre"}
                 </td>
 
-                <td>{order.eventDate}</td>
-
-                <td>S/ {order.total}</td>
-
-                <td>{order.paymentMethod}</td>
+                <td>
+                  {order.email ||
+                    order.customerEmail ||
+                    "Sin correo"}
+                </td>
 
                 <td>
-                  <select
-                    value={order.status}
-                    onChange={(e) =>
-                      changeStatus(order.id, e.target.value)
-                    }
-                    className="status"
-                  >
-                    <option>Pendiente</option>
-                    <option>Confirmado</option>
-                    <option>Entregado</option>
-                    <option>Cancelado</option>
+                  {order.phone ||
+                    order.customerPhone ||
+                    "Sin teléfono"}
+                </td>
+
+                <td>
+                  {order.city || "Sin ciudad"}
+                </td>
+
+                <td>
+                  {order.address ||
+                    order.eventAddress ||
+                    "Sin dirección"}
+                </td>
+
+                <td>
+                  {order.postalCode || "Sin código"}
+                </td>
+
+                <td>
+                  {order.eventDate || "Sin fecha"}
+                </td>
+
+                <td>
+                  {order.notes ||
+                    order.specialNotes ||
+                    "Sin notas"}
+                </td>
+
+                <td>
+                  S/ {Number(order.total || 0).toFixed(2)}
+                </td>
+
+                <td>
+                  {order.paymentMethod || "Sin método"}
+                </td>
+
+                <td>
+                  <select defaultValue={order.status || "Pendiente"}>
+                    <option value="Pendiente">Pendiente</option>
+                    <option value="Confirmado">Confirmado</option>
+                    <option value="Entregado">Entregado</option>
+                    <option value="Cancelado">Cancelado</option>
                   </select>
                 </td>
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
-    </section>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
   );
 }

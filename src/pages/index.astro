@@ -6,6 +6,7 @@ import { Hero } from '@/modules/user/components/Hero';
 import { Servicios } from '@/modules/user/components/Servicios';
 import { Testimonios } from '@/modules/user/components/Testimonios';
 import { Contacto } from '@/modules/user/components/Contacto';
+import PromoBanner from "@/modules/auth/components/PromoBanner";
 ---
 
 <html lang="es">
@@ -21,6 +22,7 @@ import { Contacto } from '@/modules/user/components/Contacto';
     <main>
       <Hero client:only="react" />
       <Servicios client:only="react" />
+      <PromoBanner client:load />
       <Testimonios client:only="react" />
       <Contacto client:only="react" />
     </main>
