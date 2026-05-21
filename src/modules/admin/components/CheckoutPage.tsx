@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
-import { createOrder } from "@/modules/auth/services/order.service";
+import { createOrder } from "@/modules/admin/services/order.service";
 import { useCartStore } from "@/modules/auth/store/cartStore";
 
 export default function CheckoutPage() {

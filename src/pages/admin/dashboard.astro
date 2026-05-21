@@ -1,90 +1,64 @@
 ---
 import AdminLayout from "@/layouts/AdminLayout.astro";
-import "../../styles/globals.css";
-
-import AdminStatsCharts from "@/modules/auth/components/AdminStatsCharts";
-import AdminOrdersTable from "@/modules/auth/components/AdminOrdersTable";
-import PromoForm from "@/modules/auth/components/PromoForm";
-import CategoryForm from "@/modules/auth/components/CategoryForm";
+import "@/styles/globals.css";
+import AdminStatsCharts from "@/modules/admin/components/AdminStatsCharts";
 ---
 
 <AdminLayout>
-  <section class="admin-panel">
-
-    <div class="admin-header">
-      <h1>Panel de Administración</h1>
+  <div class="space-y-6">
+    <div>
+      <h1 class="text-3xl font-bold tracking-tight text-zinc-100">
+        Panel de Administración
+      </h1>
+      <p class="text-zinc-400 text-sm">
+        Aquí tienes el resumen general de tu restaurante.
+      </p>
     </div>
 
-    <div class="admin-tabs">
-      <a class="tab-resumen" href="#resumen">▦ Resumen</a>
-
-      <a class="tab-pedidos" href="#pedidos">
-        ▣ Pedidos
-      </a>
-
-      <a class="tab-productos" href="/admin/productos">
-        ▧ Productos
-      </a>
-
-      <a class="tab-promociones" href="#promociones">
-        ◇ Promociones
-      </a>
-
-   
-      </a>
-    </div>
-
-    <!-- RESUMEN -->
-    <section id="resumen" class="tab-section default-section">
-      <div class="stats-grid">
-
-        <div class="stat-card">
-          <div>
-            <p>Ventas Totales Históricas</p>
-            <h2>S/ 4280.00</h2>
-          </div>
-          <span>S/</span>
+    <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div
+        class="rounded-xl border border-zinc-800 bg-zinc-900/50 p-6 shadow-sm flex justify-between items-center"
+      >
+        <div>
+          <p class="text-sm font-medium text-zinc-400">
+            Ventas Totales Históricas
+          </p>
+          <h2 class="text-2xl font-bold text-zinc-100 mt-1">S/ 4280.00</h2>
         </div>
-
-        <div class="stat-card">
-          <div>
-            <p>Promociones Activas</p>
-            <h2 id="promo-count">1</h2>
-          </div>
-          <span>◇</span>
-        </div>
-
-        <div class="stat-card">
-          <div>
-            <p>Usuarios Registrados</p>
-            <h2 id="user-count">4</h2>
-          </div>
-          <span>♙</span>
-        </div>
-
-        <div class="stat-card">
-          <div>
-            <p>Total Pedidos</p>
-            <h2 id="order-count">1</h2>
-          </div>
-          <span>▤</span>
-        </div>
-
+        <span class="text-xl font-bold text-emerald-500">S/</span>
       </div>
 
+      <div
+        class="rounded-xl border border-zinc-800 bg-zinc-900/50 p-6 shadow-sm flex justify-between items-center"
+      >
+        <div>
+          <p class="text-sm font-medium text-zinc-400">Promociones Activas</p>
+          <h2 class="text-2xl font-bold text-zinc-100 mt-1">1</h2>
+        </div>
+        <span class="text-xl text-amber-500">◇</span>
+      </div>
+
+      <div
+        class="rounded-xl border border-zinc-800 bg-zinc-900/50 p-6 shadow-sm flex justify-between items-center"
+      >
+        <div>
+          <p class="text-sm font-medium text-zinc-400">Usuarios Registrados</p>
+          <h2 class="text-2xl font-bold text-zinc-100 mt-1">6</h2>
+        </div>
+        <span class="text-xl text-blue-500">♙</span>
+      </div>
+
+      <div
+        class="rounded-xl border border-zinc-800 bg-zinc-900/50 p-6 shadow-sm flex justify-between items-center"
+      >
+        <div>
+          <p class="text-sm font-medium text-zinc-400">Total Pedidos</p>
+          <h2 class="text-2xl font-bold text-zinc-100 mt-1">0</h2>
+        </div>
+        <span class="text-xl text-purple-500">▤</span>
+      </div>
+    </div>
+
       <AdminStatsCharts client:load />
-    </section>
-
-    <!-- PEDIDOS -->
-    <section id="pedidos" class="tab-section">
-      <AdminOrdersTable client:load />
-    </section>
-
-    <!-- PROMOCIONES -->
-    <section id="promociones" class="tab-section admin-card">
-      <PromoForm client:load />
-    </section>
-
-  
-  </section>
+  </div>
 </AdminLayout>

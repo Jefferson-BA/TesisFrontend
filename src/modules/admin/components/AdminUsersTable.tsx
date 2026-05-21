@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getUsers, deleteUser } from "@/modules/auth/services/user.service";
+import { getUsers, deleteUser } from "@/modules/admin/services/user.service";
 
 export default function AdminUsersTable() {
   const [users, setUsers] = useState<any[]>([]);
