@@ -1,0 +1,35 @@
+---
+import "../../styles/globals.css";
+
+import { PublicNavbar } from "../../modules/user/components/PublicNavbar";
+import UserProfileCard from "../../modules/admin/components/UserProfileCard";
+import UserOrders from "../../modules/admin/components/UserOrders";
+
+import { Toaster } from "sonner";
+---
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>Mi Perfil | DeParraSpitz</title>
+  </head>
+
+  <body class="min-h-screen bg-[#0b0806] text-white">
+    <PublicNavbar client:only="react" />
+
+    <main class="pt-[120px] max-w-7xl mx-auto px-6 pb-20">
+      <div class="mb-10">
+        <h1 class="text-5xl font-serif font-bold">Mi Perfil</h1>
+        <p class="text-[#f1d8b5] mt-3">
+          Revisa tus datos personales y tu historial de pedidos.
+        </p>
+      </div>
+
+      <UserProfileCard client:only="react" />
+
+      <UserOrders client:only="react" />
+    </main>
+
+    <Toaster richColors position="top-right" client:only="react" />
+  </body>
+</html>

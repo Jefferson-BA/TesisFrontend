@@ -1,8 +1,6 @@
 ---
 import "@/styles/globals.css";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/shared/AppSidebar";
-import { QueryProvider } from "@/components/shared/QueryProvider"; // <-- Aquí también
+import AdminLayoutReact from "./AdminLayoutReact";
 ---
 
 <html lang="es">
@@ -11,22 +9,13 @@ import { QueryProvider } from "@/components/shared/QueryProvider"; // <-- Aquí 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Admin Dashboard</title>
   </head>
-  <body class="bg-zinc-950 text-zinc-100">
-    <QueryProvider client:only="react">
-      <SidebarProvider client:only="react">
-        <AppSidebar role="admin" client:only="react" />
-        
-        <main class="w-full min-h-screen flex flex-col">
-          <header class="p-4 flex items-center border-b border-zinc-800 bg-zinc-950/50 backdrop-blur">
-            <SidebarTrigger client:only="react" />
-            <h1 class="ml-4 font-semibold text-zinc-100">Dashboard Administrativo</h1>
-          </header>
-          
-          <div class="p-6 flex-1">
-            <slot />
-          </div>
-        </main>
-      </SidebarProvider>
-    </QueryProvider>
+  <body class="bg-zinc-950 text-zinc-100 antialiased">
+    
+    {/* Pasamos el control a React. Al usar client:only, solucionamos el problema
+        del contexto de SidebarProvider y el warning de tamaño de Recharts */}
+    <AdminLayoutReact client:only="react">
+      <slot />
+    </AdminLayoutReact>
+
   </body>
 </html>

@@ -1,42 +1,127 @@
-import { useAuthStore } from "@/modules/auth/store/authStore";
-import { Button } from "@/components/ui/button";
+import {
+  ShoppingCart,
+  LayoutDashboard,
+  LogOut,
+  ChefHat,
+  User,
+} from "lucide-react";
+import { useEffect, useState } from "react";
+import { useCartStore } from "@/modules/auth/store/cartStore";
 
 export function PublicNavbar() {
-  const user = useAuthStore((state) => state.user);
-  const logout = useAuthStore((state) => state.logout);
+  const cart = useCartStore((state) => state.cart);
+  const [user, setUser] = useState<any>(null);
 
-  const handleLogout = () => {
-    logout();
-    document.cookie = "user-role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-    window.location.reload(); 
+  useEffect(() => {
+    const savedUser = localStorage.getItem("user");
+
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+    }
+  }, []);
+
+  const logout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    document.cookie =
+      "user-role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    window.location.href = "/login";
   };
 
   return (
-    <nav className="w-full border-b border-zinc-800 bg-zinc-950/80 backdrop-blur sticky top-0 z-50 p-4">
-      <div className="max-w-7xl mx-auto flex justify-between items-center text-white">
-        {/* Logo del Restaurante */}
-        <div className="font-extrabold text-xl md:text-2xl tracking-tighter text-white uppercase">
-          Hojas de Parra <span className="text-emerald-500">Spitz</span>
+    <header className="fixed top-0 left-0 w-full z-50 bg-[#0b0806]/95 border-b border-[#3d2c1f] backdrop-blur">
+      <nav className="max-w-7xl mx-auto h-[82px] px-6 flex items-center justify-between">
+        <a href="/" className="flex items-center gap-3">
+          <div className="w-12 h-12 rounded-xl bg-[#120d0a] border border-[#3d2c1f] flex items-center justify-center shadow-[0_0_25px_rgba(234,179,8,0.25)]">
+            <ChefHat className="text-yellow-500 w-6 h-6" />
+          </div>
+
+          <div>
+            <h1 className="font-serif text-2xl font-bold text-white leading-none">
+              DeParraSpitz
+            </h1>
+            <p className="text-yellow-500 text-xs font-black tracking-[0.25em] mt-1">
+              CATERING & EVENTOS
+            </p>
+          </div>
+        </a>
+
+        <div className="hidden md:flex items-center gap-10 text-sm font-semibold text-zinc-300">
+          <a href="/" className="hover:text-yellow-500 transition-colors">
+            Inicio
+          </a>
+
+          <a href="/menu" className="hover:text-yellow-500 transition-colors">
+            Menú
+          </a>
+
+          <a href="/#contacto" className="hover:text-yellow-500 transition-colors">
+            Contacto
+          </a>
         </div>
 
-        {/* Menú de Usuario */}
-        <div>
+        <div className="flex items-center gap-5 text-sm">
           {user ? (
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-zinc-300">
-                Hola, <span className="font-bold text-white">{user.name}</span>
-              </span>
-              <Button variant="outline" size="sm" className="border-zinc-700 text-white hover:bg-zinc-800" onClick={handleLogout}>
-                Cerrar Sesión
-              </Button>
-            </div>
+            <>
+              <a
+                href="/user/profile"
+                className="hidden md:flex items-center gap-2 text-zinc-300 hover:text-yellow-500 transition-colors"
+              >
+                <User size={17} />
+
+                <span>
+                  Hola,{" "}
+                  <strong className="text-white">
+                    {user.name || user.email || "Usuario"}
+                  </strong>
+                </span>
+              </a>
+
+              <a
+                href="/user/profile"
+                className="hidden md:block bg-yellow-500 text-black px-4 py-2 rounded-lg font-bold hover:bg-yellow-400 transition-colors"
+              >
+                Perfil
+              </a>
+
+              {(user.role === "admin" || user.role === "superadmin") && (
+                <a
+                  href="/admin/dashboard"
+                  className="hidden md:flex items-center gap-2 text-zinc-300 hover:text-yellow-500"
+                >
+                  <LayoutDashboard size={17} />
+                  Dashboard
+                </a>
+              )}
+
+              <button
+                onClick={logout}
+                className="hidden md:flex items-center gap-2 text-yellow-500 font-bold hover:text-yellow-400"
+              >
+                <LogOut size={17} />
+                Salir
+              </button>
+            </>
           ) : (
-            <Button asChild className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold">
-              <a href="/login">Iniciar Sesión</a>
-            </Button>
+            <a
+              href="/login"
+              className="text-zinc-300 hover:text-yellow-500 font-semibold"
+            >
+              Admin Login
+            </a>
           )}
+
+          <a href="/cart" className="relative">
+            <ShoppingCart className="w-8 h-8 text-white hover:text-yellow-500 transition-colors" />
+
+            {cart.length > 0 && (
+              <span className="absolute -top-3 -right-3 bg-yellow-500 text-black text-xs font-black w-6 h-6 rounded-full flex items-center justify-center">
+                {cart.length}
+              </span>
+            )}
+          </a>
         </div>
-      </div>
-    </nav>
+      </nav>
+    </header>
   );
 }

@@ -2,18 +2,19 @@
 import '@/styles/globals.css';
 import { LoginForm } from '@/modules/auth/components/LoginForm';
 import { QueryProvider } from '@/components/shared/QueryProvider'; // <-- Importamos el provider
+import { Toaster } from 'sonner';
 ---
 
 <html lang="es">
   <head>
     <meta charset="utf-8" />
-    <title>Login | Panel Super Admin</title>
+    <title>Login | Hojas de Parra Spitz</title>
   </head>
   <body class="flex min-h-screen items-center justify-center bg-zinc-950 p-4">
     <main>
-      <QueryProvider client:load>
-        <LoginForm client:load />
-      </QueryProvider>
+      <LoginForm client:only="react" />
     </main>
+    
+    <Toaster client:only="react" richColors position="top-right" />
   </body>
 </html>

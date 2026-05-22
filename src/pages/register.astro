@@ -1,6 +1,8 @@
 ---
 import '@/styles/globals.css';
 import { RegisterForm } from '@/modules/auth/components/RegisterForm';
+// 👇 1. Asegúrate de tener esta importación
+import { Toaster } from 'sonner'; 
 ---
 
 <html lang="es">
@@ -12,5 +14,7 @@ import { RegisterForm } from '@/modules/auth/components/RegisterForm';
     <main>
       <RegisterForm client:only="react" />
     </main>
+    
+    <Toaster client:only="react" richColors position="top-right" />
   </body>
 </html>

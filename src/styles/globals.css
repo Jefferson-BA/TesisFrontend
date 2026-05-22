@@ -115,6 +115,8 @@
     --sidebar-accent-foreground: oklch(0.985 0 0);
     --sidebar-border: oklch(1 0 0 / 10%);
     --sidebar-ring: oklch(0.552 0.016 285.938);
+
+    
 }
 
 @layer base {
@@ -130,4 +132,225 @@
 }
 html {
   font-family: 'Geist Variable', sans-serif;
+}
+.admin-panel {
+  max-width: 1220px;
+  margin: 0 auto;
+  padding: 42px 24px 90px;
+  color: white;
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 34px;
+}
+
+.admin-header h1 {
+  font-family: Georgia, serif;
+  font-size: 36px;
+  font-weight: 800;
+}
+
+.admin-header p {
+  color: #f1d8b5;
+  font-size: 16px;
+}
+
+.admin-tabs {
+  display: inline-flex;
+  gap: 8px;
+  background: #1c1511;
+  border: 1px solid #4a3824;
+  padding: 6px;
+  border-radius: 8px;
+  margin-bottom: 28px;
+}
+
+.admin-tabs a {
+  color: #e8d1b0;
+  text-decoration: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+.admin-tabs a.active,
+.admin-tabs a:hover {
+  background: #050505;
+  color: white;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 22px;
+  margin-bottom: 34px;
+}
+
+.stat-card,
+.admin-card,
+.profile-card {
+  background: #15100e;
+  border: 1px solid #4a3824;
+  border-radius: 12px;
+}
+
+.stat-card {
+  padding: 26px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.stat-card p {
+  color: #f1d8b5;
+  margin-bottom: 14px;
+}
+
+.stat-card h2 {
+  font-size: 28px;
+  font-weight: 900;
+}
+
+.stat-card span {
+  color: #eab308;
+}
+
+.admin-card {
+  padding: 26px;
+  margin-top: 28px;
+}
+
+.admin-card h2,
+.profile-card h2 {
+  font-size: 18px;
+  font-weight: 800;
+  margin-bottom: 28px;
+}
+
+.card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  color: #f1d8b5;
+  text-align: left;
+  padding: 16px 8px;
+  border-bottom: 1px solid #4a3824;
+}
+
+td {
+  padding: 16px 8px;
+  border-bottom: 1px solid #3a2b1d;
+  font-weight: 700;
+}
+
+td small {
+  display: block;
+  color: #d8c2a6;
+  margin-top: 4px;
+  font-weight: 400;
+}
+
+.status,
+.filter {
+  background: #15100e;
+  color: white;
+  border: 1px solid #2e241b;
+  padding: 9px 18px;
+  border-radius: 6px;
+}
+
+.available {
+  background: #075c25;
+  color: #22c55e;
+  padding: 6px 10px;
+  border-radius: 5px;
+  font-size: 13px;
+}
+
+.yellow-btn {
+  background: #eab308;
+  color: black;
+  border: none;
+  padding: 11px 18px;
+  border-radius: 7px;
+  font-weight: 700;
+}
+
+.profile-card {
+  margin-top: 28px;
+  padding: 26px;
+  max-width: 430px;
+}
+
+.profile-card p {
+  color: #f1d8b5;
+  margin-bottom: 8px;
+}
+
+.profile-card strong {
+  display: block;
+  font-size: 18px;
+  margin-bottom: 22px;
+}
+
+.profile-card button {
+  width: 100%;
+  background: #ef4444;
+  color: white;
+  border: none;
+  padding: 13px;
+  border-radius: 7px;
+  font-weight: 700;
+}
+
+@media (max-width: 900px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .admin-tabs {
+    flex-wrap: wrap;
+  }
+
+  .admin-card {
+    overflow-x: auto;
+  }
+}
+.tab-section {
+  display: none;
+}
+
+.default-section {
+  display: block;
+}
+
+.admin-panel:has(#pedidos:target) .default-section,
+.admin-panel:has(#productos:target) .default-section,
+.admin-panel:has(#promociones:target) .default-section,
+.admin-panel:has(#perfil:target) .default-section {
+  display: none;
+}
+
+#resumen:target,
+#pedidos:target,
+#productos:target,
+#promociones:target,
+#perfil:target {
+  display: block;
 }

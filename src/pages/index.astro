@@ -1,68 +1,31 @@
 ---
 import '@/styles/globals.css';
-import { PublicNavbar } from '@/modules/user/components/PublicNavbar';
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 
-// Platillos de ejemplo para tu restaurante
-const MOCK_DISHES = [
-  { id: 1, name: "Hojas de Parra Clásicas", price: 12.50, desc: "Rellenas de arroz, carne y especias finas" },
-  { id: 2, name: "Hummus Spitz", price: 8.00, desc: "Suave crema de garbanzos con aceite de oliva virgen extra" },
-  { id: 3, name: "Shawarma Especial", price: 15.50, desc: "Cortes de carne selecta con salsa de la casa" },
-  { id: 4, name: "Falafel Crujiente", price: 10.00, desc: "Croquetas tradicionales sobre cama de lechuga fresca" },
-];
+import { PublicNavbar } from '@/modules/user/components/PublicNavbar';
+import { Hero } from '@/modules/user/components/Hero';
+import { Servicios } from '@/modules/user/components/Servicios';
+import { Testimonios } from '@/modules/user/components/Testimonios';
+import { Contacto } from '@/modules/user/components/Contacto';
+import PromoBanner from "@/modules/admin/components/PromoBanner";
 ---
 
 <html lang="es">
   <head>
     <meta charset="utf-8" />
-    <title>Hojas de Parra Spitz | Auténtico Sabor</title>
+    <title>DeParraSpitz | Catering & Eventos</title>
   </head>
-  <body class="min-h-screen bg-zinc-950 text-zinc-100 font-sans">
+
+  <body class="min-h-screen bg-[#0b0806] text-white font-sans">
     
     <PublicNavbar client:only="react" />
 
-    <main class="max-w-7xl mx-auto p-6">
-      
-      <section class="py-20 text-center space-y-6">
-        <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight text-white">
-          Sabores auténticos, <br/>
-          <span class="text-emerald-500">tradición en cada bocado.</span>
-        </h1>
-        <p class="text-zinc-400 max-w-2xl mx-auto text-lg md:text-xl">
-          Explora nuestro menú y pide tus platillos favoritos. Inicia sesión para guardar tus direcciones y pedir mucho más rápido.
-        </p>
-      </section>
-
-      <section>
-        <h2 class="text-2xl font-bold mb-8 border-b border-zinc-800 pb-2">Nuestras Especialidades</h2>
-        
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {MOCK_DISHES.map((dish) => (
-            <Card className="bg-zinc-900 border-zinc-800 overflow-hidden group flex flex-col h-full">
-              <div class="h-48 bg-zinc-800 group-hover:bg-zinc-700 transition-colors duration-300 flex items-center justify-center">
-                <span class="text-zinc-600 text-sm">Foto del platillo</span>
-              </div>
-              
-              <CardHeader className="pb-2">
-                <CardTitle className="text-lg text-white">{dish.name}</CardTitle>
-                <p class="text-xs text-zinc-400 mt-1">{dish.desc}</p>
-              </CardHeader>
-              
-              <CardContent className="flex-1">
-                <p class="text-2xl font-black text-emerald-500">${dish.price.toFixed(2)}</p>
-              </CardContent>
-              
-              <CardFooter className="mt-auto">
-                <Button className="w-full bg-zinc-800 hover:bg-emerald-600 text-white transition-all">
-                  Pedir ahora
-                </Button>
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
-      </section>
-
+    <main>
+      <Hero client:only="react" />
+      <Servicios client:only="react" />
+      <PromoBanner client:load />
+      <Testimonios client:only="react" />
+      <Contacto client:only="react" />
     </main>
+
   </body>
 </html>
