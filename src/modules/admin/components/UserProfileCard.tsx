@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { User, Mail, ShieldCheck, Pencil, X } from "lucide-react";
 import { toast } from "sonner";
-import { updateUser } from "../services/user.service";
+import { updateUser } from "../../user/services/user.service";
 
 export default function UserProfileCard() {
   const [user, setUser] = useState<any>(null);
