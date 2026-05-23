@@ -5,28 +5,12 @@ import {
   ChefHat,
   User,
 } from "lucide-react";
-import { useEffect, useState } from "react";
 import { useCartStore } from "@/modules/auth/store/cartStore";
+import { useUser } from "@/modules/user/hooks/useUser";
 
 export function PublicNavbar() {
   const cart = useCartStore((state) => state.cart);
-  const [user, setUser] = useState<any>(null);
-
-  useEffect(() => {
-    const savedUser = localStorage.getItem("user");
-
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-    }
-  }, []);
-
-  const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    document.cookie =
-      "user-role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-    window.location.href = "/login";
-  };
+  const { user, logout } = useUser();
 
   return (
     <header className="fixed top-0 left-0 w-full z-50 bg-[#0b0806]/95 border-b border-[#3d2c1f] backdrop-blur">
