@@ -59,9 +59,6 @@ export const useLogin = () => {
       }, 100);
     },
 
-    onError: (error: any) => {
-      console.error(error);
-      alert(error.response?.data?.message || "Error al iniciar sesión");
-    },
+    
   });
 };
