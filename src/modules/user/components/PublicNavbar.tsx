@@ -10,7 +10,7 @@ import { useUser } from "@/modules/user/hooks/useUser";
 
 export function PublicNavbar() {
   const cart = useCartStore((state) => state.cart);
-  const { user, logout } = useUser();
+  const { user, logout, isAdmin } = useUser();
 
   return (
     <header className="fixed top-0 left-0 w-full z-50 bg-[#0b0806]/95 border-b border-[#3d2c1f] backdrop-blur">
@@ -68,7 +68,7 @@ export function PublicNavbar() {
                 Perfil
               </a>
 
-              {(user.role === "admin" || user.role === "superadmin") && (
+              {isAdmin && (
                 <a
                   href="/admin/dashboard"
                   className="hidden md:flex items-center gap-2 text-zinc-300 hover:text-yellow-500"

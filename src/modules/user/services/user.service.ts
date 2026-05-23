@@ -5,12 +5,17 @@ export const getUsers = async () => {
   return res.data;
 };
 
-export const updateUser = async (id: number, data: any) => {
+export const updateUser = async (
+  id: string | number,
+  data: any
+) => {
   const res = await api.patch(`/users/${id}`, data);
   return res.data;
 };
 
-export const deleteUser = async (id: number) => {
+export const deleteUser = async (
+  id: string | number
+) => {
   const res = await api.delete(`/users/${id}`);
   return res.data;
 };
