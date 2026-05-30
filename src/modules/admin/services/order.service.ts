@@ -1,5 +1,12 @@
 import { api } from "@/api/axios";
 
+// 1. Nueva función específica para enviar las reservas
+export const createReservation = async (data: any) => {
+  const res = await api.post("/reservations", data);
+  return res.data;
+};
+
+// Tus funciones anteriores las dejamos intactas por seguridad
 export const createOrder = async (data: any) => {
   const res = await api.post("/orders", data);
   return res.data;

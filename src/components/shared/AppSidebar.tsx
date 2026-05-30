@@ -8,6 +8,7 @@ import {
   UtensilsCrossed,
   Tag,
   LogOut,
+  Calendar,
 } from "lucide-react";
 
 import {
@@ -32,6 +33,7 @@ const menuByRole = {
 
     // 🔹 Nuevos módulos agregados
     { title: "Pedidos", url: "/admin/pedidos", icon: ShoppingBag },
+    { title: "Reservas", url: "/admin/reservas", icon: Calendar }, // <--- NUEVA LÍNEA AQUÍ
     { title: "Productos", url: "/admin/productos", icon: UtensilsCrossed },
     { title: "Promociones", url: "/admin/promociones", icon: Tag },
 

@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import {
   ShoppingCart,
   LayoutDashboard,
@@ -11,6 +12,13 @@ import { useUser } from "@/modules/user/hooks/useUser";
 export function PublicNavbar() {
   const cart = useCartStore((state) => state.cart);
   const { user, logout, isAdmin } = useUser();
+  
+  // 👇 NUEVO: Estado para saber si ya estamos en el navegador
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   return (
     <header className="fixed top-0 left-0 w-full z-50 bg-[#0b0806]/95 border-b border-[#3d2c1f] backdrop-blur">
@@ -34,25 +42,29 @@ export function PublicNavbar() {
           <a href="/" className="hover:text-yellow-500 transition-colors">
             Inicio
           </a>
-
           <a href="/menu" className="hover:text-yellow-500 transition-colors">
             Menú
           </a>
-
+          <a href="/reservas" className="text-yellow-500 hover:text-yellow-400 transition-colors font-bold">
+            Reservas
+          </a>
           <a href="/#contacto" className="hover:text-yellow-500 transition-colors">
             Contacto
           </a>
         </div>
 
         <div className="flex items-center gap-5 text-sm">
-          {user ? (
+          {/* 👇 Usamos isMounted para que el servidor y el cliente coincidan al inicio */}
+          {!isMounted ? (
+            // Mientras carga, mostramos un espacio vacío o un botón de login genérico
+            <div className="w-20"></div> 
+          ) : user ? (
             <>
               <a
                 href="/user/profile"
                 className="hidden md:flex items-center gap-2 text-zinc-300 hover:text-yellow-500 transition-colors"
               >
                 <User size={17} />
-
                 <span>
                   Hola,{" "}
                   <strong className="text-white">
@@ -98,7 +110,8 @@ export function PublicNavbar() {
           <a href="/cart" className="relative">
             <ShoppingCart className="w-8 h-8 text-white hover:text-yellow-500 transition-colors" />
 
-            {cart.length > 0 && (
+            {/* 👇 También protegemos el globo del carrito con isMounted */}
+            {isMounted && cart.length > 0 && (
               <span className="absolute -top-3 -right-3 bg-yellow-500 text-black text-xs font-black w-6 h-6 rounded-full flex items-center justify-center">
                 {cart.length}
               </span>
