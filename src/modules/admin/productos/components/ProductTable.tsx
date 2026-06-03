@@ -3,7 +3,7 @@ import {
   deleteProduct,
   getProducts,
   updateProduct,
-} from "@/modules/auth/services/product.service";
+} from "@/modules/admin/productos/services/product.service";
 
 export default function ProductTable() {
   const [products, setProducts] = useState<any[]>([]);

@@ -1,6 +1,6 @@
 import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { useCartStore } from "@/modules/auth/store/cartStore";
+import { useCartStore } from "@/modules/admin/promociones/store/cartStore";
 
 export default function CartPage() {
   const cart = useCartStore((state) => state.cart);

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getOrders } from "../services/order.service";
+import { getOrders } from "../../admin/pedidos/services/order.service";
 
 export default function UserOrders() {
   const [orders, setOrders] = useState<any[]>([]);

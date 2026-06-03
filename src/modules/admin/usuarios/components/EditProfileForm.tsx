@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { updateUser } from "../../user/services/user.service";
+import { updateUser } from "../../../user/services/user.service";
 import { useUser } from "@/modules/user/hooks/useUser";
 
 export default function EditProfileForm() {

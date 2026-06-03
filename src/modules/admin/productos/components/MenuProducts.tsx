@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { ShoppingCart, X } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
-import { getProducts } from "@/modules/auth/services/product.service";
-import { useCartStore } from "@/modules/auth/store/cartStore";
+import { getProducts } from "@/modules/admin/productos/services/product.service";
+import { useCartStore } from "@/modules/admin/promociones/store/cartStore";
 
 export const MenuProducts = () => {
   const [products, setProducts] = useState<any[]>([]);

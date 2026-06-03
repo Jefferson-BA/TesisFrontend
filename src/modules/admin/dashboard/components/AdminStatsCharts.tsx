@@ -1,4 +1,4 @@
-import { useAdminStats } from "@/modules/admin/hooks/useAdminStats";
+import { useAdminStats } from "@/modules/admin/dashboard/hooks/useAdminStats";
 import {
   BarChart, Bar, LineChart, Line, PieChart, Pie, Cell,
   XAxis, YAxis, Tooltip, ResponsiveContainer

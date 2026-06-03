@@ -1,7 +1,8 @@
 ---
 // src/pages/admin/reservas.astro
 import Layout from '@/layouts/AdminLayout.astro'; 
-import ReservationsAdmin from '@/modules/admin/components/ReservationsAdmin';
+// Le agregamos el .tsx al final para romper cualquier error de resolución
+import ReservationsAdmin from '@/modules/admin/reservas/components/ReservationsAdmin.tsx';
 import { Toaster } from 'sonner';
 ---
 

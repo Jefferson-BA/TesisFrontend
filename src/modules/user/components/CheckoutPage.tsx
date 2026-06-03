@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
-import { createOrder } from "@/modules/admin/services/order.service";
-import { useCartStore } from "@/modules/auth/store/cartStore";
+import { createOrder } from "@/modules/admin/pedidos/services/order.service";
+import { useCartStore } from "@/modules/admin/promociones/store/cartStore";
 
 export default function CheckoutPage() {
   const cart = useCartStore((state) => state.cart);

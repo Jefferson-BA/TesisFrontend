@@ -1,6 +1,6 @@
 import React from "react";
 import { useReservationWizard } from "../hooks/useReservationWizard";
-import { useCartStore } from "@/modules/auth/store/cartStore";
+import { useCartStore } from "@/modules/admin/promociones/store/cartStore";
 import type { Product } from "@/modules/user/interfaces/product.interface";
 
 export default function ReservationWizard() {

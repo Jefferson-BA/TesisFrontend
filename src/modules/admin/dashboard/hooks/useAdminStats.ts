@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 // Ahora que moviste los servicios, estas rutas sí funcionarán:
-import { getOrders } from "@/modules/admin/services/order.service";
+import { getOrders } from "@/modules/admin/pedidos/services/order.service";
 import { getUsers } from "@/modules/user/services/user.service";
 // La promoStore la dejamos en auth por ahora (o la puedes mover a un store global luego)
 import { usePromoStore } from "@/modules/auth/store/promoStore";

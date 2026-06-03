@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { createProduct } from "@/modules/auth/services/product.service";
+import { createProduct } from "@/modules/admin/productos/services/product.service";
 import {
   getCategories,
   createCategory,
-} from "@/modules/auth/services/category.service";
+} from "@/modules/admin/productos/services/category.service";
 
 export default function ProductForm() {
   const [categories, setCategories] = useState<any[]>([]);

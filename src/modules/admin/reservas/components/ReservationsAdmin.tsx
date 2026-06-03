@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Eye, Package, Phone, Edit, Trash2, X, Calendar, MapPin, Users, FileText } from "lucide-react";
-import { getReservations, updateReservation, deleteReservation } from "@/modules/admin/services/reservation.service";
+import { getReservations, updateReservation, deleteReservation } from "@/modules/admin/reservas/services/reservation.service";
 
 export default function ReservationsAdmin() {
   const [reservations, setReservations] = useState<any[]>([]);

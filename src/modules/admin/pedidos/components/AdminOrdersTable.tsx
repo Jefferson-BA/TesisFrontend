@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getOrders } from "@/modules/admin/services/order.service";
+import { getOrders } from "@/modules/admin/pedidos/services/order.service";
 
 export default function AdminOrdersTable() {
   const [orders, setOrders] = useState<any[]>([]);

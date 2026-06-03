@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { getProducts } from "@/modules/auth/services/product.service";
-import { createReservation } from "@/modules/admin/services/order.service";
-import { useCartStore } from "@/modules/auth/store/cartStore";
+import { getProducts } from "@/modules/admin/productos/services/product.service";
+import { createReservation } from "@/modules/admin/pedidos/services/order.service";
+import { useCartStore } from "@/modules/admin/promociones/store/cartStore";
 import type { Product } from "@/modules/user/interfaces/product.interface";
 export const useReservationWizard = () => {
     const [currentStep, setCurrentStep] = useState<number>(1);

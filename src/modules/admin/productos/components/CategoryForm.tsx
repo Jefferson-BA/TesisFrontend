@@ -3,7 +3,7 @@ import {
   createCategory,
   getCategories,
   deleteCategory,
-} from "@/modules/auth/services/category.service";
+} from "@/modules/admin/productos/services/category.service";
 
 export default function CategoryForm() {
   const [name, setName] = useState("");
