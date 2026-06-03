@@ -1,7 +1,10 @@
 ---
+// src/pages/admin/dashboard.astro
 import AdminLayout from "@/layouts/AdminLayout.astro";
 import "@/styles/globals.css";
-import AdminStatsCharts from '@/modules/admin/dashboard/components/AdminStatsCharts';---
+import AdminStatsCharts from '@/modules/admin/dashboard/components/AdminStatsCharts';
+import { QueryProvider } from "@/components/shared/QueryProvider";
+---
 
 <AdminLayout>
   <div class="space-y-6">
@@ -15,49 +18,44 @@ import AdminStatsCharts from '@/modules/admin/dashboard/components/AdminStatsCha
     </div>
 
     <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      <div
-        class="rounded-xl border border-zinc-800 bg-zinc-900/50 p-6 shadow-sm flex justify-between items-center"
-      >
+      
+      <div class="rounded-xl border border-zinc-800 bg-zinc-900/50 p-6 shadow-sm flex justify-between items-center">
         <div>
           <p class="text-sm font-medium text-zinc-400">
             Ventas Totales Históricas
           </p>
-          <h2 class="text-2xl font-bold text-zinc-100 mt-1">S/ 4280.00</h2>
+          <h2 id="earnings-count" class="text-2xl font-bold text-zinc-100 mt-1">S/ 0.00</h2>
         </div>
         <span class="text-xl font-bold text-emerald-500">S/</span>
       </div>
 
-      <div
-        class="rounded-xl border border-zinc-800 bg-zinc-900/50 p-6 shadow-sm flex justify-between items-center"
-      >
+      <div class="rounded-xl border border-zinc-800 bg-zinc-900/50 p-6 shadow-sm flex justify-between items-center">
         <div>
-          <p class="text-sm font-medium text-zinc-400">Promociones Activas</p>
-          <h2 class="text-2xl font-bold text-zinc-100 mt-1">1</h2>
+          <p class="text-sm font-medium text-zinc-400">Reservas Totales</p>
+          <h2 id="reservation-count" class="text-2xl font-bold text-zinc-100 mt-1">0</h2>
         </div>
         <span class="text-xl text-amber-500">◇</span>
       </div>
 
-      <div
-        class="rounded-xl border border-zinc-800 bg-zinc-900/50 p-6 shadow-sm flex justify-between items-center"
-      >
+      <div class="rounded-xl border border-zinc-800 bg-zinc-900/50 p-6 shadow-sm flex justify-between items-center">
         <div>
           <p class="text-sm font-medium text-zinc-400">Usuarios Registrados</p>
-          <h2 class="text-2xl font-bold text-zinc-100 mt-1">6</h2>
+          <h2 id="user-count" class="text-2xl font-bold text-zinc-100 mt-1">0</h2>
         </div>
         <span class="text-xl text-blue-500">♙</span>
       </div>
 
-      <div
-        class="rounded-xl border border-zinc-800 bg-zinc-900/50 p-6 shadow-sm flex justify-between items-center"
-      >
+      <div class="rounded-xl border border-zinc-800 bg-zinc-900/50 p-6 shadow-sm flex justify-between items-center">
         <div>
           <p class="text-sm font-medium text-zinc-400">Total Pedidos</p>
-          <h2 class="text-2xl font-bold text-zinc-100 mt-1">0</h2>
+          <h2 id="order-count" class="text-2xl font-bold text-zinc-100 mt-1">0</h2>
         </div>
         <span class="text-xl text-purple-500">▤</span>
       </div>
     </div>
 
-      <AdminStatsCharts client:load />
+    <QueryProvider client:load>
+<AdminStatsCharts client:only="react" />
+    
   </div>
 </AdminLayout>

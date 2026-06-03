@@ -1,71 +1,63 @@
-import { useEffect, useState } from "react";
-// Ahora que moviste los servicios, estas rutas sí funcionarán:
-import { getOrders } from "@/modules/admin/pedidos/services/order.service";
-import { getUsers } from "@/modules/user/services/user.service";
-// La promoStore la dejamos en auth por ahora (o la puedes mover a un store global luego)
-import { usePromoStore } from "@/modules/auth/store/promoStore";
+// src/modules/admin/dashboard/hooks/useAdminStats.ts
+
+import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
+import { getDashboardStats } from "../services/dashboard.service";
 
 export function useAdminStats() {
-  const promos = usePromoStore((state) => state.promos);
-  const [orders, setOrders] = useState<any[]>([]);
-  const [users, setUsers] = useState<any[]>([]);
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["admin-stats"],
+    queryFn: getDashboardStats,
+    refetchInterval: 30000, // Se refresca automáticamente cada 30 segundos
+  });
 
-  // 1. Carga de datos del backend (Agregamos ": any" para silenciar a TypeScript)
+  // Sincronización dinámica con las tarjetas HTML de Astro en la página
   useEffect(() => {
-    getOrders().then((res: any) => {
-      const data = Array.isArray(res) ? res : res?.data || [];
-      setOrders(data);
-    });
+    if (!data) return;
 
-    getUsers().then((res: any) => {
-      const data = Array.isArray(res) ? res : res?.data || [];
-      setUsers(data);
-    });
-  }, []);
-
-  // 2. Sincronización con las tarjetas de Astro
-  useEffect(() => {
-    const promoCount = document.getElementById("promo-count");
-    const userCount = document.getElementById("user-count");
+    // Buscamos los elementos por ID en tu plantilla de Astro
+    const earningsCount = document.getElementById("earnings-count");
+    const reservationCount = document.getElementById("reservation-count");
     const orderCount = document.getElementById("order-count");
+    const userCount = document.getElementById("user-count");
 
-    if (promoCount) promoCount.innerText = String(promos.length);
-    if (userCount) userCount.innerText = String(users.length);
-    if (orderCount) orderCount.innerText = String(orders.length);
-  }, [promos, users, orders]);
+    // Formateamos los valores dentro del DOM de Astro
+    if (earningsCount) earningsCount.innerText = `S/ ${data.cards.totalEarnings.toFixed(2)}`;
+    if (reservationCount) reservationCount.innerText = String(data.cards.totalReservations);
+    if (orderCount) orderCount.innerText = String(data.cards.totalOrders);
+    if (userCount) userCount.innerText = String(data.cards.totalCustomers);
+  }, [data]);
 
-  // 3. Procesamiento de Ventas
-  const ventasPorMes = orders.length > 0
-    ? orders.reduce((acc: any[], order: any) => {
-        const mes = new Date(order.createdAt).toLocaleString("es-PE", { month: "short" });
-        const found = acc.find((x) => x.mes === mes);
-        if (found) found.ventas += Number(order.totalAmount || 0);
-        else acc.push({ mes, ventas: Number(order.totalAmount || 0) });
-        return acc;
-      }, [])
-    : [{ mes: "Sin datos", ventas: 0 }];
+  // 1. Mapeo de ventas mensuales (Genera los nombres de los últimos 6 meses automáticamente)
+  const labelMeses = Array.from({ length: 6 }, (_, i) => {
+    const d = new Date();
+    d.setMonth(d.getMonth() - (5 - i));
+    return d.toLocaleString("es-PE", { month: "short" }).toUpperCase();
+  });
 
-  // 4. Formateo general
-  const usuariosData = [
-    { tipo: "Usuarios", cantidad: users.length },
-    { tipo: "Promos", cantidad: promos.length },
-    { tipo: "Pedidos", cantidad: orders.length },
-  ];
+  const ventasPorMes = data?.charts.salesMonthly.map((value, idx) => ({
+    mes: labelMeses[idx] || `Mes ${idx + 1}`,
+    ventas: value,
+  })) || [{ mes: "Sin datos", ventas: 0 }];
 
-  // 5. Estado de Órdenes
-  const estadoPedidos = orders.length > 0
-    ? orders.reduce((acc: any[], order: any) => {
-        const estado = order.status || "pending";
-        const found = acc.find((x) => x.name === estado);
-        if (found) found.value += 1;
-        else acc.push({ name: estado, value: 1 });
-        return acc;
-      }, [])
-    : [{ name: "Sin pedidos", value: 1 }];
+  // 2. Mapeo de volumen general de datos
+  const usuariosData = data ? [
+    { tipo: "Clientes", cantidad: data.cards.totalCustomers },
+    { tipo: "Reservas", cantidad: data.cards.totalReservations },
+    { tipo: "Pedidos", cantidad: data.cards.totalOrders },
+  ] : [{ tipo: "Cargando...", cantidad: 0 }];
+
+  // 3. Mapeo del estado de Reservas (Tu backend envía el estado de reservas para la dona)
+  const estadoReservas = data ? [
+    { name: "Pendientes", value: data.charts.reservationsStatus.pending },
+    { name: "Aprobadas", value: data.charts.reservationsStatus.approved },
+  ] : [{ name: "Sin datos", value: 1 }];
 
   return {
     ventasPorMes,
     usuariosData,
-    estadoPedidos,
+    estadoReservas,
+    isLoading,
+    isError
   };
 }
