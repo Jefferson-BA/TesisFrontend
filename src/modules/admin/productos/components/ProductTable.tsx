@@ -1,38 +1,24 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   deleteProduct,
-  getProducts,
   updateProduct,
 } from "@/modules/admin/productos/services/product.service";
 
-export default function ProductTable() {
-  const [products, setProducts] = useState<any[]>([]);
+// Definimos la interfaz para que TypeScript acepte las propiedades externas
+interface ProductTableProps {
+  products: any[];
+  onRefresh: () => void | Promise<void>;
+}
+
+export default function ProductTable({ products, onRefresh }: ProductTableProps) {
   const [editingProduct, setEditingProduct] = useState<any>(null);
-
-  const loadProducts = async () => {
-    try {
-      const data = await getProducts();
-
-      if (Array.isArray(data)) setProducts(data);
-      else if (Array.isArray(data.products)) setProducts(data.products);
-      else if (Array.isArray(data.data)) setProducts(data.data);
-      else setProducts([]);
-    } catch (error) {
-      console.error(error);
-      setProducts([]);
-    }
-  };
-
-  useEffect(() => {
-    loadProducts();
-  }, []);
 
   const handleDelete = async (id: string) => {
     if (!confirm("¿Seguro que deseas eliminar este producto?")) return;
 
     try {
       await deleteProduct(id);
-      await loadProducts();
+      await onRefresh(); // Refresca el dashboard centralizado
       alert("Producto eliminado");
     } catch (error) {
       console.error(error);
@@ -74,7 +60,7 @@ export default function ProductTable() {
 
       alert("Producto actualizado correctamente");
       setEditingProduct(null);
-      await loadProducts();
+      await onRefresh(); // Refresca el dashboard centralizado
     } catch (error) {
       console.error(error);
       alert("Error al actualizar producto");
@@ -188,58 +174,62 @@ export default function ProductTable() {
           </thead>
 
           <tbody>
-            {products.map((product) => (
-              <tr
-                key={product.id || product._id}
-                className="border-b border-[#4a3824]"
-              >
-                <td className="py-4 font-bold">{product.name}</td>
+            {products && products.length > 0 ? (
+              products.map((product) => (
+                <tr
+                  key={product.id || product._id}
+                  className="border-b border-[#4a3824]"
+                >
+                  <td className="py-4 font-bold">{product.name}</td>
 
-                <td>
-                  {product.category?.name ||
-                    product.category ||
-                    "Sin categoría"}
-                </td>
+                  <td>
+                    {product.category?.name ||
+                      product.category ||
+                      "Sin categoría"}
+                  </td>
 
-                <td>S/ {Number(product.price).toFixed(2)}</td>
+                  <td>S/ {Number(product.price).toFixed(2)}</td>
 
-                <td>{product.stock}</td>
+                  <td>{product.stock}</td>
 
-                <td>
-                  <span
-                    className={`px-3 py-1 rounded-lg font-bold ${
-                      product.stock > 0
-                        ? "bg-green-600 text-white"
-                        : "bg-red-600 text-white"
-                    }`}
-                  >
-                    {product.stock > 0
-                      ? "Disponible"
-                      : "No disponible"}
-                  </span>
-                </td>
-
-                <td>
-                  <div className="flex gap-3">
-                    <button
-                      onClick={() => handleEdit(product)}
-                      className="bg-yellow-500 hover:bg-yellow-400 text-black px-4 py-2 rounded-lg font-bold"
+                  <td>
+                    <span
+                      className={`px-3 py-1 rounded-lg font-bold ${
+                        product.stock > 0
+                          ? "bg-green-600 text-white"
+                          : "bg-red-600 text-white"
+                      }`}
                     >
-                      Editar
-                    </button>
+                      {product.stock > 0 ? "Disponible" : "No disponible"}
+                    </span>
+                  </td>
 
-                    <button
-                      onClick={() =>
-                        handleDelete(product.id || product._id)
-                      }
-                      className="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-lg font-bold"
-                    >
-                      Borrar
-                    </button>
-                  </div>
+                  <td>
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => handleEdit(product)}
+                        className="bg-yellow-500 hover:bg-yellow-400 text-black px-4 py-2 rounded-lg font-bold"
+                      >
+                        Editar
+                      </button>
+
+                      <button
+                        onClick={() => handleDelete(product.id || product._id)}
+                        className="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded-lg font-bold"
+                      >
+                        Borrar
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={6} className="text-center py-8 text-zinc-500">
+                  No hay productos cargados en el catálogo.
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>

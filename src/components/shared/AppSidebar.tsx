@@ -7,6 +7,7 @@ import {
   ShoppingBag,
   UtensilsCrossed,
   Tag,
+  Tags, // 🔹 NUEVO: Ícono para Categorías
   LogOut,
   Calendar,
 } from "lucide-react";
@@ -33,8 +34,9 @@ const menuByRole = {
 
     // 🔹 Nuevos módulos agregados
     { title: "Pedidos", url: "/admin/pedidos", icon: ShoppingBag },
-    { title: "Reservas", url: "/admin/reservas", icon: Calendar }, // <--- NUEVA LÍNEA AQUÍ
+    { title: "Reservas", url: "/admin/reservas", icon: Calendar }, 
     { title: "Productos", url: "/admin/productos", icon: UtensilsCrossed },
+    { title: "Categorías", url: "/admin/categorias", icon: Tags }, // 🔹 NUEVA LÍNEA AQUÍ
     { title: "Promociones", url: "/admin/promociones", icon: Tag },
 
     // 🔹 Originales
@@ -70,8 +72,6 @@ export function AppSidebar({ role }: AppSidebarProps) {
   return (
     <Sidebar className="border-r border-zinc-800 bg-zinc-950 text-zinc-100">
       
-
-
       {/* 🔹 CONTENIDO */}
       <SidebarContent className="bg-zinc-950 text-zinc-200">
         <SidebarGroup>

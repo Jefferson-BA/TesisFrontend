@@ -1,15 +1,18 @@
 import { useEffect, useState } from "react";
+import { PlusCircle, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { createProduct } from "@/modules/admin/productos/services/product.service";
-import {
-  getCategories,
-  createCategory,
-} from "@/modules/admin/productos/services/category.service";
+import { categoryService } from "@/modules/admin/categorias/services/category.service";
 
-export default function ProductForm() {
+interface ProductFormProps {
+  onProductCreated: () => void;
+}
+
+export const ProductForm = ({ onProductCreated }: ProductFormProps) => {
   const [categories, setCategories] = useState<any[]>([]);
-  const [newCategory, setNewCategory] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const [form, setForm] = useState({
+  const [formData, setFormData] = useState({
     name: "",
     description: "",
     price: "",
@@ -18,217 +21,166 @@ export default function ProductForm() {
     imageUrl: "",
   });
 
-  const loadCategories = async () => {
-    const data = await getCategories();
-    setCategories(Array.isArray(data) ? data : data.data || []);
-  };
-
   useEffect(() => {
-    loadCategories();
+    categoryService.getAll()
+      .then((res) => {
+        setCategories(Array.isArray(res) ? res : (res as any).data || []);
+      })
+      .catch(() => {
+        toast.error("Error al cargar las categorías");
+      });
   }, []);
 
-  const handleChange = (e: any) => {
-    setForm({
-      ...form,
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    setFormData({
+      ...formData,
       [e.target.name]: e.target.value,
     });
   };
 
-  const handleCreateCategory = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!newCategory.trim()) return;
-
-    try {
-      await createCategory({ name: newCategory });
-
-      alert("Categoría creada correctamente");
-
-      setNewCategory("");
-
-      loadCategories();
-    } catch (error: any) {
-      console.error(error.response?.data || error);
-
-      alert(error.response?.data?.message || "Error al crear categoría");
+    if (!formData.name || !formData.price || !formData.categoryId) {
+      toast.error("Por favor completa los campos obligatorios (*)");
+      return;
     }
-  };
 
-  const handleSubmit = async (e: any) => {
-    e.preventDefault();
-
+    setLoading(true);
     try {
       await createProduct({
-        name: form.name,
-        description: form.description,
-        price: Number(form.price),
-        stock: Number(form.stock),
-        categoryId: form.categoryId,
-        imageUrl: form.imageUrl,
+        ...formData,
+        price: Number(formData.price),
+        stock: Number(formData.stock) || 0,
       });
-
-      alert("Producto creado correctamente");
-
-      setForm({
-        name: "",
-        description: "",
-        price: "",
-        stock: "",
-        categoryId: "",
-        imageUrl: "",
-      });
-
-      window.location.reload();
-    } catch (error: any) {
-      console.error("ERROR PRODUCTO:", error.response?.data || error);
-
-      alert(error.response?.data?.message || "Error al crear producto");
+      
+      toast.success("Producto creado exitosamente");
+      setFormData({ name: "", description: "", price: "", stock: "", categoryId: "", imageUrl: "" });
+      onProductCreated(); // Recarga la tabla de abajo automáticamente
+    } catch (error) {
+      console.error(error);
+      toast.error("Error al guardar el producto");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6">
-      {/* FORM PRODUCTO */}
-      <div className="bg-[#120c09] border border-yellow-900/40 rounded-2xl p-6">
-        <h2 className="text-2xl font-bold text-white mb-6">
-          Nuevo Producto
-        </h2>
-
-        <form onSubmit={handleSubmit} className="grid gap-4">
-          {/* NOMBRE */}
-          <input
-            type="text"
-            name="name"
-            placeholder="Nombre"
-            value={form.name}
-            onChange={handleChange}
-            className="bg-black border border-zinc-800 rounded-lg px-4 py-3 text-white"
-            required
-          />
-
-          {/* DESCRIPCION */}
-          <textarea
-            name="description"
-            placeholder="Descripción"
-            value={form.description}
-            onChange={handleChange}
-            className="bg-black border border-zinc-800 rounded-lg px-4 py-3 text-white"
-          />
-
-          {/* PRECIO */}
-          <input
-            type="number"
-            name="price"
-            placeholder="Precio"
-            value={form.price}
-            onChange={handleChange}
-            className="bg-black border border-zinc-800 rounded-lg px-4 py-3 text-white"
-            required
-          />
-
-          {/* DISPONIBILIDAD */}
-<select
-  name="stock"
-  value={form.stock}
-  onChange={handleChange}
-  className="bg-black border border-zinc-800 rounded-lg px-4 py-3 text-white"
-  required
->
-  <option value="">Selecciona disponibilidad</option>
-  <option value="10">Disponible</option>
-  <option value="0">No disponible</option>
-  <option value="1">Disponible para mañana</option>
-</select>
-
-          {/* CATEGORIAS */}
-          <select
-            name="categoryId"
-            value={form.categoryId}
-            onChange={handleChange}
-            className="bg-black border border-zinc-800 rounded-lg px-4 py-3 text-white"
-            required
-          >
-            <option value="">Selecciona una categoría</option>
-
-            {categories.map((cat) => (
-              <option key={cat.id} value={cat.id}>
-                {cat.name}
-              </option>
-            ))}
-          </select>
-
-          {/* IMAGEN */}
-          <input
-            type="text"
-            name="imageUrl"
-            placeholder="URL de imagen"
-            value={form.imageUrl}
-            onChange={handleChange}
-            className="bg-black border border-zinc-800 rounded-lg px-4 py-3 text-white"
-          />
-
-          {/* BOTON */}
-          <button
-            type="submit"
-            className="bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-3 rounded-lg transition-all"
-          >
-            Crear Producto
-          </button>
-        </form>
+    <section className="bg-[#15100e] border border-[#4a3824] rounded-2xl p-6 shadow-xl text-white">
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold text-yellow-500">Nuevo Producto</h2>
+        <p className="text-zinc-400 text-sm mt-1">
+          Registra los alimentos, bebidas o combos disponibles en el menú.
+        </p>
       </div>
 
-      {/* FORM CATEGORIAS */}
-      <div className="bg-[#120c09] border border-yellow-900/40 rounded-2xl p-6">
-        <h2 className="text-2xl font-bold text-white mb-6">
-          Crear Categoría
-        </h2>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+          <div className="flex flex-col gap-2">
+            <label htmlFor="name" className="text-zinc-300 text-sm font-medium">Nombre del Producto *</label>
+            <input
+              id="name"
+              name="name"
+              type="text"
+              value={formData.name}
+              onChange={handleChange}
+              placeholder="Ej. Lomo Saltado"
+              className="h-11 px-4 bg-[#1c1613] border border-[#4a3824] text-white rounded-lg placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              required
+            />
+          </div>
 
-        <form onSubmit={handleCreateCategory} className="grid gap-4">
-          <input
-            type="text"
-            placeholder="Ejemplo: Criollo, Árabe, Parrillero"
-            value={newCategory}
-            onChange={(e) => setNewCategory(e.target.value)}
-            className="bg-black border border-zinc-800 rounded-lg px-4 py-3 text-white"
-            required
-          />
-
-          <button
-            type="submit"
-            className="bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-3 rounded-lg"
-          >
-            Crear Categoría
-          </button>
-        </form>
-
-        {/* LISTA CATEGORIAS */}
-        <h3 className="text-white font-bold mt-8 mb-4">
-          Categorías disponibles
-        </h3>
-
-        <div className="space-y-3">
-          {categories.length === 0 ? (
-            <p className="text-zinc-400">
-              No hay categorías registradas
-            </p>
-          ) : (
-            categories.map((cat) => (
-              <div
-                key={cat.id}
-                className="bg-black border border-zinc-800 rounded-lg p-4"
-              >
-                <p className="text-yellow-500 font-bold">
+          <div className="flex flex-col gap-2">
+            <label htmlFor="categoryId" className="text-zinc-300 text-sm font-medium">Categoría *</label>
+            <select
+              id="categoryId"
+              name="categoryId"
+              value={formData.categoryId}
+              onChange={handleChange}
+              className="h-11 px-3 bg-[#1c1613] border border-[#4a3824] text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              required
+            >
+              <option value="">Selecciona una categoría</option>
+              {categories.map((cat) => (
+                <option key={cat.id || cat._id} value={cat.id || cat._id}>
                   {cat.name}
-                </p>
+                </option>
+              ))}
+            </select>
+          </div>
 
-                <p className="text-xs text-zinc-400 break-all">
-                  {cat.id}
-                </p>
-              </div>
-            ))
-          )}
+          <div className="flex flex-col gap-2">
+            <label htmlFor="price" className="text-zinc-300 text-sm font-medium">Precio (S/) *</label>
+            <input
+              id="price"
+              name="price"
+              type="number"
+              step="0.01"
+              value={formData.price}
+              onChange={handleChange}
+              placeholder="0.00"
+              className="h-11 px-4 bg-[#1c1613] border border-[#4a3824] text-white rounded-lg placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              required
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <label htmlFor="stock" className="text-zinc-300 text-sm font-medium">Stock Inicial</label>
+            <input
+              id="stock"
+              name="stock"
+              type="number"
+              value={formData.stock}
+              onChange={handleChange}
+              placeholder="Cantidad disponible"
+              className="h-11 px-4 bg-[#1c1613] border border-[#4a3824] text-white rounded-lg placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+            />
+          </div>
+
+          <div className="md:col-span-2 flex flex-col gap-2">
+            <label htmlFor="imageUrl" className="text-zinc-300 text-sm font-medium">URL de la Imagen</label>
+            <input
+              id="imageUrl"
+              name="imageUrl"
+              type="text"
+              value={formData.imageUrl}
+              onChange={handleChange}
+              placeholder="https://ejemplo.com/imagen.jpg"
+              className="h-11 px-4 bg-[#1c1613] border border-[#4a3824] text-white rounded-lg placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+            />
+          </div>
+
+          <div className="md:col-span-2 flex flex-col gap-2">
+            <label htmlFor="description" className="text-zinc-300 text-sm font-medium">Descripción del Plato</label>
+            <textarea
+              id="description"
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              placeholder="Detalla los ingredientes o la presentación..."
+              rows={3}
+              className="p-3 bg-[#1c1613] border border-[#4a3824] text-white rounded-lg placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 resize-none"
+            />
+          </div>
+
         </div>
-      </div>
-    </div>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full h-11 bg-yellow-500 hover:bg-yellow-400 disabled:bg-zinc-700 text-black disabled:text-zinc-400 font-bold rounded-lg flex items-center justify-center gap-2 transition-colors duration-200"
+        >
+          {loading ? (
+            <>
+              <Loader2 className="h-5 w-5 animate-spin" /> Guardando...
+            </>
+          ) : (
+            <>
+              <PlusCircle className="h-5 w-5" /> Crear Producto
+            </>
+          )}
+        </button>
+      </form>
+    </section>
   );
-}
+};

@@ -1,0 +1,11 @@
+---
+import AdminLayout from '@/layouts/AdminLayout.astro';
+import { CategoriesAdmin } from '@/modules/admin/categorias/components/CategoriesAdmin';
+---
+
+<AdminLayout title="Dashboard | Categorías">
+  {/* Cambiamos className por class aquí 👇 */}
+  <div class="p-6"> 
+    <CategoriesAdmin client:load />
+  </div>
+</AdminLayout>

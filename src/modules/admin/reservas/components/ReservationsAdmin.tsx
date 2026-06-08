@@ -1,11 +1,17 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Eye, Package, Phone, Edit, Trash2, X, Calendar, MapPin, Users, FileText } from "lucide-react";
+import { Eye, Package, Phone, Edit, Trash2, X, Calendar, MapPin, Users, FileText, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
 import { getReservations, updateReservation, deleteReservation } from "@/modules/admin/reservas/services/reservation.service";
+import type { PaginationMeta } from "@/modules/admin/reservas/interfaces/reservation.interface";
 
 export default function ReservationsAdmin() {
   const [reservations, setReservations] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // 🔥 ESTADOS PARA PAGINACIÓN
+  const [meta, setMeta] = useState<PaginationMeta | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const limit = 10;
 
   // Estados para los Modales
   const [selectedReservation, setSelectedReservation] = useState<any>(null);
@@ -14,18 +20,27 @@ export default function ReservationsAdmin() {
 
   useEffect(() => {
     fetchReservations();
-  }, []);
+  }, [currentPage]); // Se vuelve a ejecutar si cambia la página
 
   const fetchReservations = async () => {
+    setIsLoading(true);
     try {
-      const data = await getReservations();
-      const resArray = Array.isArray(data) ? data : data.data || [];
-      setReservations(resArray);
+      const response = await getReservations(undefined, currentPage, limit);
+      
+      // Mapeamos la nueva estructura { data, meta }
+      setReservations(response.data || []);
+      setMeta(response.meta || null);
     } catch (error) {
       console.error("Error cargando reservas:", error);
       toast.error("No se pudieron cargar las reservas");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const goToPage = (page: number) => {
+    if (meta && page >= 1 && page <= meta.totalPages) {
+      setCurrentPage(page);
     }
   };
 
@@ -50,7 +65,7 @@ export default function ReservationsAdmin() {
     try {
       await deleteReservation(id);
       toast.success("Reserva eliminada correctamente");
-      fetchReservations();
+      fetchReservations(); // Refrescar la página actual
     } catch (error) {
       toast.error("No se pudo eliminar la reserva");
     }
@@ -85,104 +100,156 @@ export default function ReservationsAdmin() {
     return 'bg-zinc-800 text-zinc-300 border-zinc-700';
   };
 
-  if (isLoading) return <div className="p-8 text-zinc-400 flex justify-center items-center h-40">Cargando reservas...</div>;
-
   return (
     <>
       <div className="bg-[#15100c] rounded-xl border border-[#2a1f1a] overflow-hidden shadow-xl">
         <div className="p-6 border-b border-[#2a1f1a] flex justify-between items-center bg-[#1a1410]">
           <h2 className="text-xl font-black text-yellow-500 uppercase tracking-wide">Gestión de Reservas</h2>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-zinc-300">
-            <thead className="bg-[#211814] text-xs uppercase text-zinc-400 font-bold">
-              <tr>
-                <th className="px-6 py-5 border-b border-[#2a1f1a]">Fecha / Hora</th>
-                <th className="px-6 py-5 border-b border-[#2a1f1a]">Lugar e Invitados</th>
-                <th className="px-6 py-5 border-b border-[#2a1f1a] text-center">Estado</th>
-                <th className="px-6 py-5 border-b border-[#2a1f1a] text-center">Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {reservations.length === 0 ? (
+        
+        {isLoading ? (
+          <div className="p-8 text-zinc-400 flex justify-center items-center h-40">Cargando reservas...</div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm text-zinc-300">
+              <thead className="bg-[#211814] text-xs uppercase text-zinc-400 font-bold">
                 <tr>
-                  <td colSpan={4} className="px-6 py-12 text-center text-zinc-500">
-                    No hay reservas registradas aún.
-                  </td>
+                  <th className="px-6 py-5 border-b border-[#2a1f1a]">Fecha / Hora</th>
+                  <th className="px-6 py-5 border-b border-[#2a1f1a]">Lugar e Invitados</th>
+                  <th className="px-6 py-5 border-b border-[#2a1f1a] text-center">Estado</th>
+                  <th className="px-6 py-5 border-b border-[#2a1f1a] text-center">Acciones</th>
                 </tr>
-              ) : (
-                reservations.map((res) => (
-                  <tr key={res.id} className="hover:bg-[#211814] transition-colors border-b border-[#2a1f1a] group">
-                    <td className="px-6 py-4 align-middle">
-                      <div className="font-bold text-zinc-100 text-base">
-                        {new Date(res.eventDate).toLocaleDateString()}
-                      </div>
-                      <div className="text-xs text-zinc-500 mt-1 flex items-center gap-1.5">
-                        <Calendar className="w-3 h-3" />
-                        {res.serviceStartTime}
-                      </div>
-                    </td>
-                    
-                    <td className="px-6 py-4 align-middle">
-                      <div className="font-medium text-zinc-200 block max-w-[220px] truncate flex items-center gap-1.5">
-                        <MapPin className="w-3.5 h-3.5 text-zinc-500" />
-                        {res.city} - {res.venueAddress}
-                      </div>
-                      <div className="text-xs text-zinc-400 mt-1 flex items-center gap-1.5">
-                        <Users className="w-3.5 h-3.5" />
-                        {res.guestsCount} personas
-                      </div>
-                    </td>
-                    
-                    <td className="px-6 py-4 align-middle text-center">
-                      <select 
-                        className={`text-xs font-bold rounded-md px-3 py-1.5 outline-none border cursor-pointer transition-all hover:brightness-110 ${getStatusColor(res.status)}`}
-                        value={res.status?.toLowerCase()}
-                        onChange={(e) => handleStatusChange(res.id, e.target.value)}
-                      >
-                        <option value="pending_review" className="bg-zinc-900 text-zinc-100">PENDIENTE REVISIÓN</option>
-                        <option value="approved" className="bg-zinc-900 text-zinc-100">APROBADA</option>
-                        <option value="deposit_paid" className="bg-zinc-900 text-zinc-100">ADELANTO PAG.</option>
-                        <option value="fully_paid" className="bg-zinc-900 text-zinc-100">PAGADA 100%</option>
-                        <option value="completed" className="bg-zinc-900 text-zinc-100">COMPLETADA</option>
-                        <option value="cancelled" className="bg-zinc-900 text-zinc-100">CANCELADA</option>
-                      </select>
-                    </td>
-
-                    <td className="px-6 py-4 align-middle">
-                      <div className="flex justify-center items-center gap-2 opacity-80 group-hover:opacity-100 transition-opacity">
-                        
-                        <button onClick={() => handleViewDetails(res.id)} title="Ver detalles completos" className="p-2 rounded-md text-zinc-400 hover:text-cyan-400 hover:bg-cyan-400/10 transition-colors">
-                          <Eye className="w-4 h-4" />
-                        </button>
-                        
-                        <button onClick={() => handleViewOrder(res.order?.id)} title="Ver pedido en tienda" className="p-2 rounded-md text-zinc-400 hover:text-purple-400 hover:bg-purple-400/10 transition-colors">
-                          <Package className="w-4 h-4" />
-                        </button>
-
-                        <a href={res.user?.phone ? `tel:${res.user.phone}` : '#'} 
-                           onClick={(e) => !res.user?.phone && e.preventDefault()}
-                           title={res.user?.phone ? `Llamar a ${res.user.phone}` : "No hay teléfono registrado"} 
-                           className={`p-2 rounded-md transition-colors ${res.user?.phone ? 'text-zinc-400 hover:text-emerald-400 hover:bg-emerald-400/10' : 'text-zinc-700 cursor-not-allowed'}`}>
-                          <Phone className="w-4 h-4" />
-                        </a>
-
-                        <button onClick={() => handleEdit(res.id)} title="Editar reserva" className="p-2 rounded-md text-zinc-400 hover:text-yellow-400 hover:bg-yellow-400/10 transition-colors">
-                          <Edit className="w-4 h-4" />
-                        </button>
-
-                        <button onClick={() => handleDelete(res.id)} title="Eliminar definitivamente" className="p-2 rounded-md text-zinc-400 hover:text-red-400 hover:bg-red-400/10 transition-colors">
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-
-                      </div>
+              </thead>
+              <tbody>
+                {reservations.length === 0 ? (
+                  <tr>
+                    <td colSpan={4} className="px-6 py-12 text-center text-zinc-500">
+                      No hay reservas registradas aún.
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+                ) : (
+                  reservations.map((res) => (
+                    <tr key={res.id} className="hover:bg-[#211814] transition-colors border-b border-[#2a1f1a] group">
+                      <td className="px-6 py-4 align-middle">
+                        <div className="font-bold text-zinc-100 text-base">
+                          {new Date(res.eventDate).toLocaleDateString()}
+                        </div>
+                        <div className="text-xs text-zinc-500 mt-1 flex items-center gap-1.5">
+                          <Calendar className="w-3 h-3" />
+                          {res.serviceStartTime}
+                        </div>
+                      </td>
+                      
+                      <td className="px-6 py-4 align-middle">
+                        <div className="font-medium text-zinc-200 block max-w-[220px] truncate flex items-center gap-1.5">
+                          <MapPin className="w-3.5 h-3.5 text-zinc-500" />
+                          {res.city} - {res.venueAddress}
+                        </div>
+                        <div className="text-xs text-zinc-400 mt-1 flex items-center gap-1.5">
+                          <Users className="w-3.5 h-3.5" />
+                          {res.guestsCount} personas
+                        </div>
+                      </td>
+                      
+                      <td className="px-6 py-4 align-middle text-center">
+                        <select 
+                          className={`text-xs font-bold rounded-md px-3 py-1.5 outline-none border cursor-pointer transition-all hover:brightness-110 ${getStatusColor(res.status)}`}
+                          value={res.status?.toLowerCase()}
+                          onChange={(e) => handleStatusChange(res.id, e.target.value)}
+                        >
+                          <option value="pending_review" className="bg-zinc-900 text-zinc-100">PENDIENTE REVISIÓN</option>
+                          <option value="approved" className="bg-zinc-900 text-zinc-100">APROBADA</option>
+                          <option value="deposit_paid" className="bg-zinc-900 text-zinc-100">ADELANTO PAG.</option>
+                          <option value="fully_paid" className="bg-zinc-900 text-zinc-100">PAGADA 100%</option>
+                          <option value="completed" className="bg-zinc-900 text-zinc-100">COMPLETADA</option>
+                          <option value="cancelled" className="bg-zinc-900 text-zinc-100">CANCELADA</option>
+                        </select>
+                      </td>
+
+                      <td className="px-6 py-4 align-middle">
+                        <div className="flex justify-center items-center gap-2 opacity-80 group-hover:opacity-100 transition-opacity">
+                          
+                          <button onClick={() => handleViewDetails(res.id)} title="Ver detalles completos" className="p-2 rounded-md text-zinc-400 hover:text-cyan-400 hover:bg-cyan-400/10 transition-colors">
+                            <Eye className="w-4 h-4" />
+                          </button>
+                          
+                          <button onClick={() => handleViewOrder(res.order?.id)} title="Ver pedido en tienda" className="p-2 rounded-md text-zinc-400 hover:text-purple-400 hover:bg-purple-400/10 transition-colors">
+                            <Package className="w-4 h-4" />
+                          </button>
+
+                          <a href={res.user?.phone ? `tel:${res.user.phone}` : '#'} 
+                             onClick={(e) => !res.user?.phone && e.preventDefault()}
+                             title={res.user?.phone ? `Llamar a ${res.user.phone}` : "No hay teléfono registrado"} 
+                             className={`p-2 rounded-md transition-colors ${res.user?.phone ? 'text-zinc-400 hover:text-emerald-400 hover:bg-emerald-400/10' : 'text-zinc-700 cursor-not-allowed'}`}>
+                            <Phone className="w-4 h-4" />
+                          </a>
+
+                          <button onClick={() => handleEdit(res.id)} title="Editar reserva" className="p-2 rounded-md text-zinc-400 hover:text-yellow-400 hover:bg-yellow-400/10 transition-colors">
+                            <Edit className="w-4 h-4" />
+                          </button>
+
+                          <button onClick={() => handleDelete(res.id)} title="Eliminar definitivamente" className="p-2 rounded-md text-zinc-400 hover:text-red-400 hover:bg-red-400/10 transition-colors">
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* 🔥 FOOTER DE PAGINACIÓN */}
+        {!isLoading && meta && meta.totalPages > 0 && (
+          <div className="p-4 border-t border-[#2a1f1a] bg-[#1a1410] flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="text-xs text-zinc-500 uppercase tracking-wider font-semibold">
+              Mostrando <span className="text-yellow-500 font-bold">{reservations.length}</span> de <span className="text-zinc-300 font-bold">{meta.totalItems}</span> reservas
+            </div>
+
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={() => goToPage(1)}
+                disabled={currentPage === 1}
+                className="p-1.5 rounded bg-[#211814] border border-[#2a1f1a] text-zinc-400 hover:text-yellow-500 hover:border-yellow-500/30 disabled:opacity-30 disabled:pointer-events-none transition-colors"
+                title="Primera página"
+              >
+                <ChevronsLeft className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => goToPage(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="p-1.5 rounded bg-[#211814] border border-[#2a1f1a] text-zinc-400 hover:text-yellow-500 hover:border-yellow-500/30 disabled:opacity-30 disabled:pointer-events-none transition-colors"
+                title="Página anterior"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              
+              <div className="px-3 py-1.5 rounded bg-[#15100c] border border-yellow-500/20 text-xs font-bold text-yellow-500 mx-1 min-w-[80px] text-center">
+                {currentPage} / {meta.totalPages}
+              </div>
+
+              <button
+                onClick={() => goToPage(currentPage + 1)}
+                disabled={currentPage === meta.totalPages}
+                className="p-1.5 rounded bg-[#211814] border border-[#2a1f1a] text-zinc-400 hover:text-yellow-500 hover:border-yellow-500/30 disabled:opacity-30 disabled:pointer-events-none transition-colors"
+                title="Página siguiente"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => goToPage(meta.totalPages)}
+                disabled={currentPage === meta.totalPages}
+                className="p-1.5 rounded bg-[#211814] border border-[#2a1f1a] text-zinc-400 hover:text-yellow-500 hover:border-yellow-500/30 disabled:opacity-30 disabled:pointer-events-none transition-colors"
+                title="Última página"
+              >
+                <ChevronsRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* ==========================================
