@@ -1,12 +1,12 @@
-// src/modules/admin/pedidos/components/ReservationDetailCard.tsx
 import { Calendar, MapPin, Users, Phone, User, Mail, FileText, Bookmark } from "lucide-react";
+import type { Reservation } from "@/modules/admin/reservas/interfaces/reservation.interface";
 
 interface ReservationDetailCardProps {
-  reservation: any;
+  reservation: Reservation; // Cambiado de 'any' a nuestro tipo limpio
 }
 
 export default function ReservationDetailCard({ reservation }: ReservationDetailCardProps) {
-  
+  console.log("Datos que llegan a la tarjeta:", reservation);
   const getStatusBadge = (status: string) => {
     const s = status?.toLowerCase();
     if (s === 'pending_review') return 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20';
@@ -35,16 +35,21 @@ export default function ReservationDetailCard({ reservation }: ReservationDetail
             <User className="w-3 h-3 text-yellow-500" /> Cuenta Registrada
           </p>
           <p className="text-zinc-100 font-bold truncate">
-            {reservation.user?.name || "No disponible"}
+            {reservation.user?.name || reservation.customerName || reservation.clientName || "No disponible"}
           </p>
           <p className="text-xs text-zinc-400 truncate flex items-center gap-1">
-            <Mail className="w-3 h-3 text-zinc-500" /> {reservation.user?.email || "Sin correo electrónico"}
+            <Mail className="w-3 h-3 text-zinc-500" /> {reservation.user?.email || reservation.customerEmail || "Sin correo electrónico"}
           </p>
-          {reservation.user?.phone && (
-            <p className="text-xs text-zinc-400 flex items-center gap-1">
-              <Phone className="w-3 h-3 text-zinc-500" /> {reservation.user.phone}
-            </p>
-          )}
+          
+          {/* CAMBIO AQUÍ: Se eliminó el condicional de envoltura y se añadieron fallbacks robustos */}
+          <p className="text-xs text-zinc-400 flex items-center gap-1">
+            <Phone className="w-3 h-3 text-zinc-500" />{" "}
+            {reservation.phone || 
+             reservation.user?.phone || 
+             reservation.customerPhone || 
+             reservation.clientPhone || 
+             "Sin teléfono"}
+          </p>
         </div>
 
         {/* Ubicación Geográfica */}
@@ -92,12 +97,12 @@ export default function ReservationDetailCard({ reservation }: ReservationDetail
       </div>
 
       {/* Notas */}
-      {(reservation.notes || reservation.specialNotes) && (
+      {(reservation.notes) && (
         <div className="mt-3 bg-[#211814] p-3 rounded-lg border border-[#2a1f1a] text-xs text-zinc-400">
           <span className="text-yellow-500 font-bold uppercase tracking-wider text-[10px] flex items-center gap-1 mb-1">
             <FileText className="w-3 h-3" /> Requerimientos Especiales:
           </span>
-          <p className="italic">"{reservation.notes || reservation.specialNotes}"</p>
+          <p className="italic">"{reservation.notes}"</p>
         </div>
       )}
     </div>

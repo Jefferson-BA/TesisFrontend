@@ -18,13 +18,21 @@ export interface Reservation {
     email: string;
     phone: string;
   };
+  // 👇 Añadimos estos campos del formulario de contacto para soporte total
+  customerName?: string;
+  clientName?: string;
+  phone?: string;
+  customerPhone?: string;
+  clientPhone?: string;
+  customerEmail?: string;
+  
   notes?: string;
   order?: {
     id: string;
   };
 }
 
-// 🔥 NUEVAS INTERFACES PARA PAGINACIÓN
+// INTERFACES PARA PAGINACIÓN
 export interface PaginationMeta {
   totalItems: number;
   itemCount: number;

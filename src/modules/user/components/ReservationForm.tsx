@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { toast } from "sonner";
-import { createOrder } from "@/modules/admin/pedidos/services/order.service";
+import { createOrder, createReservation } from "@/modules/admin/pedidos/services/order.service";
 import { useCartStore } from "@/modules/admin/promociones/store/cartStore";
 
 export default function ReservationForm() {
@@ -18,7 +18,7 @@ export default function ReservationForm() {
     guests: "",
     eventType: "Boda",
     notes: "",
-    paymentMethod: "card", 
+    paymentMethod: "card",
   });
 
   const handleChange = (e: any) => {
@@ -28,7 +28,7 @@ export default function ReservationForm() {
     });
   };
 
- const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
 
     if (cart.length === 0) {
@@ -36,38 +36,53 @@ export default function ReservationForm() {
       return;
     }
 
-    // 🛠️ CORRECCIÓN AQUÍ: Dejamos el ID como string (UUID) tal como lo pide tu backend
     const items = cart.map((item) => ({
-      productId: String(item.id), // Aseguramos que sea texto (UUID) y no número
+      productId: String(item.id),
       quantity: Number(item.quantity),
     }));
 
-    const orderData = {
-      shippingAddress: `${form.address} | EVENTO: ${form.date} a las ${form.time} | Asistentes: ${form.guests} | Tipo: ${form.eventType} | Notas: ${form.notes}`,
-      city: form.city,
-      postalCode: "00000",
-      phone: form.phone,
-      paymentMethod: form.paymentMethod,
-      items,
-    };
-
     try {
+      // 1️⃣ PRIMERO: Creamos la reserva con los datos del evento
+      const reservationPayload = {
+        eventDate: form.date,
+        serviceStartTime: form.time,
+        guestsCount: Number(form.guests),
+        venueAddress: form.address,
+        city: form.city,
+        notes: form.notes,
+        phone: form.phone, // ¡Enviamos el teléfono aquí directo también!
+        items,
+      };
+
+      // Obtenemos la respuesta del backend que nos dará el ID generado
+      const newReservation = await createReservation(reservationPayload);
+
+      // 2️⃣ SEGUNDO: Creamos la orden enviándole el ID de la reserva (LA LLAVE MÁGICA)
+      const orderData = {
+        reservationId: newReservation.id, // 🔥 AQUÍ VINCULAMOS LA ORDEN CON LA RESERVA
+        shippingAddress: `${form.address} | EVENTO: ${form.date} a las ${form.time} | Asistentes: ${form.guests} | Tipo: ${form.eventType} | Notas: ${form.notes}`,
+        city: form.city,
+        postalCode: "00000",
+        phone: form.phone,
+        paymentMethod: form.paymentMethod,
+        items,
+      };
+
       await createOrder(orderData);
-      
+
       clearCart();
       toast.success("¡Reserva enviada exitosamente!");
-      
+
       setTimeout(() => {
         window.location.href = "/";
       }, 1500);
 
     } catch (error: any) {
       console.error("Fallo del servidor:", error);
-      
+
       if (error.response?.status === 500) {
         toast.error("Tu reserva se procesó, pero hubo un problema interno. Te contactaremos pronto.");
       } else {
-        // Esto te mostrará en un bonito toast si vuelve a faltar alguna validación
         const backendMessage = error.response?.data?.message;
         const alertMessage = Array.isArray(backendMessage) ? backendMessage.join(", ") : backendMessage;
         toast.error(alertMessage || "Error al enviar la reserva");
@@ -78,7 +93,7 @@ export default function ReservationForm() {
   return (
     <div className="bg-[#15100e] border border-[#4a3824] p-8 rounded-2xl max-w-3xl mx-auto shadow-2xl">
       <form onSubmit={handleSubmit} className="space-y-6">
-        
+
         {/* --- DATOS PERSONALES --- */}
         <h2 className="text-xl font-bold text-yellow-500 border-b border-[#4a3824] pb-2">1. Datos de Contacto</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -146,11 +161,10 @@ export default function ReservationForm() {
               key={value}
               type="button"
               onClick={() => setForm({ ...form, paymentMethod: value })}
-              className={`py-3 rounded-lg font-bold transition-all duration-300 ${
-                form.paymentMethod === value
+              className={`py-3 rounded-lg font-bold transition-all duration-300 ${form.paymentMethod === value
                   ? "bg-yellow-500 text-black shadow-[0_0_15px_rgba(234,179,8,0.3)]"
                   : "text-[#f1d8b5] hover:bg-[#3a2a1e]"
-              }`}
+                }`}
             >
               {label}
             </button>

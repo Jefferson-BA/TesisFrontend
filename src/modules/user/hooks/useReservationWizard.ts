@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { getProducts } from "@/modules/admin/productos/services/product.service";
-import { createReservation } from "@/modules/admin/pedidos/services/order.service";
+// 🔥 IMPORTAMOS createOrder AQUÍ TAMBIÉN
+import { createReservation, createOrder } from "@/modules/admin/pedidos/services/order.service";
 import { useCartStore } from "@/modules/admin/promociones/store/cartStore";
 import type { Product } from "@/modules/user/interfaces/product.interface";
+
 export const useReservationWizard = () => {
     const [currentStep, setCurrentStep] = useState<number>(1);
     const [products, setProducts] = useState<Product[]>([]);
@@ -26,12 +28,10 @@ export const useReservationWizard = () => {
         paymentMethod: "card",
     });
 
-    // Carga los productos y promociones de la base de datos al montar el componente
     useEffect(() => {
         const fetchMenu = async () => {
             try {
                 const res = await getProducts();
-                // Si tu backend responde directamente el array o dentro de un objeto .data
                 const data = Array.isArray(res) ? res : res.data || [];
                 setProducts(data);
             } catch (error) {
@@ -58,36 +58,48 @@ export const useReservationWizard = () => {
             return;
         }
 
-        // 2. Mapeamos los items: 'productId' como String (UUID) y 'quantity' como Número
         const items = cart.map((item) => ({
             productId: String(item.id),
             quantity: Number(item.quantity),
         }));
 
-        // 3. Armamos el JSON final tal como lo pide el DTO del backend
-        const safeDate = formData.date ? new Date(formData.date) : new Date();
-
-        const reservationPayload = {
-            // Convertimos la fecha segura a ISO 8601
-            eventDate: safeDate.toISOString(),
-
-            serviceStartTime: formData.time || "12:00", // Blindaje para la hora también
-            guestsCount: Number(formData.guests) || 1, // Blindaje (min 1 invitado)
-            venueAddress: formData.address || "Dirección pendiente",
-            city: formData.city || "Ciudad pendiente",
-            items: items,
-        };
-        console.log("📦 PAYLOAD ENVIADO AL BACKEND:", JSON.stringify(reservationPayload, null, 2));
         try {
-            // 4. LLAMAMOS AL NUEVO ENDPOINT /reservations
-            await createReservation(reservationPayload);
+            // 1️⃣ PRIMERO: Armamos la reserva SIN 'phone' ni 'notes' para cumplir con el DTO del backend
+            const reservationPayload = {
+                eventDate: formData.date,
+                serviceStartTime: formData.time || "12:00",
+                guestsCount: Number(formData.guests) || 1,
+                venueAddress: formData.address || "Dirección pendiente",
+                city: formData.city || "Ciudad pendiente",
+                items: items,
+            };
 
+            console.log("📦 PAYLOAD DE RESERVA LIMPÍO:", JSON.stringify(reservationPayload, null, 2));
+            const newReservation = await createReservation(reservationPayload);
+
+            // 2️⃣ SEGUNDO: Creamos la orden vinculándola al ID obtenido. 
+            // Aquí SÍ enviamos el teléfono y las notas incrustadas en la dirección.
+            const orderData = {
+                reservationId: newReservation.id, // Enlace de las dos tablas
+                shippingAddress: `${formData.address} | EVENTO: ${formData.date} a las ${formData.time} | Asistentes: ${formData.guests} | Tipo: ${formData.eventType} ${formData.notes ? `| Notas: ${formData.notes}` : ''}`,
+                city: formData.city || "Ciudad pendiente",
+                postalCode: "00000",
+                phone: formData.phone, // 🔥 El teléfono se guarda aquí de forma segura
+                paymentMethod: formData.paymentMethod,
+                items,
+            };
+
+            console.log("📦 PAYLOAD DE ORDEN:", JSON.stringify(orderData, null, 2));
+            await createOrder(orderData);
+
+            // 3️⃣ Limpieza y redirección
             clearCart();
             toast.success("¡Reserva enviada exitosamente!");
 
             setTimeout(() => {
                 window.location.href = "/";
             }, 1500);
+
         } catch (error: any) {
             console.error("Error al procesar reserva:", error);
             const backendMessage = error.response?.data?.message;

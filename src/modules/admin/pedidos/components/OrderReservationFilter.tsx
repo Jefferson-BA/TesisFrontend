@@ -46,8 +46,7 @@ export default function OrderReservationFilter({ onSelectReservation }: OrderRes
         <option value="">Ver todos los pedidos</option>
         {reservations.map((res) => (
           <option key={res.id} value={res.id}>
-            Reserva {res.tableNumber || res.mesaId || res.id} - {res.user?.name || res.customerName || res.clientName || `Ref: #${res.id}`}
-          </option>
+            Reserva de {res.user?.name || res.customerName || res.clientName || `Ref: #${res.id}`}          </option>
         ))}
       </select>
     </div>
