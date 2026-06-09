@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Eye, Package, Phone, Edit, Trash2, X, Calendar, MapPin, Users, FileText, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { Eye, Package, Phone, Edit, Trash2, X, Calendar, MapPin, Users, FileText, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Utensils } from "lucide-react";
 import { getReservations, updateReservation, deleteReservation } from "@/modules/admin/reservas/services/reservation.service";
 import type { PaginationMeta } from "@/modules/admin/reservas/interfaces/reservation.interface";
 
 export default function ReservationsAdmin() {
   const [reservations, setReservations] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  
+
   // 🔥 ESTADOS PARA PAGINACIÓN
   const [meta, setMeta] = useState<PaginationMeta | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -18,6 +18,10 @@ export default function ReservationsAdmin() {
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
+  // 🔥 ESTADOS PARA EL MODAL DE TIENDA / CARRITO
+  const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
+  const [modalOrderItems, setModalOrderItems] = useState<any[]>([]);
+
   useEffect(() => {
     fetchReservations();
   }, [currentPage]); // Se vuelve a ejecutar si cambia la página
@@ -26,8 +30,6 @@ export default function ReservationsAdmin() {
     setIsLoading(true);
     try {
       const response = await getReservations(undefined, currentPage, limit);
-      
-      // Mapeamos la nueva estructura { data, meta }
       setReservations(response.data || []);
       setMeta(response.meta || null);
     } catch (error) {
@@ -45,7 +47,6 @@ export default function ReservationsAdmin() {
   };
 
   const handleStatusChange = async (id: string, newStatus: string) => {
-    // Actualización Optimista
     setReservations((prev) =>
       prev.map((res) => (res.id === id ? { ...res, status: newStatus } : res))
     );
@@ -56,7 +57,7 @@ export default function ReservationsAdmin() {
     } catch (error) {
       console.error("Error al actualizar estado:", error);
       toast.error("Error al actualizar. Revirtiendo cambio...");
-      fetchReservations(); // Revertimos si falla
+      fetchReservations();
     }
   };
 
@@ -65,14 +66,13 @@ export default function ReservationsAdmin() {
     try {
       await deleteReservation(id);
       toast.success("Reserva eliminada correctamente");
-      fetchReservations(); // Refrescar la página actual
+      fetchReservations();
     } catch (error) {
       toast.error("No se pudo eliminar la reserva");
     }
   };
 
-const handleViewDetails = (id: string) => {
-    // Redirige automáticamente a la sección de pedidos con el ID de la reserva en la URL
+  const handleViewDetails = (id: string) => {
     window.location.href = `/admin/pedidos?reservationId=${id}`;
   };
 
@@ -82,12 +82,17 @@ const handleViewDetails = (id: string) => {
     setIsEditModalOpen(true);
   };
 
-  const handleViewOrder = (orderId?: string) => {
-    if (orderId) toast.info(`ID del pedido: ${orderId} (Próximamente modal de Tienda)`);
-    else toast.error("Esta reserva no tiene un pedido asociado.");
+  // 🔥 ACCIÓN ACTUALIZADA PARA ABRIR EL MODAL DEL CARRITO
+  const handleViewOrder = (res: any) => {
+    const items = res.items || res.order?.items || [];
+    if (items.length > 0) {
+      setModalOrderItems(items);
+      setIsOrderModalOpen(true);
+    } else {
+      toast.error("Esta reserva no contiene platos o productos registrados.");
+    }
   };
 
-  // Helper para los colores del estado con los datos oficiales del backend
   const getStatusColor = (status: string) => {
     const s = status?.toLowerCase();
     if (s === 'pending_review') return 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20';
@@ -105,7 +110,7 @@ const handleViewDetails = (id: string) => {
         <div className="p-6 border-b border-[#2a1f1a] flex justify-between items-center bg-[#1a1410]">
           <h2 className="text-xl font-black text-yellow-500 uppercase tracking-wide">Gestión de Reservas</h2>
         </div>
-        
+
         {isLoading ? (
           <div className="p-8 text-zinc-400 flex justify-center items-center h-40">Cargando reservas...</div>
         ) : (
@@ -138,7 +143,7 @@ const handleViewDetails = (id: string) => {
                           {res.serviceStartTime}
                         </div>
                       </td>
-                      
+
                       <td className="px-6 py-4 align-middle">
                         <div className="font-medium text-zinc-200 block max-w-[220px] truncate flex items-center gap-1.5">
                           <MapPin className="w-3.5 h-3.5 text-zinc-500" />
@@ -149,11 +154,11 @@ const handleViewDetails = (id: string) => {
                           {res.guestsCount} personas
                         </div>
                       </td>
-                      
+
                       <td className="px-6 py-4 align-middle text-center">
-                        <select 
+                        <select
                           className={`text-xs font-bold rounded-md px-3 py-1.5 outline-none border cursor-pointer transition-all hover:brightness-110 ${getStatusColor(res.status)}`}
-                          value={res.status?.toLowerCase()}
+                          value={res.status}
                           onChange={(e) => handleStatusChange(res.id, e.target.value)}
                         >
                           <option value="pending_review" className="bg-zinc-900 text-zinc-100">PENDIENTE REVISIÓN</option>
@@ -167,19 +172,33 @@ const handleViewDetails = (id: string) => {
 
                       <td className="px-6 py-4 align-middle">
                         <div className="flex justify-center items-center gap-2 opacity-80 group-hover:opacity-100 transition-opacity">
-                          
+
                           <button onClick={() => handleViewDetails(res.id)} title="Ver detalles completos" className="p-2 rounded-md text-zinc-400 hover:text-cyan-400 hover:bg-cyan-400/10 transition-colors">
                             <Eye className="w-4 h-4" />
                           </button>
-                          
-                          <button onClick={() => handleViewOrder(res.order?.id)} title="Ver pedido en tienda" className="p-2 rounded-md text-zinc-400 hover:text-purple-400 hover:bg-purple-400/10 transition-colors">
+
+                          <button onClick={() => handleViewOrder(res)} title="Ver pedidos" className="p-2 rounded-md text-zinc-400 hover:text-purple-400 hover:bg-purple-400/10 transition-colors">
                             <Package className="w-4 h-4" />
                           </button>
 
-                          <a href={res.user?.phone ? `tel:${res.user.phone}` : '#'} 
-                             onClick={(e) => !res.user?.phone && e.preventDefault()}
-                             title={res.user?.phone ? `Llamar a ${res.user.phone}` : "No hay teléfono registrado"} 
-                             className={`p-2 rounded-md transition-colors ${res.user?.phone ? 'text-zinc-400 hover:text-emerald-400 hover:bg-emerald-400/10' : 'text-zinc-700 cursor-not-allowed'}`}>
+                          {/* Botón de WhatsApp con mensaje personalizado */}
+                          <a
+                            href={
+                              res.user?.phone
+                                ? `https://wa.me/${res.user.phone.replace(/\D/g, '')}?text=${encodeURIComponent(
+                                  `¡Hola ${res.user.name || ''}! Te saluda el equipo administrativo. Nos comunicamos contigo respecto a tu reserva para el día ${new Date(res.eventDate).toLocaleDateString()}.`
+                                )}`
+                                : '#'
+                            }
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => !res.user?.phone && e.preventDefault()}
+                            title={res.user?.phone ? `Enviar WhatsApp a ${res.user.phone}` : "No hay teléfono registrado"}
+                            className={`p-2 rounded-md transition-colors ${res.user?.phone
+                                ? 'text-zinc-400 hover:text-emerald-400 hover:bg-emerald-400/10'
+                                : 'text-zinc-700 cursor-not-allowed'
+                              }`}
+                          >
                             <Phone className="w-4 h-4" />
                           </a>
 
@@ -225,7 +244,7 @@ const handleViewDetails = (id: string) => {
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
-              
+
               <div className="px-3 py-1.5 rounded bg-[#15100c] border border-yellow-500/20 text-xs font-bold text-yellow-500 mx-1 min-w-[80px] text-center">
                 {currentPage} / {meta.totalPages}
               </div>
@@ -252,6 +271,76 @@ const handleViewDetails = (id: string) => {
       </div>
 
       {/* ==========================================
+          🔥 NUEVO MODAL: RESUMEN DE PLATOS SOLICITADOS
+      ========================================== */}
+      {isOrderModalOpen && (
+        <div className="fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4 backdrop-blur-sm">
+          <div className="bg-[#15100c] border border-[#2a1f1a] rounded-xl w-full max-w-2xl shadow-2xl overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-150">
+            <div className="p-6 border-b border-[#2a1f1a] bg-[#1a1410] flex justify-between items-center">
+              <h3 className="text-sm font-black text-yellow-500 uppercase flex items-center gap-2 tracking-wider">
+                <Utensils className="w-4 h-4" /> Resumen de Platos Solicitados
+              </h3>
+              <button onClick={() => setIsOrderModalOpen(false)} className="text-zinc-500 hover:text-zinc-100 transition-colors">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-6 overflow-x-auto">
+              <table className="w-full text-left border-collapse text-xs">
+                <thead className="border-b border-[#2a1f1a] text-[10px] uppercase text-zinc-500 tracking-wider font-bold">
+                  <tr>
+                    <th className="pb-3 text-zinc-400 font-bold">Comida / Producto</th>
+                    <th className="pb-3 text-zinc-400 font-bold">Categoría</th>
+                    <th className="pb-3 text-zinc-400 font-bold text-center">Precio Unit.</th>
+                    <th className="pb-3 text-zinc-400 font-bold text-center">Unidades</th>
+                    <th className="pb-3 text-zinc-400 font-bold text-right">Subtotal</th>
+                  </tr>
+                </thead>
+                <tbody className="text-zinc-300 divide-y divide-[#2a1f1a]/30">
+                  {modalOrderItems.map((item: any, index: number) => {
+                    const itemName = item.name || item.product?.name || item.foodName || "Plato sin nombre";
+                    const itemCategory = item.category || item.product?.category?.name || "Comida";
+                    const itemQty = item.quantity || item.qty || 1;
+                    const itemPrice = Number(item.price || item.product?.price || 0);
+                    const itemSubtotal = Number(item.subtotal || (itemQty * itemPrice));
+
+                    return (
+                      <tr key={item.id || index} className="hover:bg-[#1a1410] transition-colors">
+                        <td className="py-4 font-bold text-zinc-100 text-sm">{itemName}</td>
+                        <td className="py-4 text-zinc-500">
+                          <span className="px-2.5 py-0.5 bg-[#211814] rounded-md text-[10px] border border-[#2a1f1a]">
+                            {itemCategory}
+                          </span>
+                        </td>
+                        <td className="py-4 text-center font-mono text-zinc-400">
+                          S/ {itemPrice.toFixed(2)}
+                        </td>
+                        <td className="py-4 text-center">
+                          <span className="font-black text-yellow-500 text-sm">x{itemQty}</span>
+                        </td>
+                        <td className="py-4 text-right font-mono font-bold text-emerald-400/90">
+                          S/ {itemSubtotal.toFixed(2)}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="p-4 border-t border-[#2a1f1a] bg-[#1a1410] flex justify-end">
+              <div className="text-right">
+                <span className="text-xs text-zinc-500 uppercase font-bold tracking-wider mr-3">Total Carrito:</span>
+                <span className="text-lg font-mono font-black text-yellow-500">
+                  S/ {modalOrderItems.reduce((acc, item) => acc + (Number(item.subtotal) || ((item.quantity || 1) * Number(item.price || 0))), 0).toFixed(2)}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ==========================================
           MODAL: VER DETALLES
       ========================================== */}
       {isDetailsModalOpen && selectedReservation && (
@@ -265,7 +354,7 @@ const handleViewDetails = (id: string) => {
                 <X className="w-5 h-5" />
               </button>
             </div>
-            
+
             <div className="p-6 space-y-4 text-sm text-zinc-300">
               <div className="bg-[#1a1410] p-4 rounded-lg border border-[#2a1f1a] flex flex-col gap-2">
                 <p className="flex items-center gap-2"><Users className="w-4 h-4 text-zinc-500" /> <strong className="text-zinc-100">Cliente:</strong> {selectedReservation.user?.name || "No disponible"}</p>
@@ -312,7 +401,7 @@ const handleViewDetails = (id: string) => {
                 <X className="w-5 h-5" />
               </button>
             </div>
-            
+
             <p className="text-zinc-400 mb-6 text-sm">
               Conecta tu formulario aquí para editar la dirección, hora o notas de la reserva #{selectedReservation.id}.
             </p>
