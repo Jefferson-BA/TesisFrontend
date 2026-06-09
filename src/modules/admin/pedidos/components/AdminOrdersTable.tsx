@@ -8,14 +8,13 @@ export default function AdminOrdersTable() {
   const [orders, setOrders] = useState<any[]>([]);
   const [selectedReservation, setSelectedReservation] = useState<any | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  // Nuevo estado para controlar qué fila está expandida
   const [expandedOrderId, setExpandedOrderId] = useState<string | number | null>(null);
 
   const loadOrders = async (reservationId?: string | number) => {
     setLoading(true);
     try {
       const data = await getOrders(reservationId);
-      console.log("📦 DATA DE ÓRDENES RECIBIDA:", data);
+      console.log("📦 DATA DE ÓRDENES ACTUALIZADA:", data);
       const ordersList = Array.isArray(data) ? data : data.data || [];
       setOrders(ordersList);
     } catch (error) {
@@ -29,7 +28,6 @@ export default function AdminOrdersTable() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const reservationId = params.get("reservationId");
-
     if (reservationId) {
       loadOrders(reservationId);
     } else {
@@ -40,7 +38,6 @@ export default function AdminOrdersTable() {
   const handleReservationChange = (reservation: any | null) => {
     setSelectedReservation(reservation);
     loadOrders(reservation?.id);
-    // Cerramos cualquier fila expandida al cambiar de reserva
     setExpandedOrderId(null);
   };
 
@@ -56,7 +53,6 @@ export default function AdminOrdersTable() {
     }
   };
 
-  // Función para abrir/cerrar el detalle del pedido
   const toggleRow = (orderId: string | number) => {
     setExpandedOrderId((prev) => (prev === orderId ? null : orderId));
   };
@@ -72,7 +68,6 @@ export default function AdminOrdersTable() {
 
   return (
     <div className="space-y-6 w-full max-w-full">
-      {/* Encabezado */}
       <div className="p-6 rounded-xl border border-[#2a1f1a] bg-[#15100c] flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xl">
         <div>
           <h2 className="text-xl font-black text-yellow-500 uppercase tracking-wide">Gestión de Pedidos</h2>
@@ -81,12 +76,10 @@ export default function AdminOrdersTable() {
         <OrderReservationFilter onSelectReservation={handleReservationChange} />
       </div>
 
-      {/* Tarjeta de Detalles de Reserva Activa */}
       {selectedReservation && (
         <ReservationDetailCard reservation={selectedReservation} />
       )}
 
-      {/* Tabla Completa */}
       <div className="rounded-xl border border-[#2a1f1a] bg-[#15100c] overflow-hidden shadow-xl">
         <div className="overflow-x-auto min-w-full block">
           {loading ? (
@@ -101,7 +94,7 @@ export default function AdminOrdersTable() {
             <table className="w-full text-left border-collapse text-sm text-zinc-300">
               <thead className="bg-[#211814] text-xs uppercase text-zinc-400 font-bold whitespace-nowrap">
                 <tr>
-                  <th className="px-4 py-4 border-b border-[#2a1f1a] w-10"></th> {/* Columna para el ícono de expandir */}
+                  <th className="px-4 py-4 border-b border-[#2a1f1a] w-10"></th>
                   <th className="px-4 py-4 border-b border-[#2a1f1a]">N° Pedido</th>
                   <th className="px-4 py-4 border-b border-[#2a1f1a]">Nombre</th>
                   <th className="px-4 py-4 border-b border-[#2a1f1a]">Correo</th>
@@ -115,7 +108,6 @@ export default function AdminOrdersTable() {
                   <th className="px-4 py-4 border-b border-[#2a1f1a] text-center">Estado</th>
                 </tr>
               </thead>
-
               <tbody className="divide-y divide-[#2a1f1a]/50 text-xs">
                 {orders.map((order) => {
                   const userRel = order.reservation?.user || {};
@@ -131,13 +123,10 @@ export default function AdminOrdersTable() {
                     : (order.notes || "Sin notas");
 
                   const isExpanded = expandedOrderId === order.id;
-                  
-                  // Extracción segura de los items del pedido (Ajusta los nombres según lo que devuelva tu backend)
-                  const orderItems = order.items || order.products || order.orderDetails || [];
+                  const orderItems = order.items || [];
 
                   return (
                     <React.Fragment key={order.id}>
-                      {/* FILA PRINCIPAL DEL PEDIDO */}
                       <tr 
                         className={`transition-colors border-b border-[#2a1f1a]/40 cursor-pointer ${isExpanded ? "bg-[#1f1712]" : "hover:bg-[#211814]"}`}
                         onClick={() => toggleRow(order.id)}
@@ -181,7 +170,6 @@ export default function AdminOrdersTable() {
                         </td>
                       </tr>
 
-                      {/* FILA EXPANDIBLE CON EL DETALLE DE LOS PLATOS */}
                       {isExpanded && (
                         <tr className="bg-[#0f0b08] border-b border-[#2a1f1a]">
                           <td colSpan={12} className="p-6">
@@ -189,7 +177,6 @@ export default function AdminOrdersTable() {
                               <h4 className="text-yellow-500 text-xs font-black uppercase tracking-wider mb-4 flex items-center gap-2">
                                 <Utensils className="w-4 h-4" /> Resumen de Platos Solicitados
                               </h4>
-                              
                               {orderItems.length > 0 ? (
                                 <div className="overflow-x-auto">
                                   <table className="w-full text-left border-collapse">
@@ -204,12 +191,11 @@ export default function AdminOrdersTable() {
                                     </thead>
                                     <tbody className="text-xs text-zinc-300 divide-y divide-[#2a1f1a]/30">
                                       {orderItems.map((item: any, index: number) => {
-                                        // Extraemos los datos de forma robusta según cómo venga tu API
-                                        const itemName = item.name || item.product?.name || item.foodName || "Plato sin nombre";
-                                        const itemCategory = item.category || item.product?.category?.name || "General";
-                                        const itemQty = item.quantity || item.qty || 1;
-                                        const itemPrice = Number(item.price || item.product?.price || 0);
-                                        const itemSubtotal = itemQty * itemPrice;
+                                        const itemName = item.name || "Plato sin nombre";
+                                        const itemCategory = item.category || "Comida"; 
+                                        const itemQty = item.quantity || 1;
+                                        const itemPrice = Number(item.price || 0);
+                                        const itemSubtotal = Number(item.subtotal || (itemQty * itemPrice));
 
                                         return (
                                           <tr key={item.id || index} className="hover:bg-[#1a1410] transition-colors">
