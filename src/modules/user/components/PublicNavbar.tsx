@@ -19,12 +19,22 @@ export function PublicNavbar() {
   const [isMounted, setIsMounted] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [currentPath, setCurrentPath] = useState("");
 
   useEffect(() => {
     setIsMounted(true);
+    // Captura de forma segura la URL del navegador en el cliente
+    if (typeof window !== "undefined") {
+      setCurrentPath(window.location.pathname);
+    }
   }, []);
 
-  // Cerrar dropdowns al hacer click fuera si fuera necesario (opcional)
+  // Función auxiliar para determinar de forma limpia si una pestaña está activa
+  const isTabActive = (path: string) => {
+    if (path === "/") return currentPath === "/";
+    return currentPath.startsWith(path);
+  };
+
   return (
     <header className="fixed top-0 left-0 w-full z-50 bg-[#0b0806]/90 border-b border-[#3d2c1f]/60 backdrop-blur-md transition-all">
       <nav className="max-w-7xl mx-auto h-[76px] px-4 sm:px-6 flex items-center justify-between">
@@ -46,18 +56,36 @@ export function PublicNavbar() {
         </a>
 
         {/* NAVIGATION LINKS (DESKTOP) */}
-        <div className="hidden md:flex items-center gap-8 text-sm font-medium text-zinc-400">
-          <a href="/" className="hover:text-yellow-500 transition-colors py-2">
+        <div className="hidden md:flex items-center gap-8 text-sm font-medium">
+          <a 
+            href="/" 
+            className={`transition-all py-2 border-b-2 ${
+              isTabActive("/") 
+                ? "text-yellow-500 font-semibold border-yellow-500/80" 
+                : "text-zinc-400 hover:text-yellow-500 border-transparent"
+            }`}
+          >
             Inicio
           </a>
-          <a href="/menu" className="hover:text-yellow-500 transition-colors py-2">
+          <a 
+            href="/menu" 
+            className={`transition-all py-2 border-b-2 ${
+              isTabActive("/menu") 
+                ? "text-yellow-500 font-semibold border-yellow-500/80" 
+                : "text-zinc-400 hover:text-yellow-500 border-transparent"
+            }`}
+          >
             Menú
           </a>
-          <a href="/reservas" className="text-yellow-500 hover:text-yellow-400 transition-colors font-semibold py-2 border-b-2 border-yellow-500/30">
+          <a 
+            href="/reservas" 
+            className={`transition-all py-2 border-b-2 ${
+              isTabActive("/reservas") 
+                ? "text-yellow-500 font-semibold border-yellow-500/80" 
+                : "text-zinc-400 hover:text-yellow-500 border-transparent"
+            }`}
+          >
             Reservas
-          </a>
-          <a href="/#contacto" className="hover:text-yellow-500 transition-colors py-2">
-            Contacto
           </a>
         </div>
 
@@ -81,7 +109,7 @@ export function PublicNavbar() {
                 <ChevronDown size={14} className={`text-zinc-500 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
 
-              {/* DROPDOWN MENU MENU */}
+              {/* DROPDOWN MENU */}
               {isDropdownOpen && (
                 <div className="absolute right-0 mt-2 w-52 bg-[#0f0c0a] border border-[#3d2c1f] rounded-xl shadow-2xl py-1.5 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
                   <div className="px-4 py-2 border-b border-[#3d2c1f]/50 mb-1">
@@ -124,7 +152,7 @@ export function PublicNavbar() {
             <ShoppingCart className="w-6 h-6 transition-transform group-hover:scale-105" />
             {isMounted && cart.length > 0 && (
               <span className="absolute top-0 right-0 bg-yellow-500 text-black text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center shadow-[0_0_10px_rgba(234,179,8,0.5)] transform translate-x-1 -translate-y-1">
-                {cart.length}
+                {cart.reduce((acc, item) => acc + item.quantity, 0)}
               </span>
             )}
           </a>
@@ -141,18 +169,38 @@ export function PublicNavbar() {
 
       {/* MOBILE MENU DRAWER */}
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-[#0b0806] border-b border-[#3d2c1f] px-6 py-4 space-y-3 animate-in fade-in slide-in-from-top-5">
-          <a href="/" className="block text-zinc-300 hover:text-yellow-500 font-medium py-1">Inicio</a>
-          <a href="/menu" className="block text-zinc-300 hover:text-yellow-500 font-medium py-1">Menú</a>
-          <a href="/reservas" className="block text-yellow-500 font-semibold py-1">Reservas</a>
-          <a href="/#contacto" className="block text-zinc-300 hover:text-yellow-500 font-medium py-1">Contacto</a>
+        <div className="md:hidden bg-[#0b0806] border-b border-[#3d2c1f] px-6 py-4 space-y-2 animate-in fade-in slide-in-from-top-5">
+          <a 
+            href="/" 
+            className={`block font-medium py-2 rounded-lg px-3 transition-colors ${
+              isTabActive("/") ? "text-yellow-500 bg-[#120d0a]" : "text-zinc-300"
+            }`}
+          >
+            Inicio
+          </a>
+          <a 
+            href="/menu" 
+            className={`block font-medium py-2 rounded-lg px-3 transition-colors ${
+              isTabActive("/menu") ? "text-yellow-500 bg-[#120d0a]" : "text-zinc-300"
+            }`}
+          >
+            Menú
+          </a>
+          <a 
+            href="/reservas" 
+            className={`block font-medium py-2 rounded-lg px-3 transition-colors ${
+              isTabActive("/reservas") ? "text-yellow-500 bg-[#120d0a]" : "text-zinc-300"
+            }`}
+          >
+            Reservas
+          </a>
           
           {isMounted && user && (
-            <div className="pt-3 border-t border-[#3d2c1f]/60 space-y-2">
-              <p className="text-xs text-zinc-500 truncate">Conectado como: {user.email}</p>
-              <a href="/user/profile" className="block text-sm text-zinc-300 py-1">Mi Perfil</a>
-              {isAdmin && <a href="/admin/dashboard" className="block text-sm text-zinc-300 py-1">Dashboard</a>}
-              <button onClick={logout} className="block text-sm text-red-400 py-1 text-left w-full">Salir</button>
+            <div className="pt-3 border-t border-[#3d2c1f]/60 space-y-1">
+              <p className="text-[11px] text-zinc-500 px-3 truncate">Conectado como: {user.email}</p>
+              <a href="/user/profile" className="block text-sm text-zinc-300 py-2 px-3 hover:text-yellow-500">Mi Perfil</a>
+              {isAdmin && <a href="/admin/dashboard" className="block text-sm text-zinc-300 py-2 px-3 hover:text-yellow-500">Dashboard</a>}
+              <button onClick={logout} className="block text-sm text-red-400 py-2 px-3 text-left w-full hover:bg-red-500/5 rounded-lg">Salir</button>
             </div>
           )}
         </div>
