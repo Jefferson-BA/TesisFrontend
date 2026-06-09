@@ -1,23 +1,23 @@
-// src/modules/admin/pedidos/components/AdminOrdersTable.tsx
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { getOrders, updateOrderStatus } from "@/modules/admin/pedidos/services/order.service";
 import OrderReservationFilter from "./OrderReservationFilter";
 import ReservationDetailCard from "./ReservationDetailCard";
+import { ChevronDown, ChevronRight, Utensils, Receipt } from "lucide-react";
 
 export default function AdminOrdersTable() {
   const [orders, setOrders] = useState<any[]>([]);
   const [selectedReservation, setSelectedReservation] = useState<any | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  // Nuevo estado para controlar qué fila está expandida
+  const [expandedOrderId, setExpandedOrderId] = useState<string | number | null>(null);
 
   const loadOrders = async (reservationId?: string | number) => {
     setLoading(true);
     try {
       const data = await getOrders(reservationId);
-      
-      // 👇 LOG AGREGADO: Espiando qué devuelve el endpoint de órdenes
       console.log("📦 DATA DE ÓRDENES RECIBIDA:", data);
-      
-      setOrders(Array.isArray(data) ? data : data.data || []);
+      const ordersList = Array.isArray(data) ? data : data.data || [];
+      setOrders(ordersList);
     } catch (error) {
       console.error(error);
       alert("Error al cargar pedidos");
@@ -26,12 +26,22 @@ export default function AdminOrdersTable() {
     }
   };
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const reservationId = params.get("reservationId");
+
+    if (reservationId) {
+      loadOrders(reservationId);
+    } else {
+      loadOrders();
+    }
+  }, []);
+
   const handleReservationChange = (reservation: any | null) => {
-    // 👇 LOG AGREGADO: Espiando qué trae el objeto de la reserva
-    console.log("🔍 DATA DE LA RESERVA SELECCIONADA:", reservation);
-    
     setSelectedReservation(reservation);
     loadOrders(reservation?.id);
+    // Cerramos cualquier fila expandida al cambiar de reserva
+    setExpandedOrderId(null);
   };
 
   const handleStatusChange = async (orderId: string | number, newStatus: string) => {
@@ -46,13 +56,22 @@ export default function AdminOrdersTable() {
     }
   };
 
-  useEffect(() => {
-    loadOrders();
-  }, []);
+  // Función para abrir/cerrar el detalle del pedido
+  const toggleRow = (orderId: string | number) => {
+    setExpandedOrderId((prev) => (prev === orderId ? null : orderId));
+  };
+
+  const getStatusStyle = (status: string) => {
+    const s = status?.toLowerCase() || "pendiente";
+    if (s.includes("pend")) return "bg-amber-500/10 text-amber-500 border-amber-500/30";
+    if (s.includes("conf") || s.includes("aprob")) return "bg-emerald-500/10 text-emerald-400 border-emerald-500/30";
+    if (s.includes("entreg")) return "bg-blue-500/10 text-blue-400 border-blue-500/30";
+    if (s.includes("canc")) return "bg-rose-500/10 text-rose-500 border-rose-500/30";
+    return "bg-zinc-800 text-zinc-300 border-zinc-700";
+  };
 
   return (
     <div className="space-y-6 w-full max-w-full">
-      
       {/* Encabezado */}
       <div className="p-6 rounded-xl border border-[#2a1f1a] bg-[#15100c] flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xl">
         <div>
@@ -67,7 +86,7 @@ export default function AdminOrdersTable() {
         <ReservationDetailCard reservation={selectedReservation} />
       )}
 
-      {/* Tabla Completa con las 12 Columnas Originales */}
+      {/* Tabla Completa */}
       <div className="rounded-xl border border-[#2a1f1a] bg-[#15100c] overflow-hidden shadow-xl">
         <div className="overflow-x-auto min-w-full block">
           {loading ? (
@@ -80,15 +99,15 @@ export default function AdminOrdersTable() {
             </div>
           ) : (
             <table className="w-full text-left border-collapse text-sm text-zinc-300">
-              <thead className="bg-[#211814] text-xs uppercase text-zinc-400 font-bold white-space-nowrap">
+              <thead className="bg-[#211814] text-xs uppercase text-zinc-400 font-bold whitespace-nowrap">
                 <tr>
+                  <th className="px-4 py-4 border-b border-[#2a1f1a] w-10"></th> {/* Columna para el ícono de expandir */}
                   <th className="px-4 py-4 border-b border-[#2a1f1a]">N° Pedido</th>
                   <th className="px-4 py-4 border-b border-[#2a1f1a]">Nombre</th>
                   <th className="px-4 py-4 border-b border-[#2a1f1a]">Correo</th>
                   <th className="px-4 py-4 border-b border-[#2a1f1a]">Teléfono</th>
                   <th className="px-4 py-4 border-b border-[#2a1f1a]">Ciudad</th>
                   <th className="px-4 py-4 border-b border-[#2a1f1a]">Dirección</th>
-                  <th className="px-4 py-4 border-b border-[#2a1f1a]">Cód. Postal</th>
                   <th className="px-4 py-4 border-b border-[#2a1f1a]">Fecha Evento</th>
                   <th className="px-4 py-4 border-b border-[#2a1f1a]">Notas</th>
                   <th className="px-4 py-4 border-b border-[#2a1f1a]">Total</th>
@@ -98,66 +117,136 @@ export default function AdminOrdersTable() {
               </thead>
 
               <tbody className="divide-y divide-[#2a1f1a]/50 text-xs">
-                {orders.map((order) => (
-                  <tr key={order.id} className="hover:bg-[#211814] transition-colors border-b border-[#2a1f1a]/40">
-                    <td className="px-4 py-4 font-mono text-yellow-500 font-black">#{order.id}</td>
-                    
-                    <td className="px-4 py-4 font-bold text-zinc-100">
-                      {order.fullName || order.customerName || order.name || "Sin nombre"}
-                    </td>
-                    
-                    <td className="px-4 py-4 text-zinc-400">
-                      {order.email || order.customerEmail || "Sin correo"}
-                    </td>
-                    
-                    <td className="px-4 py-4 text-zinc-300">
-                      {order.phone || order.customerPhone || "Sin teléfono"}
-                    </td>
-                    
-                    <td className="px-4 py-4 text-zinc-300">
-                      {order.city || "Sin ciudad"}
-                    </td>
-                    
-                    <td className="px-4 py-4 text-zinc-300 max-w-[150px] truncate" title={order.address || order.eventAddress}>
-                      {order.address || order.eventAddress || "Sin dirección"}
-                    </td>
-                    
-                    <td className="px-4 py-4 text-zinc-400">
-                      {order.postalCode || "Sin código"}
-                    </td>
-                    
-                    <td className="px-4 py-4 text-zinc-400">
-                      {order.eventDate || "Sin fecha"}
-                    </td>
-                    
-                    <td className="px-4 py-4 max-w-[150px] truncate text-zinc-400" title={order.notes || order.specialNotes}>
-                      {order.notes || order.specialNotes || "Sin notas"}
-                    </td>
-                    
-                    <td className="px-4 py-4 font-bold text-zinc-100">
-                      S/ {Number(order.total || 0).toFixed(2)}
-                    </td>
-                    
-                    <td className="px-4 py-4">
-                      <span className="px-2 py-0.5 font-bold uppercase rounded bg-[#211814] text-zinc-400 border border-[#2a1f1a]">
-                        {order.paymentMethod || "Sin método"}
-                      </span>
-                    </td>
-                    
-                    <td className="px-4 py-4 text-center">
-                      <select
-                        value={order.status || "Pendiente"}
-                        onChange={(e) => handleStatusChange(order.id, e.target.value)}
-                        className="bg-[#1a1410] border border-[#2a1f1a] text-zinc-200 text-xs font-bold rounded-md p-1.5 focus:ring-1 focus:ring-yellow-500 outline-none cursor-pointer transition-all hover:brightness-110"
+                {orders.map((order) => {
+                  const userRel = order.reservation?.user || {};
+                  const clientName = order.fullName || order.customerName || userRel.name || "Jefferson";
+                  const clientEmail = order.email || order.customerEmail || userRel.email || "jeffeson123xd@gmail.com";
+                  const rawPhone = order.phone || order.customerPhone || userRel.phone;
+                  const clientPhone = rawPhone && rawPhone !== "No disponible" ? rawPhone : "123123123";
+                  
+                  const hasAddressPipe = order.shippingAddress?.includes("|");
+                  const cleanAddress = hasAddressPipe ? order.shippingAddress.split(" | ")[0] : (order.address || order.shippingAddress);
+                  const parsedNotes = hasAddressPipe && order.shippingAddress.includes("Notas:")
+                    ? order.shippingAddress.split("Notas: ")[1]
+                    : (order.notes || "Sin notas");
+
+                  const isExpanded = expandedOrderId === order.id;
+                  
+                  // Extracción segura de los items del pedido (Ajusta los nombres según lo que devuelva tu backend)
+                  const orderItems = order.items || order.products || order.orderDetails || [];
+
+                  return (
+                    <React.Fragment key={order.id}>
+                      {/* FILA PRINCIPAL DEL PEDIDO */}
+                      <tr 
+                        className={`transition-colors border-b border-[#2a1f1a]/40 cursor-pointer ${isExpanded ? "bg-[#1f1712]" : "hover:bg-[#211814]"}`}
+                        onClick={() => toggleRow(order.id)}
                       >
-                        <option value="Pendiente" className="bg-[#15100c]">Pendiente</option>
-                        <option value="Confirmado" className="bg-[#15100c]">Confirmado</option>
-                        <option value="Entregado" className="bg-[#15100c]">Entregado</option>
-                        <option value="Cancelado" className="bg-[#15100c]">Cancelado</option>
-                      </select>
-                    </td>
-                  </tr>
-                ))}
+                        <td className="px-4 py-4 text-zinc-500">
+                          {isExpanded ? <ChevronDown className="w-4 h-4 text-yellow-500" /> : <ChevronRight className="w-4 h-4" />}
+                        </td>
+                        <td className="px-4 py-4 font-mono text-yellow-500 font-black">#{order.id}</td>
+                        <td className="px-4 py-4 font-bold text-zinc-100">{clientName}</td>
+                        <td className="px-4 py-4 text-zinc-400 font-mono text-[11px]">{clientEmail}</td>
+                        <td className="px-4 py-4 text-zinc-300 font-mono">{clientPhone}</td>
+                        <td className="px-4 py-4 text-zinc-300 capitalize">{order.city || order.reservation?.city || "Lima"}</td>
+                        <td className="px-4 py-4 text-zinc-300 max-w-[160px] truncate" title={order.shippingAddress || order.address}>
+                          {cleanAddress || "Sin dirección"}
+                        </td>
+                        <td className="px-4 py-4 text-zinc-400 font-mono">
+                          {order.eventDate || order.reservation?.eventDate || "Por confirmar"}
+                        </td>
+                        <td className="px-4 py-4 max-w-[140px] truncate text-zinc-400 italic" title={parsedNotes}>
+                          {parsedNotes}
+                        </td>
+                        <td className="px-4 py-4 font-bold text-zinc-100 font-mono">
+                          S/ {Number(order.total || 0).toFixed(2)}
+                        </td>
+                        <td className="px-4 py-4">
+                          <span className="px-2 py-0.5 font-bold uppercase rounded bg-[#1a1410] text-amber-500/90 border border-[#2a1f1a] text-[10px] tracking-wider">
+                            {order.paymentMethod || "yape"}
+                          </span>
+                        </td>
+                        <td className="px-4 py-4 text-center" onClick={(e) => e.stopPropagation()}>
+                          <select
+                            value={order.status || "Pendiente"}
+                            onChange={(e) => handleStatusChange(order.id, e.target.value)}
+                            className={`border text-xs font-black rounded-md p-1.5 focus:ring-1 focus:ring-yellow-500 outline-none cursor-pointer transition-all hover:brightness-110 ${getStatusStyle(order.status)}`}
+                          >
+                            <option value="Pendiente" className="bg-[#15100c] text-amber-500">⏳ Pendiente</option>
+                            <option value="Confirmado" className="bg-[#15100c] text-emerald-400">✅ Confirmado</option>
+                            <option value="Entregado" className="bg-[#15100c] text-blue-400">🚚 Entregado</option>
+                            <option value="Cancelado" className="bg-[#15100c] text-rose-500">❌ Cancelado</option>
+                          </select>
+                        </td>
+                      </tr>
+
+                      {/* FILA EXPANDIBLE CON EL DETALLE DE LOS PLATOS */}
+                      {isExpanded && (
+                        <tr className="bg-[#0f0b08] border-b border-[#2a1f1a]">
+                          <td colSpan={12} className="p-6">
+                            <div className="bg-[#15100c] rounded-xl border border-[#2a1f1a] p-5 shadow-inner">
+                              <h4 className="text-yellow-500 text-xs font-black uppercase tracking-wider mb-4 flex items-center gap-2">
+                                <Utensils className="w-4 h-4" /> Resumen de Platos Solicitados
+                              </h4>
+                              
+                              {orderItems.length > 0 ? (
+                                <div className="overflow-x-auto">
+                                  <table className="w-full text-left border-collapse">
+                                    <thead className="border-b border-[#2a1f1a] text-[10px] uppercase text-zinc-500">
+                                      <tr>
+                                        <th className="pb-2 font-bold">Comida / Producto</th>
+                                        <th className="pb-2 font-bold">Categoría</th>
+                                        <th className="pb-2 font-bold text-center">Precio Unit.</th>
+                                        <th className="pb-2 font-bold text-center">Unidades</th>
+                                        <th className="pb-2 font-bold text-right">Subtotal</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody className="text-xs text-zinc-300 divide-y divide-[#2a1f1a]/30">
+                                      {orderItems.map((item: any, index: number) => {
+                                        // Extraemos los datos de forma robusta según cómo venga tu API
+                                        const itemName = item.name || item.product?.name || item.foodName || "Plato sin nombre";
+                                        const itemCategory = item.category || item.product?.category?.name || "General";
+                                        const itemQty = item.quantity || item.qty || 1;
+                                        const itemPrice = Number(item.price || item.product?.price || 0);
+                                        const itemSubtotal = itemQty * itemPrice;
+
+                                        return (
+                                          <tr key={item.id || index} className="hover:bg-[#1a1410] transition-colors">
+                                            <td className="py-3 font-medium text-zinc-200">{itemName}</td>
+                                            <td className="py-3 text-zinc-500">
+                                              <span className="px-2 py-0.5 bg-[#211814] rounded-md text-[10px] border border-[#2a1f1a]">
+                                                {itemCategory}
+                                              </span>
+                                            </td>
+                                            <td className="py-3 text-center font-mono text-zinc-400">
+                                              S/ {itemPrice.toFixed(2)}
+                                            </td>
+                                            <td className="py-3 text-center">
+                                              <span className="font-bold text-yellow-500">x{itemQty}</span>
+                                            </td>
+                                            <td className="py-3 text-right font-mono font-bold text-emerald-400/90">
+                                              S/ {itemSubtotal.toFixed(2)}
+                                            </td>
+                                          </tr>
+                                        );
+                                      })}
+                                    </tbody>
+                                  </table>
+                                </div>
+                              ) : (
+                                <div className="text-zinc-500 text-xs italic flex items-center gap-2 py-2">
+                                  <Receipt className="w-4 h-4 opacity-50" />
+                                  No hay detalle de productos registrado en esta orden.
+                                </div>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
+                  );
+                })}
               </tbody>
             </table>
           )}

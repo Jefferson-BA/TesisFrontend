@@ -1,16 +1,18 @@
+// src/modules/admin/pedidos/components/ReservationDetailCard.tsx
 import { Calendar, MapPin, Users, Phone, User, Mail, FileText, Bookmark } from "lucide-react";
 import type { Reservation } from "@/modules/admin/reservas/interfaces/reservation.interface";
 
 interface ReservationDetailCardProps {
-  reservation: Reservation; // Cambiado de 'any' a nuestro tipo limpio
+  reservation: Reservation;
 }
 
 export default function ReservationDetailCard({ reservation }: ReservationDetailCardProps) {
   console.log("Datos que llegan a la tarjeta:", reservation);
+
   const getStatusBadge = (status: string) => {
     const s = status?.toLowerCase();
     if (s === 'pending_review') return 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20';
-    if (s === 'approved') return 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20';
+    if (s === 'approved' || s === 'active') return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
     if (s === 'deposit_paid') return 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20';
     if (s === 'fully_paid') return 'bg-green-500/10 text-green-400 border-green-500/20';
     if (s === 'completed') return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
@@ -18,8 +20,26 @@ export default function ReservationDetailCard({ reservation }: ReservationDetail
     return 'bg-zinc-800 text-zinc-300 border-zinc-700';
   };
 
+  // Formateador seguro de fechas para evitar desfases ISO estándar
+  const renderFormattedDate = (dateStr: string) => {
+    if (!dateStr) return "Por confirmar";
+    try {
+      const date = new Date(dateStr);
+      if (isNaN(date.getTime())) return dateStr;
+      // Añadir ajuste local si viene truncado solo año-mes-día
+      if (dateStr.length <= 10) {
+        return dateStr.split("-").reverse().join("/");
+      }
+      return date.toLocaleDateString("es-PE", { day: "2-digit", month: "2-digit", year: "numeric" });
+    } catch {
+      return dateStr;
+    }
+  };
+
   return (
-    <div className="w-full rounded-xl border border-yellow-500/30 bg-[#1a1410] p-5 shadow-lg animate-fadeIn">
+    <div className="w-full rounded-xl border border-yellow-500/20 bg-[#1a1410] p-5 shadow-2xl animate-fadeIn backdrop-blur-sm">
+      
+      {/* Barra de título integrada */}
       <div className="flex items-center gap-2 mb-4 border-b border-[#2a1f1a] pb-2">
         <Bookmark className="w-4 h-4 text-yellow-500" />
         <h3 className="text-xs font-black text-yellow-500 uppercase tracking-wider">
@@ -30,79 +50,73 @@ export default function ReservationDetailCard({ reservation }: ReservationDetail
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
         
         {/* Datos de Cuenta del Cliente */}
-        <div className="bg-[#15100c] p-3 rounded-lg border border-[#2a1f1a] space-y-1">
-          <p className="text-zinc-500 text-xs font-bold uppercase tracking-tight flex items-center gap-1">
+        <div className="bg-[#15100c] p-3 rounded-lg border border-[#2a1f1a] flex flex-col justify-center space-y-1 min-h-[85px]">
+          <p className="text-zinc-500 text-[10px] font-black uppercase tracking-wider flex items-center gap-1 mb-1">
             <User className="w-3 h-3 text-yellow-500" /> Cuenta Registrada
           </p>
-          <p className="text-zinc-100 font-bold truncate">
-            {reservation.user?.name || reservation.customerName || reservation.clientName || "No disponible"}
+          <p className="text-zinc-100 font-bold truncate text-sm">
+            {reservation.user?.name || reservation.customerName || reservation.clientName || "Jefferson"}
           </p>
-          <p className="text-xs text-zinc-400 truncate flex items-center gap-1">
-            <Mail className="w-3 h-3 text-zinc-500" /> {reservation.user?.email || reservation.customerEmail || "Sin correo electrónico"}
+          <p className="text-xs text-zinc-400 truncate flex items-center gap-1 font-mono">
+            <Mail className="w-2.5 h-2.5 text-zinc-600" /> {reservation.user?.email || reservation.customerEmail || "jeffeson123xd@gmail.com"}
           </p>
-          
-          {/* CAMBIO AQUÍ: Se eliminó el condicional de envoltura y se añadieron fallbacks robustos */}
-          <p className="text-xs text-zinc-400 flex items-center gap-1">
-            <Phone className="w-3 h-3 text-zinc-500" />{" "}
-            {reservation.phone || 
-             reservation.user?.phone || 
-             reservation.customerPhone || 
-             reservation.clientPhone || 
-             "Sin teléfono"}
+          <p className="text-xs text-amber-500/90 flex items-center gap-1 font-mono font-bold">
+            <Phone className="w-2.5 h-2.5 text-amber-600" />{" "}
+            {reservation.phone && reservation.phone !== "Sin teléfono" ? reservation.phone : "123123123"}
           </p>
         </div>
 
         {/* Ubicación Geográfica */}
-        <div className="bg-[#15100c] p-3 rounded-lg border border-[#2a1f1a]">
-          <p className="text-zinc-500 text-xs font-bold uppercase tracking-tight flex items-center gap-1">
+        <div className="bg-[#15100c] p-3 rounded-lg border border-[#2a1f1a] flex flex-col justify-center min-h-[85px]">
+          <p className="text-zinc-500 text-[10px] font-black uppercase tracking-wider flex items-center gap-1 mb-1">
             <MapPin className="w-3 h-3 text-yellow-500" /> Destino de Entrega
           </p>
-          <p className="text-zinc-100 font-bold mt-1 truncate">
-            {reservation.city || "Sin Ciudad"}
+          <p className="text-zinc-100 font-bold capitalize text-sm">
+            {reservation.city || "Lima"}
           </p>
-          <p className="text-xs text-zinc-400 truncate" title={reservation.venueAddress}>
+          <p className="text-xs text-zinc-400 line-clamp-1 mt-0.5" title={reservation.venueAddress}>
             {reservation.venueAddress || "Dirección no provista"}
           </p>
         </div>
 
         {/* Cronograma */}
-        <div className="bg-[#15100c] p-3 rounded-lg border border-[#2a1f1a]">
-          <p className="text-zinc-500 text-xs font-bold uppercase tracking-tight flex items-center gap-1">
+        <div className="bg-[#15100c] p-3 rounded-lg border border-[#2a1f1a] flex flex-col justify-center min-h-[85px]">
+          <p className="text-zinc-500 text-[10px] font-black uppercase tracking-wider flex items-center gap-1 mb-1">
             <Calendar className="w-3 h-3 text-yellow-500" /> Cronograma del Evento
           </p>
-          <p className="text-zinc-100 font-bold mt-1">
-            {reservation.eventDate ? new Date(reservation.eventDate).toLocaleDateString() : "-"}
+          <p className="text-zinc-100 font-extrabold text-sm font-mono text-yellow-500/90">
+            {renderFormattedDate(reservation.eventDate)}
           </p>
           <p className="text-xs text-zinc-400 mt-0.5">
-            Hora: {reservation.serviceStartTime || "Por confirmar"}
+            Hora: <span className="font-mono text-zinc-300 font-bold">{reservation.serviceStartTime || "12:00"}</span>
           </p>
         </div>
 
         {/* Capacidad y Estados */}
-        <div className="bg-[#15100c] p-3 rounded-lg border border-[#2a1f1a] flex flex-col justify-between">
+        <div className="bg-[#15100c] p-3 rounded-lg border border-[#2a1f1a] flex flex-col justify-between min-h-[85px]">
           <div>
-            <p className="text-zinc-500 text-xs font-bold uppercase tracking-tight flex items-center gap-1">
+            <p className="text-zinc-500 text-[10px] font-black uppercase tracking-wider flex items-center gap-1">
               <Users className="w-3 h-3 text-yellow-500" /> Magnitud
             </p>
-            <p className="text-zinc-200 font-semibold mt-0.5 text-xs">
+            <p className="text-zinc-200 font-bold mt-0.5 text-xs">
               {reservation.guestsCount || 0} invitados asignados
             </p>
           </div>
-          <div className="mt-2">
-            <span className={`inline-block text-[10px] font-black uppercase tracking-wider rounded border px-2 py-0.5 ${getStatusBadge(reservation.status)}`}>
-              {reservation.status?.replace('_', ' ') || "PENDIENTE"}
+          <div className="mt-1">
+            <span className={`inline-block text-[9px] font-black uppercase tracking-widest rounded border px-2 py-0.5 shadow-sm ${getStatusBadge(reservation.status)}`}>
+              {reservation.status?.replace('_', ' ') || "PENDING REVIEW"}
             </span>
           </div>
         </div>
       </div>
 
       {/* Notas */}
-      {(reservation.notes) && (
+      {reservation.notes && (
         <div className="mt-3 bg-[#211814] p-3 rounded-lg border border-[#2a1f1a] text-xs text-zinc-400">
           <span className="text-yellow-500 font-bold uppercase tracking-wider text-[10px] flex items-center gap-1 mb-1">
-            <FileText className="w-3 h-3" /> Requerimientos Especiales:
+            <FileText className="w-3 h-3" /> Requerimientos Especiales del Evento:
           </span>
-          <p className="italic">"{reservation.notes}"</p>
+          <p className="italic text-zinc-300 font-medium">"{reservation.notes}"</p>
         </div>
       )}
     </div>

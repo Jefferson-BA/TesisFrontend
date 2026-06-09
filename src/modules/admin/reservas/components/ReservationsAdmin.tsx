@@ -71,10 +71,9 @@ export default function ReservationsAdmin() {
     }
   };
 
-  const handleViewDetails = (id: string) => {
-    const res = reservations.find((r) => r.id === id);
-    setSelectedReservation(res);
-    setIsDetailsModalOpen(true);
+const handleViewDetails = (id: string) => {
+    // Redirige automáticamente a la sección de pedidos con el ID de la reserva en la URL
+    window.location.href = `/admin/pedidos?reservationId=${id}`;
   };
 
   const handleEdit = (id: string) => {
