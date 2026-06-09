@@ -32,104 +32,120 @@ function LoginFormInner() {
   const onSubmit = (data: LoginFormData) => {
     login(data, {
       onSuccess: () => {
-        toast.success("Inicio de sesión correcto");
+        toast.success("Inicio de sesión correcto", {
+          style: {
+            background: '#120d0a',
+            color: '#fff',
+            border: '1px solid #4a3824',
+          }
+        });
       },
       onError: () => {
-        toast.error("Correo o contraseña incorrectos");
+        toast.error("Correo o contraseña incorrectos", {
+          style: {
+            background: '#120d0a',
+            color: '#fff',
+            border: '1px solid #e11d48',
+          }
+        });
       },
     });
   };
 
   return (
-    <Card className="w-[420px] bg-[#181616] border-none shadow-[0_20px_50px_rgba(0,0,0,1)] text-white overflow-hidden rounded-[45px]">
-      <CardHeader className="flex flex-col items-center space-y-6 pt-14 pb-10">
-        <div className="bg-[#1c180a] p-5 rounded-[24px] border border-[#3d3112] shadow-lg">
-          <ChefHat className="w-12 h-12 text-[#facc15]" />
+    <Card className="w-[430px] bg-[#0e0a08]/95 border border-[#3d2c1f]/40 shadow-[0_25px_60px_rgba(0,0,0,0.85)] text-white overflow-hidden rounded-[32px] backdrop-blur-md">
+      {/* Encabezado con branding unificado */}
+      <CardHeader className="flex flex-col items-center space-y-5 pt-12 pb-8">
+        <div className="bg-[#1c140e] p-4.5 rounded-2xl border border-[#4a3824]/60 shadow-[0_8px_20px_rgba(0,0,0,0.4)]">
+          <ChefHat className="w-10 h-10 text-yellow-500" />
         </div>
 
-        <div className="text-center space-y-3">
-          <CardTitle className="text-[38px] font-serif leading-tight tracking-tight text-zinc-100">
-            Acceso
-            <br />
-            Administrativo
+        <div className="text-center space-y-2.5">
+          <CardTitle className="text-3xl font-bold font-serif leading-tight tracking-tight text-zinc-100">
+            Acceso Administrativo
           </CardTitle>
 
-          <p className="text-[14px] text-zinc-500 font-medium">
-            Ingresa tus credenciales para gestionar el sistema
+          <p className="text-xs text-zinc-400 font-medium max-w-[280px] mx-auto leading-relaxed">
+            Ingresa tus credenciales premium para gestionar el sistema corporativo.
           </p>
         </div>
       </CardHeader>
 
-      <CardContent className="px-10 pb-12">
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-          <div className="space-y-3">
-            <Label className="text-[11px] font-bold uppercase tracking-[0.2em] text-zinc-600 ml-2">
-              CORREO ELECTRÓNICO
+      <CardContent className="px-9 pb-8">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          
+          {/* Input: Correo Electrónico */}
+          <div className="space-y-2">
+            <Label className="text-[10px] font-bold uppercase tracking-[0.25em] text-zinc-500 ml-1">
+              Correo Electrónico
             </Label>
 
-            <div className="relative">
-              <Mail className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400 z-10" />
+            <div className="relative group">
+              <Mail className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500 group-focus-within:text-yellow-500 transition-colors z-10" />
 
               <Input
                 {...register("email")}
-                placeholder="user@test.com"
-                className="pl-14 bg-[#edf4ff] border-none h-[65px] text-zinc-900 rounded-[22px] text-lg focus-visible:ring-2 focus-visible:ring-blue-200 transition-all placeholder:text-zinc-400"
+                placeholder="usuario@deparraspitz.com"
+                className="pl-14 bg-[#14100d] border border-[#3d2c1f]/60 h-14 text-zinc-100 rounded-xl text-base focus-visible:ring-1 focus-visible:ring-yellow-500/50 focus-visible:border-yellow-500/50 transition-all placeholder:text-zinc-600"
               />
             </div>
 
             {errors.email && (
-              <p className="text-xs text-red-500 ml-2">
+              <p className="text-xs text-rose-400 font-medium ml-1 flex items-center gap-1">
                 {errors.email.message}
               </p>
             )}
           </div>
 
-          <div className="space-y-3">
-            <Label className="text-[11px] font-bold uppercase tracking-[0.2em] text-zinc-600 ml-2">
-              CONTRASEÑA
+          {/* Input: Contraseña */}
+          <div className="space-y-2">
+            <Label className="text-[10px] font-bold uppercase tracking-[0.25em] text-zinc-500 ml-1">
+              Contraseña
             </Label>
 
-            <div className="relative">
-              <Lock className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400 z-10" />
+            <div className="relative group">
+              <Lock className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500 group-focus-within:text-yellow-500 transition-colors z-10" />
 
               <Input
                 {...register("password")}
                 type="password"
                 placeholder="••••••••"
-                className="pl-14 bg-[#edf4ff] border-none h-[65px] text-zinc-900 rounded-[22px] text-lg focus-visible:ring-2 focus-visible:ring-blue-200 transition-all"
+                className="pl-14 bg-[#14100d] border border-[#3d2c1f]/60 h-14 text-zinc-100 rounded-xl text-base focus-visible:ring-1 focus-visible:ring-yellow-500/50 focus-visible:border-yellow-500/50 transition-all placeholder:text-zinc-600"
               />
             </div>
 
             {errors.password && (
-              <p className="text-xs text-red-500 ml-2">
+              <p className="text-xs text-rose-400 font-medium ml-1 flex items-center gap-1">
                 {errors.password.message}
               </p>
             )}
           </div>
 
-          <div className="pt-4">
+          {/* Botón de envío dorado premium */}
+          <div className="pt-2">
             <Button
               type="submit"
               disabled={isPending}
-              className="w-full bg-[#eab308] hover:bg-[#facc15] text-black font-black h-[65px] rounded-[22px] text-xl shadow-[0_10px_40px_rgba(234,179,8,0.35)] transition-all active:scale-[0.98] border-none"
+              className="w-full bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-black font-bold h-14 rounded-xl text-sm uppercase tracking-widest shadow-[0_6px_25px_rgba(234,179,8,0.15)] transition-all active:scale-[0.99] border-none disabled:bg-zinc-800 disabled:text-zinc-500"
             >
               {isPending ? (
-                <Loader2 className="animate-spin" />
+                <Loader2 className="animate-spin w-5 h-5" />
               ) : (
-                "Ingresar al Dashboard"
+                "ingresar"
               )}
             </Button>
           </div>
         </form>
       </CardContent>
 
-      <CardFooter className="bg-[#181616] p-0 m-0 border-none">
-        <div className="w-full py-8 flex justify-center items-center">
-          <p className="text-[14px] text-zinc-300 font-medium">
+      {/* Footer integrado armónicamente */}
+      <CardFooter className="bg-[#0b0806] border-t border-[#3d2c1f]/30 p-0 m-0">
+        <div className="w-full py-6 flex justify-center items-center">
+          <p className="text-xs text-zinc-400 font-medium">
             ¿No tienes una cuenta?{" "}
             <a
               href="/register"
-              className="text-[#00df9a] font-bold hover:text-[#05ffa3] transition-colors ml-1"
+              className="text-yellow-500 font-bold hover:text-yellow-400 transition-colors ml-1 underline underline-offset-4"
             >
               Regístrate aquí
             </a>
