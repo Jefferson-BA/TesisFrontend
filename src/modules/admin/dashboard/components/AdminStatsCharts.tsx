@@ -15,16 +15,16 @@ function ChartsContent() {
 
   if (isLoading) {
     return (
-      <div className="w-full h-48 flex items-center justify-center border border-zinc-800 rounded-xl bg-zinc-900/30">
-        <p className="text-zinc-400 font-medium animate-pulse">Cargando estadísticas en tiempo real...</p>
+      <div className="w-full h-48 flex items-center justify-center border border-border rounded-xl bg-muted/50">
+        <p className="text-muted-foreground font-medium animate-pulse">Cargando estadísticas en tiempo real...</p>
       </div>
     );
   }
 
   if (isError) {
     return (
-      <div className="w-full h-48 flex items-center justify-center border border-red-900/50 rounded-xl bg-red-950/10">
-        <p className="text-red-400 font-medium">Error al conectar con el servidor de estadísticas.</p>
+      <div className="w-full h-48 flex items-center justify-center border border-destructive/50 rounded-xl bg-destructive/10">
+        <p className="text-destructive font-medium">Error al conectar con el servidor de estadísticas.</p>
       </div>
     );
   }
@@ -33,47 +33,56 @@ function ChartsContent() {
     <section className="grid grid-cols-1 lg:grid-cols-3 gap-6 min-w-0 w-full">
       
       {/* Gráfico 1: Ventas */}
-      <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-6 flex flex-col min-w-0">
-        <h2 className="text-zinc-100 font-semibold mb-6">Ventas Reales por Mes</h2>
+      <div className="rounded-xl border border-border bg-card p-6 flex flex-col min-w-0 transition-colors">
+        <h2 className="text-foreground font-semibold mb-6">Ventas Reales por Mes</h2>
         <div className="w-full h-[250px] min-h-[250px]">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={ventasPorMes}>
-              <XAxis dataKey="mes" stroke="#a1a1aa" fontSize={12} tickLine={false} axisLine={false} />
-              <YAxis stroke="#a1a1aa" fontSize={12} tickLine={false} axisLine={false} />
-              <Tooltip contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', color: '#f4f4f5' }} />
-              <Bar dataKey="ventas" fill="#eab308" radius={[4, 4, 0, 0]} />
+              <XAxis dataKey="mes" stroke="var(--muted-foreground)" fontSize={12} tickLine={false} axisLine={false} />
+              <YAxis stroke="var(--muted-foreground)" fontSize={12} tickLine={false} axisLine={false} />
+              <Tooltip 
+                contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--foreground)', borderRadius: '8px' }} 
+                itemStyle={{ color: 'var(--foreground)' }}
+              />
+              <Bar dataKey="ventas" fill="var(--primary)" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
       </div>
 
       {/* Gráfico 2: Resumen Totalidades */}
-      <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-6 flex flex-col min-w-0">
-        <h2 className="text-zinc-100 font-semibold mb-6">Volumen General de Datos</h2>
+      <div className="rounded-xl border border-border bg-card p-6 flex flex-col min-w-0 transition-colors">
+        <h2 className="text-foreground font-semibold mb-6">Volumen General de Datos</h2>
         <div className="w-full h-[250px] min-h-[250px]">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={usuariosData}>
-              <XAxis dataKey="tipo" stroke="#a1a1aa" fontSize={12} tickLine={false} axisLine={false} />
-              <YAxis stroke="#a1a1aa" fontSize={12} tickLine={false} axisLine={false} />
-              <Tooltip contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', color: '#f4f4f5' }} />
-              <Line type="monotone" dataKey="cantidad" stroke="#eab308" strokeWidth={3} dot={{ r: 4, fill: '#eab308' }} />
+              <XAxis dataKey="tipo" stroke="var(--muted-foreground)" fontSize={12} tickLine={false} axisLine={false} />
+              <YAxis stroke="var(--muted-foreground)" fontSize={12} tickLine={false} axisLine={false} />
+              <Tooltip 
+                contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--foreground)', borderRadius: '8px' }} 
+                itemStyle={{ color: 'var(--foreground)' }}
+              />
+              <Line type="monotone" dataKey="cantidad" stroke="var(--primary)" strokeWidth={3} dot={{ r: 4, fill: 'var(--primary)' }} />
             </LineChart>
           </ResponsiveContainer>
         </div>
       </div>
 
       {/* Gráfico 3: Estado de Reservas */}
-      <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-6 flex flex-col min-w-0">
-        <h2 className="text-zinc-100 font-semibold mb-6">Estado de Reservas</h2>
+      <div className="rounded-xl border border-border bg-card p-6 flex flex-col min-w-0 transition-colors">
+        <h2 className="text-foreground font-semibold mb-6">Estado de Reservas</h2>
         <div className="w-full h-[250px] min-h-[250px]">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
-              <Pie data={estadoReservas} dataKey="value" outerRadius={80} innerRadius={60} paddingAngle={5} label={{ fill: '#a1a1aa', fontSize: 12 }}>
+              <Pie data={estadoReservas} dataKey="value" outerRadius={80} innerRadius={60} paddingAngle={5} label={{ fill: 'var(--muted-foreground)', fontSize: 12 }}>
                 {estadoReservas.map((_, index) => (
-                  <Cell key={index} fill={["#f59e0b", "#10b981"][index % 2]} stroke="transparent" />
+                  <Cell key={index} fill={index % 2 === 0 ? "var(--primary)" : "#10b981"} stroke="transparent" />
                 ))}
               </Pie>
-              <Tooltip contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', color: '#f4f4f5' }} />
+              <Tooltip 
+                contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--foreground)', borderRadius: '8px' }} 
+                itemStyle={{ color: 'var(--foreground)' }}
+              />
             </PieChart>
           </ResponsiveContainer>
         </div>

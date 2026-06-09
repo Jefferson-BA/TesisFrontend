@@ -34,14 +34,14 @@ const menuByRole = {
 
     // 🔹 Nuevos módulos agregados
     { title: "Pedidos", url: "/admin/pedidos", icon: ShoppingBag },
-    { title: "Reservas", url: "/admin/reservas", icon: Calendar }, 
+    { title: "Reservas", url: "/admin/reservas", icon: Calendar },
     { title: "Productos", url: "/admin/productos", icon: UtensilsCrossed },
     { title: "Categorías", url: "/admin/categorias", icon: Tags }, // 🔹 NUEVA LÍNEA AQUÍ
     { title: "Promociones", url: "/admin/promociones", icon: Tag },
 
     // 🔹 Originales
     { title: "Usuarios", url: "/admin/users", icon: Users },
-    { title: "Configuración", url: "/admin/settings", icon: Settings },
+    { title: "Configuración", url: "/admin/configuracion", icon: Settings },
   ],
 
   superadmin: [
@@ -71,7 +71,7 @@ export function AppSidebar({ role }: AppSidebarProps) {
 
   return (
     <Sidebar className="border-r border-zinc-800 bg-zinc-950 text-zinc-100">
-      
+
       {/* 🔹 CONTENIDO */}
       <SidebarContent className="bg-zinc-950 text-zinc-200">
         <SidebarGroup>
@@ -88,7 +88,7 @@ export function AppSidebar({ role }: AppSidebarProps) {
                     className="hover:bg-zinc-900 hover:text-cyan-400 transition-colors py-5 rounded-lg"
                   >
                     <a href={item.url} className="flex items-center gap-3">
-                      
+
                       {/* 🔹 Mantiene estilo moderno */}
                       <item.icon className="h-5 w-5 text-emerald-500" />
 

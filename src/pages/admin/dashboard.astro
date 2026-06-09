@@ -9,53 +9,54 @@ import { QueryProvider } from "@/components/shared/QueryProvider";
 <AdminLayout>
   <div class="space-y-6">
     <div>
-      <h1 class="text-3xl font-bold tracking-tight text-zinc-100">
+      <h1 class="text-3xl font-bold tracking-tight text-foreground">
         Panel de Administración
       </h1>
-      <p class="text-zinc-400 text-sm">
+      <p class="text-muted-foreground text-sm">
         Aquí tienes el resumen general de tu restaurante.
       </p>
     </div>
 
     <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       
-      <div class="rounded-xl border border-zinc-800 bg-zinc-900/50 p-6 shadow-sm flex justify-between items-center">
+      <div class="rounded-xl border border-border bg-card p-6 shadow-sm flex justify-between items-center transition-colors">
         <div>
-          <p class="text-sm font-medium text-zinc-400">
+          <p class="text-sm font-medium text-muted-foreground">
             Ventas Totales Históricas
           </p>
-          <h2 id="earnings-count" class="text-2xl font-bold text-zinc-100 mt-1">S/ 0.00</h2>
+          <h2 id="earnings-count" class="text-2xl font-bold text-foreground mt-1">S/ 0.00</h2>
         </div>
         <span class="text-xl font-bold text-emerald-500">S/</span>
       </div>
 
-      <div class="rounded-xl border border-zinc-800 bg-zinc-900/50 p-6 shadow-sm flex justify-between items-center">
+      <div class="rounded-xl border border-border bg-card p-6 shadow-sm flex justify-between items-center transition-colors">
         <div>
-          <p class="text-sm font-medium text-zinc-400">Reservas Totales</p>
-          <h2 id="reservation-count" class="text-2xl font-bold text-zinc-100 mt-1">0</h2>
+          <p class="text-sm font-medium text-muted-foreground">Reservas Totales</p>
+          <h2 id="reservation-count" class="text-2xl font-bold text-foreground mt-1">0</h2>
         </div>
         <span class="text-xl text-amber-500">◇</span>
       </div>
 
-      <div class="rounded-xl border border-zinc-800 bg-zinc-900/50 p-6 shadow-sm flex justify-between items-center">
+      <div class="rounded-xl border border-border bg-card p-6 shadow-sm flex justify-between items-center transition-colors">
         <div>
-          <p class="text-sm font-medium text-zinc-400">Usuarios Registrados</p>
-          <h2 id="user-count" class="text-2xl font-bold text-zinc-100 mt-1">0</h2>
+          <p class="text-sm font-medium text-muted-foreground">Usuarios Registrados</p>
+          <h2 id="user-count" class="text-2xl font-bold text-foreground mt-1">0</h2>
         </div>
         <span class="text-xl text-blue-500">♙</span>
       </div>
 
-      <div class="rounded-xl border border-zinc-800 bg-zinc-900/50 p-6 shadow-sm flex justify-between items-center">
+      <div class="rounded-xl border border-border bg-card p-6 shadow-sm flex justify-between items-center transition-colors">
         <div>
-          <p class="text-sm font-medium text-zinc-400">Total Pedidos</p>
-          <h2 id="order-count" class="text-2xl font-bold text-zinc-100 mt-1">0</h2>
+          <p class="text-sm font-medium text-muted-foreground">Total Pedidos</p>
+          <h2 id="order-count" class="text-2xl font-bold text-foreground mt-1">0</h2>
         </div>
         <span class="text-xl text-purple-500">▤</span>
       </div>
     </div>
 
     <QueryProvider client:load>
-<AdminStatsCharts client:only="react" />
+      <AdminStatsCharts client:only="react" />
+    </QueryProvider>
     
   </div>
 </AdminLayout>

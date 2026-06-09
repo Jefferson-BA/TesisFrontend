@@ -8,14 +8,36 @@ import AdminLayoutReact from "./AdminLayoutReact";
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Admin Dashboard</title>
+
+    {
+      /* Script en línea para cargar el tema inmediatamente y evitar parpadeos */
+    }
+    {/* Script para forzar modo oscuro por defecto */}
+    <script is:inline>
+      const theme = (() => {
+        if (
+          typeof localStorage !== "undefined" &&
+          localStorage.getItem("theme")
+        ) {
+          return localStorage.getItem("theme");
+        }
+        return "dark"; // <-- Cambiamos el por defecto a oscuro
+      })();
+      if (theme === "light") {
+        document.documentElement.classList.remove("dark");
+      } else {
+        document.documentElement.classList.add("dark");
+      }
+      window.localStorage.setItem("theme", theme);
+    </script>
   </head>
-  <body class="bg-zinc-950 text-zinc-100 antialiased">
-    
-    {/* Pasamos el control a React. Al usar client:only, solucionamos el problema
-        del contexto de SidebarProvider y el warning de tamaño de Recharts */}
+
+  {/* Cambiamos bg-zinc-950 por bg-background para que use el CSS automático */}
+  <body
+    class="bg-background text-foreground antialiased transition-colors duration-300"
+  >
     <AdminLayoutReact client:only="react">
       <slot />
     </AdminLayoutReact>
-
   </body>
 </html>
