@@ -1,18 +1,19 @@
 ---
 // src/pages/admin/reservas.astro
 import Layout from '@/layouts/AdminLayout.astro'; 
-// Le agregamos el .tsx al final para romper cualquier error de resolución
 import ReservationsAdmin from '@/modules/admin/reservas/components/ReservationsAdmin.tsx';
 import { Toaster } from 'sonner';
 ---
 
 <Layout title="Administrar Reservas | Panel">
-  <main class="min-h-screen bg-black p-4 md:p-8">
+  {/* CORRECCIÓN: bg-black -> bg-background */}
+  <main class="min-h-screen bg-background p-4 md:p-8">
     <div class="max-w-6xl mx-auto space-y-6 pt-20">
       
       <header>
-        <h1 class="text-3xl font-black tracking-wider text-white uppercase">
-          Reservas <span class="text-yellow-500">Eventos</span>
+        {/* CORRECCIÓN: text-white -> text-foreground, text-yellow-500 -> text-primary */}
+        <h1 class="text-3xl font-black tracking-wider text-foreground uppercase">
+          Reservas <span class="text-primary">Eventos</span>
         </h1>
       </header>
 

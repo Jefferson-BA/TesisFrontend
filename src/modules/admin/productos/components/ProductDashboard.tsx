@@ -12,7 +12,7 @@ export default function ProductDashboard() {
     try {
       const responseData: any = await getProducts();
       let cleanProductsList: any[] = [];
-      
+
       if (Array.isArray(responseData)) {
         cleanProductsList = responseData;
       } else if (responseData && Array.isArray(responseData.products)) {
@@ -20,7 +20,7 @@ export default function ProductDashboard() {
       } else if (responseData && Array.isArray(responseData.data)) {
         cleanProductsList = responseData.data;
       }
-      
+
       setProducts(cleanProductsList);
     } catch (error) {
       console.error("Error al cargar el catálogo de productos:", error);
@@ -35,21 +35,21 @@ export default function ProductDashboard() {
 
   return (
     <div className="flex flex-col gap-8">
-      
+
       {/* SECCIÓN 1: Formulario (Arriba) */}
       <ProductForm onProductCreated={() => { fetchProducts(); }} />
 
       {/* SECCIÓN 2: Catálogo de Productos (Abajo) */}
       {loading ? (
-        <div className="flex flex-col items-center justify-center p-12 bg-[#15100e] border border-[#4a3824] rounded-2xl shadow-xl">
-          <Loader2 className="h-8 w-8 animate-spin text-yellow-500 mb-2" />
-          <p className="text-zinc-400 text-sm font-medium">Conectando con el catálogo...</p>
+        <div className="flex flex-col items-center justify-center p-12 bg-card border border-border rounded-2xl shadow-xl">
+          <Loader2 className="h-8 w-8 animate-spin text-primary mb-2" />
+          <p className="text-muted-foreground text-sm font-medium">Conectando con el catálogo...</p>
         </div>
       ) : (
         /* CORRECCIÓN: Envoltura síncrona segura en la prop onRefresh */
-        <ProductTable 
+        <ProductTable
           products={products} 
-          onRefresh={() => { fetchProducts(); }} 
+          onRefresh={() => { fetchProducts(); }}
         />
       )}
 

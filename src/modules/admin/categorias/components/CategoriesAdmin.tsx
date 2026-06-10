@@ -67,38 +67,38 @@ export const CategoriesAdmin = () => {
     <div className="space-y-8 max-w-6xl mx-auto">
       {/* HEADER */}
       <div>
-        <h2 className="text-3xl font-bold tracking-tight text-white">Gestión de Categorías</h2>
-        <p className="text-zinc-400 mt-1">Administra las clasificaciones de tu menú.</p>
+        <h2 className="text-3xl font-bold tracking-tight text-foreground">Gestión de Categorías</h2>
+        <p className="text-muted-foreground mt-1">Administra las clasificaciones de tu menú.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         
         {/* COLUMNA IZQUIERDA: FORMULARIO */}
         <div className="md:col-span-1 space-y-4">
-          <div className="p-6 rounded-xl border border-zinc-800 bg-zinc-950/50">
-            <h3 className="text-xl font-bold text-white mb-4">Nueva Categoría</h3>
+          <div className="p-6 rounded-xl border border-border bg-card shadow-sm">
+            <h3 className="text-xl font-bold text-card-foreground mb-4">Nueva Categoría</h3>
             
             <form onSubmit={handleCreate} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name" className="text-zinc-300">Nombre</Label>
+                <Label htmlFor="name" className="text-foreground">Nombre</Label>
                 <Input 
                   id="name" 
                   placeholder="Ejemplo: Criollo, Árabe..." 
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="bg-zinc-900 border-zinc-700 text-white placeholder:text-zinc-500 focus-visible:ring-yellow-500"
+                  className="bg-background border-input text-foreground placeholder:text-muted-foreground focus-visible:ring-primary"
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="description" className="text-zinc-300">Descripción (Opcional)</Label>
+                <Label htmlFor="description" className="text-foreground">Descripción (Opcional)</Label>
                 <Input 
                   id="description" 
                   placeholder="Breve descripción..." 
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="bg-zinc-900 border-zinc-700 text-white placeholder:text-zinc-500 focus-visible:ring-yellow-500"
+                  className="bg-background border-input text-foreground placeholder:text-muted-foreground focus-visible:ring-primary"
                 />
               </div>
 
@@ -115,35 +115,35 @@ export const CategoriesAdmin = () => {
 
         {/* COLUMNA DERECHA: TABLA DE CATEGORÍAS */}
         <div className="md:col-span-2">
-          <div className="rounded-xl border border-zinc-800 bg-zinc-950 overflow-hidden">
+          <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
             <Table>
-              <TableHeader className="bg-zinc-900/50">
-                <TableRow className="border-zinc-800 hover:bg-transparent">
-                  <TableHead className="text-yellow-500 font-semibold w-1/3">Nombre</TableHead>
-                  <TableHead className="text-yellow-500 font-semibold w-1/2">Descripción</TableHead>
-                  <TableHead className="text-yellow-500 font-semibold text-right">Acciones</TableHead>
+              <TableHeader className="bg-muted/50">
+                <TableRow className="border-border hover:bg-transparent">
+                  <TableHead className="text-primary font-semibold w-1/3">Nombre</TableHead>
+                  <TableHead className="text-primary font-semibold w-1/2">Descripción</TableHead>
+                  <TableHead className="text-primary font-semibold text-right">Acciones</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {loading ? (
                   <TableRow>
-                    <TableCell colSpan={3} className="text-center py-8 text-zinc-500">
+                    <TableCell colSpan={3} className="text-center py-8 text-muted-foreground">
                       Cargando categorías...
                     </TableCell>
                   </TableRow>
                 ) : categories.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={3} className="text-center py-8 text-zinc-500">
+                    <TableCell colSpan={3} className="text-center py-8 text-muted-foreground">
                       No hay categorías registradas.
                     </TableCell>
                   </TableRow>
                 ) : (
                   categories.map((category) => (
-                    <TableRow key={category.id} className="border-zinc-800 hover:bg-zinc-900/50 transition-colors">
-                      <TableCell className="font-medium text-zinc-100">
+                    <TableRow key={category.id} className="border-border hover:bg-muted/50 transition-colors">
+                      <TableCell className="font-medium text-foreground">
                         {category.name}
                       </TableCell>
-                      <TableCell className="text-zinc-400 text-sm">
+                      <TableCell className="text-muted-foreground text-sm">
                         {category.description || <span className="italic opacity-50">Sin descripción</span>}
                       </TableCell>
                       <TableCell className="text-right">
@@ -151,7 +151,7 @@ export const CategoriesAdmin = () => {
                           <Button 
                             variant="outline" 
                             size="icon"
-                            className="border-zinc-700 bg-transparent text-zinc-300 hover:bg-zinc-800 hover:text-white h-8 w-8"
+                            className="border-border bg-transparent text-muted-foreground hover:bg-accent hover:text-accent-foreground h-8 w-8"
                             title="Editar"
                           >
                             <Edit className="h-4 w-4" />
@@ -160,7 +160,7 @@ export const CategoriesAdmin = () => {
                             variant="destructive" 
                             size="icon" 
                             onClick={() => handleDelete(category.id)}
-                            className="bg-red-950/30 text-red-500 hover:bg-red-900/50 hover:text-red-400 h-8 w-8"
+                            className="bg-destructive/10 text-destructive hover:bg-destructive/20 hover:text-destructive h-8 w-8"
                             title="Eliminar"
                           >
                             <Trash2 className="h-4 w-4" />

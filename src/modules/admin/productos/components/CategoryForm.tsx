@@ -60,9 +60,8 @@ export default function CategoryForm() {
   };
 
   return (
-    <div className="bg-[#120c09] border border-yellow-900/40 rounded-2xl p-6">
-
-      <h2 className="text-2xl font-bold text-white mb-6">
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold text-card-foreground mb-6">
         Gestión de Categorías
       </h2>
 
@@ -72,45 +71,45 @@ export default function CategoryForm() {
           placeholder="Nombre de categoría"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="bg-black border border-zinc-800 rounded-lg px-4 py-3 text-white"
+          className="bg-background border border-input rounded-lg px-4 py-3 text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary focus:outline-none"
         />
 
         <button
           type="submit"
-          className="bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-3 rounded-lg transition-all"
+          className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-3 rounded-lg transition-all"
         >
           Crear Categoría
         </button>
       </form>
 
-      <h3 className="text-xl font-bold text-white mb-4">
+      <h3 className="text-xl font-bold text-card-foreground mb-4">
         Categorías registradas
       </h3>
 
       <div className="grid gap-3">
         {categories.length === 0 ? (
-          <p className="text-zinc-400">
+          <p className="text-muted-foreground">
             No hay categorías registradas.
           </p>
         ) : (
           categories.map((category) => (
             <div
               key={category.id}
-              className="bg-black border border-zinc-800 rounded-xl p-4 flex justify-between items-center"
+              className="bg-muted/50 border border-border rounded-xl p-4 flex justify-between items-center"
             >
               <div>
-                <p className="text-yellow-400 font-bold">
+                <p className="text-primary font-bold">
                   {category.name}
                 </p>
 
-                <p className="text-zinc-500 text-sm break-all">
+                <p className="text-muted-foreground text-sm break-all">
                   ID: {category.id}
                 </p>
               </div>
 
               <button
                 onClick={() => handleDelete(category.id)}
-                className="text-red-500 font-bold"
+                className="text-destructive hover:text-destructive/80 font-bold transition-colors"
               >
                 Eliminar
               </button>
