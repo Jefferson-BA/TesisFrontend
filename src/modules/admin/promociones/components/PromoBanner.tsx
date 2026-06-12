@@ -6,39 +6,48 @@ export default function PromoBanner() {
   if (promos.length === 0) return null;
 
   return (
-    <section className="bg-[#120d0a] py-16 border-y border-[#4a3824]">
-      <div className="max-w-7xl mx-auto px-6">
-        <h2 className="text-4xl font-serif font-bold text-white mb-8">
-          Promociones Especiales
-        </h2>
+    <section className="promo-banner-section">
+      <div className="promo-banner-container">
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {promos.map((promo) => (
+        <div className="promo-banner-heading">
+          <span className="promo-banner-eyebrow">Ofertas exclusivas</span>
+          <h2 className="promo-banner-title">Promociones Especiales</h2>
+          <p className="promo-banner-subtitle">Descuentos y beneficios disponibles por tiempo limitado</p>
+        </div>
+
+        <div className="promo-banner-grid">
+          {promos.map((promo, index) => (
             <div
               key={promo.id}
-              className="bg-[#18110e] border border-yellow-600 rounded-2xl p-8 shadow-lg"
+              className="promo-banner-card"
+              style={{ animationDelay: `${index * 0.1}s` }}
             >
-              <span className="bg-yellow-500 text-black font-black px-4 py-2 rounded-full">
-                {promo.discount}
-              </span>
+              <div className="promo-banner-card-glow" />
 
-              <h3 className="text-3xl font-bold mt-6">
-                {promo.title}
-              </h3>
+              <div className="promo-banner-card-top">
+                <span className="promo-banner-discount">{promo.discount}</span>
+                <span className="promo-banner-tag">🔥 Limitado</span>
+              </div>
 
-              <p className="text-[#f1d8b5] mt-4">
-                {promo.description}
-              </p>
+              <h3 className="promo-banner-card-title">{promo.title}</h3>
+              <p className="promo-banner-card-desc">{promo.description}</p>
 
-              <a
-                href="/menu"
-                className="inline-block mt-6 bg-yellow-500 text-black px-6 py-3 rounded-lg font-bold"
-              >
-                Ver menú
-              </a>
+              <div className="promo-banner-card-footer">
+                <a href="/menu" className="promo-banner-cta">
+                  <span>Ver menú</span>
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </a>
+                <div className="promo-banner-active-badge">
+                  <span className="promo-banner-dot" />
+                  Activo
+                </div>
+              </div>
             </div>
           ))}
         </div>
+
       </div>
     </section>
   );
