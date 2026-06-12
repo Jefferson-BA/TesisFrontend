@@ -354,3 +354,425 @@ td small {
 #perfil:target {
   display: block;
 }
+
+/* ==========================================
+   DISEÑO ANIMADO PARA LA PÁGINA DE LOGIN
+   ========================================== */
+
+/* Reset sutil solo aplicado al layout de login */
+body:has(.split-left) {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  overflow: hidden;
+  position: relative;
+  font-family: 'Geist Variable', 'Inter', system-ui, sans-serif;
+  background-color: #070504;
+  color: #ffffff;
+}
+
+/* ── Fondo con imagen y orbes animados ── */
+.login-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: #070504;
+  overflow: hidden;
+}
+
+.login-bg-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.22) saturate(0.6);
+}
+
+/* Viñeta oscura sobre la imagen */
+.login-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 20%,
+    rgba(7, 5, 4, 0.85) 100%
+  );
+}
+
+/* Orbes dinámicos */
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(80px);
+}
+
+.orb-1 {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(
+    circle,
+    rgba(234, 179, 8, 0.06) 0%,
+    transparent 70%
+  );
+  top: -100px;
+  right: 10%;
+  animation: orbDrift 12s ease-in-out infinite;
+}
+
+.orb-2 {
+  width: 350px;
+  height: 350px;
+  background: radial-gradient(
+    circle,
+    rgba(180, 83, 9, 0.05) 0%,
+    transparent 70%
+  );
+  bottom: -80px;
+  left: 5%;
+  animation: orbDrift 9s ease-in-out infinite reverse;
+  animation-delay: -4s;
+}
+
+.orb-3 {
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(
+    circle,
+    rgba(234, 179, 8, 0.04) 0%,
+    transparent 70%
+  );
+  top: 40%;
+  left: 30%;
+  animation: orbDrift 15s ease-in-out infinite;
+  animation-delay: -7s;
+}
+
+@keyframes orbDrift {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(20px, -30px) scale(1.05);
+  }
+  66% {
+    transform: translate(-15px, 20px) scale(0.97);
+  }
+}
+
+/* Textura de grano SVG ultra sutil */
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+}
+
+/* ── Branding Izquierdo (Split Left) ── */
+.split-left {
+  display: none;
+  flex: 1;
+  position: relative;
+  z-index: 2;
+  align-items: flex-end;
+  padding: 3rem;
+}
+
+@media (min-width: 900px) {
+  .split-left {
+    display: flex;
+  }
+}
+
+/* Entrada animada del bloque de marca */
+.brand-block {
+  animation: brandIn 1s ease 0.4s both;
+}
+
+@keyframes brandIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.brand-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 1rem;
+  text-decoration: none;
+}
+
+/* Punto dorado latiendo */
+.brand-logo-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #eab308;
+  box-shadow: 0 0 12px rgba(234, 179, 8, 0.8);
+  animation: dotPulse 2s ease-in-out infinite;
+}
+
+@keyframes dotPulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(0.75);
+  }
+}
+
+.brand-name {
+  font-size: 2rem;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: -0.03em;
+}
+
+.brand-name em {
+  color: #eab308;
+  font-style: normal;
+}
+
+.brand-tag {
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 0.875rem;
+  letter-spacing: 0.05em;
+}
+
+/* Estadísticas estables */
+.brand-stats {
+  display: flex;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.bstat {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.bstat-num {
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: #eab308;
+}
+
+.bstat-label {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.35);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* ── Formulario Flotante Derecho (Split Right) ── */
+.split-right {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 540px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+@media (min-width: 900px) {
+  .split-right {
+    width: 540px;
+  }
+}
+
+.right-inner {
+  width: 100%;
+  max-width: 430px;
+}
+
+/* Volver al inicio interactivo */
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #a1a1aa; /* Un gris intermedio más visible que combina con el fondo oscuro */
+  font-size: 0.82rem;
+  text-decoration: none;
+  margin-bottom: 2rem;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.back-link:hover {
+  color: #eab308;
+  gap: 10px;
+}
+
+.back-arrow {
+  transition: transform 0.2s ease;
+}
+
+.back-link:hover .back-arrow {
+  transform: translateX(-3px);
+}
+/* ============================================================
+   DEPARRASPITZ — ADICIONES DE DISEÑO
+   Pega este bloque al FINAL de tu global.css
+   (después de las directivas @tailwind, para que .font-serif
+   gane la especificidad sobre la utilidad de Tailwind)
+   ============================================================ */
+
+/* 1. Tipografía: pareja serif cálida + sans editorial */
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Manrope:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  --font-display: 'Fraunces', 'Georgia', serif;
+  --font-body: 'Manrope', system-ui, sans-serif;
+
+  /* Paleta (extiende la que ya usas) */
+  --color-bg: #0b0806;
+  --color-surface: #120d0a;
+  --color-surface-2: #1c1510;
+  --color-border: #3d2c1f;
+  --color-gold: #eab308;
+  --color-gold-soft: #f5e6c8;
+  --color-ember: #c1502e; /* acento secundario, usar con moderación */
+}
+
+body {
+  font-family: var(--font-body);
+}
+
+/* Sobrescribe la utilidad font-serif de Tailwind con Fraunces */
+.font-serif {
+  font-family: var(--font-display) !important;
+  font-feature-settings: "ss01" 1;
+}
+
+/* 2. Selección y scrollbar con identidad de marca */
+::selection {
+  background-color: rgba(234, 179, 8, 0.25);
+  color: #fff;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 999px;
+  border: 2px solid var(--color-bg);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #54392a;
+}
+
+/* 3. Foco visible accesible, acorde a la marca */
+:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* 4. Textura "grano" sutil para secciones oscuras (atmósfera) */
+.grain-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* 5. Divisor estilo "boleto de catering" (perforado) */
+.ticket-divider {
+  border: none;
+  border-top: 1px dashed rgba(234, 179, 8, 0.18);
+  height: 0;
+}
+
+/* 6. Animaciones de entrada */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-in-up {
+  animation: fade-in-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-slide-down {
+  animation: slide-down 0.25s ease-out both;
+}
+
+/* 7. Halo dorado pulsante (para el kicker / badges) */
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(234, 179, 8, 0.25);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(234, 179, 8, 0.06);
+  }
+}
+.glow-pulse {
+  animation: glow-pulse 3s ease-in-out infinite;
+}
+
+/* 8. Sello circular giratorio (signature: estampa de menú) */
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.spin-slow {
+  animation: spin-slow 18s linear infinite;
+}
+
+/* 9. Indicador de scroll (hero) */
+@keyframes bounce-soft {
+  0%, 100% { transform: translateY(0); opacity: 0.5; }
+  50% { transform: translateY(8px); opacity: 1; }
+}
+.animate-bounce-soft {
+  animation: bounce-soft 2s ease-in-out infinite;
+}
+
+/* 10. Respeta preferencia de movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in-up,
+  .animate-slide-down,
+  .glow-pulse,
+  .spin-slow,
+  .animate-bounce-soft {
+    animation: none !important;
+  }
+}

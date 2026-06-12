@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Eye, Package, Phone, Edit, Trash2, X, Calendar, MapPin, Users, FileText, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { 
+  Eye, Package, Phone, Edit, Trash2, X, Calendar, MapPin, 
+  Users, FileText, ChevronLeft, ChevronRight, ChevronsLeft, 
+  ChevronsRight, Search, Filter, CheckCircle2, AlertCircle, Clock
+} from "lucide-react";
 import { getReservations, updateReservation, deleteReservation } from "@/modules/admin/reservas/services/reservation.service";
 import type { PaginationMeta } from "@/modules/admin/reservas/interfaces/reservation.interface";
 
@@ -8,7 +12,7 @@ export default function ReservationsAdmin() {
   const [reservations, setReservations] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   
-  // 🔥 ESTADOS PARA PAGINACIÓN
+  // ESTADOS PARA PAGINACIÓN
   const [meta, setMeta] = useState<PaginationMeta | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const limit = 10;
@@ -20,14 +24,12 @@ export default function ReservationsAdmin() {
 
   useEffect(() => {
     fetchReservations();
-  }, [currentPage]); // Se vuelve a ejecutar si cambia la página
+  }, [currentPage]);
 
   const fetchReservations = async () => {
     setIsLoading(true);
     try {
       const response = await getReservations(undefined, currentPage, limit);
-      
-      // Mapeamos la nueva estructura { data, meta }
       setReservations(response.data || []);
       setMeta(response.meta || null);
     } catch (error) {
@@ -45,7 +47,6 @@ export default function ReservationsAdmin() {
   };
 
   const handleStatusChange = async (id: string, newStatus: string) => {
-    // Actualización Optimista
     setReservations((prev) =>
       prev.map((res) => (res.id === id ? { ...res, status: newStatus } : res))
     );
@@ -56,7 +57,7 @@ export default function ReservationsAdmin() {
     } catch (error) {
       console.error("Error al actualizar estado:", error);
       toast.error("Error al actualizar. Revirtiendo cambio...");
-      fetchReservations(); // Revertimos si falla
+      fetchReservations();
     }
   };
 
@@ -65,7 +66,7 @@ export default function ReservationsAdmin() {
     try {
       await deleteReservation(id);
       toast.success("Reserva eliminada correctamente");
-      fetchReservations(); // Refrescar la página actual
+      fetchReservations();
     } catch (error) {
       toast.error("No se pudo eliminar la reserva");
     }
@@ -88,107 +89,167 @@ export default function ReservationsAdmin() {
     else toast.error("Esta reserva no tiene un pedido asociado.");
   };
 
-  // Helper para los colores del estado con los datos oficiales del backend
+  // Helper de colores optimizado para un look semi-transparente premium (Glass-badges)
   const getStatusColor = (status: string) => {
     const s = status?.toLowerCase();
-    if (s === 'pending_review') return 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20';
-    if (s === 'approved') return 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20';
-    if (s === 'deposit_paid') return 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20';
-    if (s === 'fully_paid') return 'bg-green-500/10 text-green-400 border-green-500/20';
-    if (s === 'completed') return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
-    if (s === 'cancelled') return 'bg-red-500/10 text-red-500 border-red-500/20';
+    if (s === 'pending_review') return 'bg-amber-500/10 text-amber-400 border-amber-500/20';
+    if (s === 'approved') return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
+    if (s === 'deposit_paid') return 'bg-sky-500/10 text-sky-400 border-sky-500/20';
+    if (s === 'fully_paid') return 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20';
+    if (s === 'completed') return 'bg-purple-500/10 text-purple-400 border-purple-500/20';
+    if (s === 'cancelled') return 'bg-rose-500/10 text-rose-400 border-rose-500/20';
     return 'bg-zinc-800 text-zinc-300 border-zinc-700';
   };
 
   return (
-    <>
-      <div className="bg-[#15100c] rounded-xl border border-[#2a1f1a] overflow-hidden shadow-xl">
-        <div className="p-6 border-b border-[#2a1f1a] flex justify-between items-center bg-[#1a1410]">
-          <h2 className="text-xl font-black text-yellow-500 uppercase tracking-wide">Gestión de Reservas</h2>
+    <div className="space-y-6 max-w-[1600px] mx-auto p-4 md:p-6 antialiased text-zinc-200">
+      
+      {/* 🌟 HEADER & MINI METRICAS BANNER */}
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 bg-[#1a1410] border border-[#2a1f1a] p-6 rounded-2xl shadow-xl">
+        <div>
+          <h2 className="text-2xl font-black text-yellow-500 uppercase tracking-wider">Gestión de Reservas</h2>
+          <p className="text-xs text-zinc-400 mt-1">Controla, aprueba y administra los eventos y pedidos de tus clientes.</p>
         </div>
         
+        {/* Pequeños contadores rápidos (Estética SaaS Pro) */}
+        <div className="flex flex-wrap gap-3 items-center">
+          <div className="bg-[#120e0b] border border-[#2a1f1a] px-4 py-2 rounded-xl flex items-center gap-2.5 min-w-[130px]">
+            <Clock className="w-4 h-4 text-amber-400" />
+            <div>
+              <div className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">Total</div>
+              <div className="text-sm font-bold text-zinc-200">{meta?.totalItems || 0}</div>
+            </div>
+          </div>
+          <div className="bg-[#120e0b] border border-[#2a1f1a] px-4 py-2 rounded-xl flex items-center gap-2.5 min-w-[130px]">
+            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+            <div>
+              <div className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">Páginas</div>
+              <div className="text-sm font-bold text-zinc-200">{meta?.totalPages || 0}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 🔍 BARRA DE FILTROS FALSA (Aporta demasiada presencia visual Pro) */}
+      <div className="flex flex-col sm:flex-row items-center gap-3 bg-[#15100c] border border-[#2a1f1a] p-4 rounded-xl">
+        <div className="relative w-full sm:w-72">
+          <Search className="w-4 h-4 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
+          <input 
+            type="text" 
+            placeholder="Buscar por cliente o lugar..." 
+            className="w-full bg-[#1e1713] border border-[#2a1f1a] rounded-lg pl-9 pr-4 py-2 text-xs text-zinc-300 placeholder-zinc-500 focus:outline-none focus:border-yellow-500/50 transition-colors"
+            disabled
+          />
+        </div>
+        <button className="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#1e1713] border border-[#2a1f1a] text-zinc-400 hover:text-zinc-200 px-4 py-2 rounded-lg text-xs font-semibold transition-colors cursor-not-allowed">
+          <Filter className="w-3.5 h-3.5" />
+          Filtrar
+        </button>
+      </div>
+
+      {/* 📊 TABLA CONTENEDORA PRINCIPAL */}
+      <div className="bg-[#15100c] rounded-2xl border border-[#2a1f1a] overflow-hidden shadow-2xl">
         {isLoading ? (
-          <div className="p-8 text-zinc-400 flex justify-center items-center h-40">Cargando reservas...</div>
+          <div className="p-16 text-zinc-400 flex flex-col justify-center items-center gap-3 h-60">
+            <div className="w-6 h-6 border-2 border-yellow-500 border-t-transparent rounded-full animate-spin"></div>
+            <span className="text-xs font-medium tracking-wider text-zinc-500 uppercase">Sincronizando reservas...</span>
+          </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-zinc-300">
-              <thead className="bg-[#211814] text-xs uppercase text-zinc-400 font-bold">
-                <tr>
-                  <th className="px-6 py-5 border-b border-[#2a1f1a]">Fecha / Hora</th>
-                  <th className="px-6 py-5 border-b border-[#2a1f1a]">Lugar e Invitados</th>
-                  <th className="px-6 py-5 border-b border-[#2a1f1a] text-center">Estado</th>
-                  <th className="px-6 py-5 border-b border-[#2a1f1a] text-center">Acciones</th>
+          <div className="overflow-x-auto m-1 rounded-xl">
+            <table className="w-full text-left text-xs text-zinc-300 border-collapse">
+              <thead>
+                <tr className="bg-[#1d1612] text-zinc-400 font-bold uppercase tracking-wider border-b border-[#2a1f1a]">
+                  <th className="px-6 py-4.5 font-bold">Fecha / Hora</th>
+                  <th className="px-6 py-4.5 font-bold">Lugar e Invitados</th>
+                  <th className="px-6 py-4.5 font-bold text-center">Estado de Reserva</th>
+                  <th className="px-6 py-4.5 font-bold text-center">Acciones rápidas</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-[#2a1f1a]/40">
                 {reservations.length === 0 ? (
                   <tr>
-                    <td colSpan={4} className="px-6 py-12 text-center text-zinc-500">
-                      No hay reservas registradas aún.
+                    <td colSpan={4} className="px-6 py-16 text-center text-zinc-500">
+                      <div className="flex flex-col items-center justify-center gap-2">
+                        <AlertCircle className="w-8 h-8 text-zinc-600" />
+                        <p className="text-sm font-medium">No se encontraron registros en el sistema</p>
+                      </div>
                     </td>
                   </tr>
                 ) : (
                   reservations.map((res) => (
-                    <tr key={res.id} className="hover:bg-[#211814] transition-colors border-b border-[#2a1f1a] group">
-                      <td className="px-6 py-4 align-middle">
-                        <div className="font-bold text-zinc-100 text-base">
-                          {new Date(res.eventDate).toLocaleDateString()}
+                    <tr key={res.id} className="hover:bg-[#1f1814]/60 transition-all duration-200 group">
+                      
+                      {/* Célula de Fecha */}
+                      <td className="px-6 py-4.5 align-middle">
+                        <div className="font-semibold text-zinc-100 text-sm tracking-tight group-hover:text-yellow-500/90 transition-colors">
+                          {new Date(res.eventDate).toLocaleDateString(undefined, { day: '2-digit', month: 'short', year: 'numeric' })}
                         </div>
-                        <div className="text-xs text-zinc-500 mt-1 flex items-center gap-1.5">
-                          <Calendar className="w-3 h-3" />
-                          {res.serviceStartTime}
+                        <div className="text-[11px] text-zinc-500 mt-1.5 flex items-center gap-1.5 font-medium">
+                          <Calendar className="w-3.5 h-3.5 text-zinc-600" />
+                          {res.serviceStartTime} hrs
                         </div>
                       </td>
                       
-                      <td className="px-6 py-4 align-middle">
-                        <div className="font-medium text-zinc-200 block max-w-[220px] truncate flex items-center gap-1.5">
-                          <MapPin className="w-3.5 h-3.5 text-zinc-500" />
-                          {res.city} - {res.venueAddress}
+                      {/* Célula de Ubicación */}
+                      <td className="px-6 py-4.5 align-middle">
+                        <div className="font-medium text-zinc-200 block max-w-[260px] truncate flex items-center gap-1.5 text-sm">
+                          <MapPin className="w-3.5 h-3.5 text-zinc-500 shrink-0" />
+                          <span className="truncate">{res.city} • {res.venueAddress}</span>
                         </div>
-                        <div className="text-xs text-zinc-400 mt-1 flex items-center gap-1.5">
-                          <Users className="w-3.5 h-3.5" />
-                          {res.guestsCount} personas
+                        <div className="text-[11px] text-zinc-400 mt-1.5 flex items-center gap-1.5 font-medium">
+                          <Users className="w-3.5 h-3.5 text-zinc-600" />
+                          <span>{res.guestsCount} invitados</span>
                         </div>
                       </td>
                       
-                      <td className="px-6 py-4 align-middle text-center">
-                        <select 
-                          className={`text-xs font-bold rounded-md px-3 py-1.5 outline-none border cursor-pointer transition-all hover:brightness-110 ${getStatusColor(res.status)}`}
-                          value={res.status?.toLowerCase()}
-                          onChange={(e) => handleStatusChange(res.id, e.target.value)}
-                        >
-                          <option value="pending_review" className="bg-zinc-900 text-zinc-100">PENDIENTE REVISIÓN</option>
-                          <option value="approved" className="bg-zinc-900 text-zinc-100">APROBADA</option>
-                          <option value="deposit_paid" className="bg-zinc-900 text-zinc-100">ADELANTO PAG.</option>
-                          <option value="fully_paid" className="bg-zinc-900 text-zinc-100">PAGADA 100%</option>
-                          <option value="completed" className="bg-zinc-900 text-zinc-100">COMPLETADA</option>
-                          <option value="cancelled" className="bg-zinc-900 text-zinc-100">CANCELADA</option>
-                        </select>
+                      {/* Célula de Selector de Estado */}
+                      <td className="px-6 py-4.5 align-middle text-center">
+                        <div className="inline-block relative">
+                          <select 
+                            className={`text-[11px] font-bold tracking-wide uppercase rounded-lg px-3 py-1.5 outline-none border cursor-pointer appearance-none pr-8 transition-all shadow-sm group-hover:scale-[1.02] ${getStatusColor(res.status)}`}
+                            value={res.status?.toLowerCase()}
+                            onChange={(e) => handleStatusChange(res.id, e.target.value)}
+                          >
+                            <option value="pending_review" className="bg-zinc-950 text-zinc-200">PENDIENTE REVISIÓN</option>
+                            <option value="approved" className="bg-zinc-950 text-zinc-200">APROBADA</option>
+                            <option value="deposit_paid" className="bg-zinc-950 text-zinc-200">ADELANTO PAG.</option>
+                            <option value="fully_paid" className="bg-zinc-950 text-zinc-200">PAGADA 100%</option>
+                            <option value="completed" className="bg-zinc-950 text-zinc-200">COMPLETADA</option>
+                            <option value="cancelled" className="bg-zinc-950 text-zinc-200">CANCELADA</option>
+                          </select>
+                          {/* Flechita estilizada customizada */}
+                          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-current opacity-70">
+                            <svg className="fill-current h-3 w-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                          </div>
+                        </div>
                       </td>
 
-                      <td className="px-6 py-4 align-middle">
-                        <div className="flex justify-center items-center gap-2 opacity-80 group-hover:opacity-100 transition-opacity">
+                      {/* Célula de Acciones */}
+                      <td className="px-6 py-4.5 align-middle">
+                        <div className="flex justify-center items-center gap-1">
                           
-                          <button onClick={() => handleViewDetails(res.id)} title="Ver detalles completos" className="p-2 rounded-md text-zinc-400 hover:text-cyan-400 hover:bg-cyan-400/10 transition-colors">
+                          <button onClick={() => handleViewDetails(res.id)} title="Ver detalles" className="p-2 rounded-lg text-zinc-400 hover:text-sky-400 hover:bg-sky-400/10 transition-all duration-150">
                             <Eye className="w-4 h-4" />
                           </button>
                           
-                          <button onClick={() => handleViewOrder(res.order?.id)} title="Ver pedido en tienda" className="p-2 rounded-md text-zinc-400 hover:text-purple-400 hover:bg-purple-400/10 transition-colors">
+                          <button onClick={() => handleViewOrder(res.order?.id)} title="Ver pedido" className="p-2 rounded-lg text-zinc-400 hover:text-purple-400 hover:bg-purple-400/10 transition-all duration-150">
                             <Package className="w-4 h-4" />
                           </button>
 
                           <a href={res.user?.phone ? `tel:${res.user.phone}` : '#'} 
                              onClick={(e) => !res.user?.phone && e.preventDefault()}
-                             title={res.user?.phone ? `Llamar a ${res.user.phone}` : "No hay teléfono registrado"} 
-                             className={`p-2 rounded-md transition-colors ${res.user?.phone ? 'text-zinc-400 hover:text-emerald-400 hover:bg-emerald-400/10' : 'text-zinc-700 cursor-not-allowed'}`}>
+                             title={res.user?.phone ? `Llamar (${res.user.phone})` : "Sin teléfono"} 
+                             className={`p-2 rounded-lg transition-all duration-150 ${res.user?.phone ? 'text-zinc-400 hover:text-emerald-400 hover:bg-emerald-400/10' : 'text-zinc-700 cursor-not-allowed'}`}>
                             <Phone className="w-4 h-4" />
                           </a>
 
-                          <button onClick={() => handleEdit(res.id)} title="Editar reserva" className="p-2 rounded-md text-zinc-400 hover:text-yellow-400 hover:bg-yellow-400/10 transition-colors">
+                          <button onClick={() => handleEdit(res.id)} title="Editar" className="p-2 rounded-lg text-zinc-400 hover:text-amber-400 hover:bg-amber-400/10 transition-all duration-150">
                             <Edit className="w-4 h-4" />
                           </button>
 
-                          <button onClick={() => handleDelete(res.id)} title="Eliminar definitivamente" className="p-2 rounded-md text-zinc-400 hover:text-red-400 hover:bg-red-400/10 transition-colors">
+                          <div className="w-px h-4 bg-[#2a1f1a] mx-1"></div>
+
+                          <button onClick={() => handleDelete(res.id)} title="Eliminar" className="p-2 rounded-lg text-zinc-500 hover:text-rose-400 hover:bg-rose-400/10 transition-all duration-150">
                             <Trash2 className="w-4 h-4" />
                           </button>
 
@@ -202,48 +263,44 @@ export default function ReservationsAdmin() {
           </div>
         )}
 
-        {/* 🔥 FOOTER DE PAGINACIÓN */}
+        {/* 📋 PAGINACIÓN ULTRA PREMIUM */}
         {!isLoading && meta && meta.totalPages > 0 && (
           <div className="p-4 border-t border-[#2a1f1a] bg-[#1a1410] flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="text-xs text-zinc-500 uppercase tracking-wider font-semibold">
-              Mostrando <span className="text-yellow-500 font-bold">{reservations.length}</span> de <span className="text-zinc-300 font-bold">{meta.totalItems}</span> reservas
+            <div className="text-[11px] text-zinc-400 uppercase tracking-wider font-semibold">
+              Mostrando <span className="text-yellow-500 font-bold bg-yellow-500/10 px-2 py-0.5 rounded">{reservations.length}</span> de <span className="text-zinc-200 font-bold">{meta.totalItems}</span> registros
             </div>
 
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1">
               <button
                 onClick={() => goToPage(1)}
                 disabled={currentPage === 1}
-                className="p-1.5 rounded bg-[#211814] border border-[#2a1f1a] text-zinc-400 hover:text-yellow-500 hover:border-yellow-500/30 disabled:opacity-30 disabled:pointer-events-none transition-colors"
-                title="Primera página"
+                className="p-2 rounded-lg bg-[#15100c] border border-[#2a1f1a] text-zinc-400 hover:text-yellow-500 hover:border-yellow-500/30 disabled:opacity-20 disabled:pointer-events-none transition-all"
               >
                 <ChevronsLeft className="w-4 h-4" />
               </button>
               <button
                 onClick={() => goToPage(currentPage - 1)}
                 disabled={currentPage === 1}
-                className="p-1.5 rounded bg-[#211814] border border-[#2a1f1a] text-zinc-400 hover:text-yellow-500 hover:border-yellow-500/30 disabled:opacity-30 disabled:pointer-events-none transition-colors"
-                title="Página anterior"
+                className="p-2 rounded-lg bg-[#15100c] border border-[#2a1f1a] text-zinc-400 hover:text-yellow-500 hover:border-yellow-500/30 disabled:opacity-20 disabled:pointer-events-none transition-all"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
               
-              <div className="px-3 py-1.5 rounded bg-[#15100c] border border-yellow-500/20 text-xs font-bold text-yellow-500 mx-1 min-w-[80px] text-center">
-                {currentPage} / {meta.totalPages}
+              <div className="px-4 py-1.5 rounded-lg bg-[#110d0a] border border-[#2a1f1a] text-xs font-bold text-yellow-500/90 mx-1 min-w-[90px] text-center tracking-wide">
+                {currentPage} <span className="text-zinc-600 font-normal mx-1">/</span> {meta.totalPages}
               </div>
 
               <button
                 onClick={() => goToPage(currentPage + 1)}
                 disabled={currentPage === meta.totalPages}
-                className="p-1.5 rounded bg-[#211814] border border-[#2a1f1a] text-zinc-400 hover:text-yellow-500 hover:border-yellow-500/30 disabled:opacity-30 disabled:pointer-events-none transition-colors"
-                title="Página siguiente"
+                className="p-2 rounded-lg bg-[#15100c] border border-[#2a1f1a] text-zinc-400 hover:text-yellow-500 hover:border-yellow-500/30 disabled:opacity-20 disabled:pointer-events-none transition-all"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>
               <button
                 onClick={() => goToPage(meta.totalPages)}
                 disabled={currentPage === meta.totalPages}
-                className="p-1.5 rounded bg-[#211814] border border-[#2a1f1a] text-zinc-400 hover:text-yellow-500 hover:border-yellow-500/30 disabled:opacity-30 disabled:pointer-events-none transition-colors"
-                title="Última página"
+                className="p-2 rounded-lg bg-[#15100c] border border-[#2a1f1a] text-zinc-400 hover:text-yellow-500 hover:border-yellow-500/30 disabled:opacity-20 disabled:pointer-events-none transition-all"
               >
                 <ChevronsRight className="w-4 h-4" />
               </button>
@@ -253,46 +310,56 @@ export default function ReservationsAdmin() {
       </div>
 
       {/* ==========================================
-          MODAL: VER DETALLES
+          MODAL: VER DETALLES (Look Glassmorphism)
       ========================================== */}
       {isDetailsModalOpen && selectedReservation && (
-        <div className="fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4 backdrop-blur-sm">
-          <div className="bg-[#15100c] border border-[#2a1f1a] rounded-xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col">
-            <div className="p-6 border-b border-[#2a1f1a] bg-[#1a1410] flex justify-between items-center">
-              <h3 className="text-lg font-black text-yellow-500 uppercase flex items-center gap-2">
-                <FileText className="w-5 h-5" /> Detalles de la Reserva
+        <div className="fixed inset-0 z-[100] bg-black/75 flex items-center justify-center p-4 backdrop-blur-sm transition-opacity">
+          <div className="bg-[#15100c] border border-[#2a1f1a] rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-150">
+            <div className="p-5 border-b border-[#2a1f1a] bg-[#1a1410] flex justify-between items-center">
+              <h3 className="text-sm font-black text-yellow-500 uppercase tracking-widest flex items-center gap-2">
+                <FileText className="w-4 h-4" /> Información de Reserva
               </h3>
-              <button onClick={() => setIsDetailsModalOpen(false)} className="text-zinc-500 hover:text-zinc-100 transition-colors">
-                <X className="w-5 h-5" />
+              <button onClick={() => setIsDetailsModalOpen(false)} className="text-zinc-500 hover:text-zinc-200 p-1.5 hover:bg-[#2a1f1a] rounded-lg transition-colors">
+                <X className="w-4 h-4" />
               </button>
             </div>
             
-            <div className="p-6 space-y-4 text-sm text-zinc-300">
-              <div className="bg-[#1a1410] p-4 rounded-lg border border-[#2a1f1a] flex flex-col gap-2">
-                <p className="flex items-center gap-2"><Users className="w-4 h-4 text-zinc-500" /> <strong className="text-zinc-100">Cliente:</strong> {selectedReservation.user?.name || "No disponible"}</p>
-                <p className="flex items-center gap-2"><Phone className="w-4 h-4 text-zinc-500" /> <strong className="text-zinc-100">Teléfono:</strong> {selectedReservation.user?.phone || "No disponible"}</p>
-                <p className="flex items-center gap-2"><strong className="text-zinc-100 pl-6">Email:</strong> {selectedReservation.user?.email || "No disponible"}</p>
+            <div className="p-6 space-y-4 text-xs text-zinc-300 overflow-y-auto max-h-[70vh]">
+              
+              {/* Sección Cliente */}
+              <div>
+                <span className="text-[10px] uppercase font-bold text-zinc-500 tracking-wider block mb-2">Datos del Solicitante</span>
+                <div className="bg-[#19130f] p-4 rounded-xl border border-[#2a1f1a] space-y-2.5">
+                  <p className="flex items-center gap-2.5"><Users className="w-4 h-4 text-zinc-500" /> <strong className="text-zinc-400 font-semibold w-16">Cliente:</strong> <span className="text-zinc-200 font-medium">{selectedReservation.user?.name || "No especificado"}</span></p>
+                  <p className="flex items-center gap-2.5"><Phone className="w-4 h-4 text-zinc-500" /> <strong className="text-zinc-400 font-semibold w-16">Teléfono:</strong> <span className="text-zinc-200 font-medium">{selectedReservation.user?.phone || "No registrado"}</span></p>
+                  <p className="flex items-center gap-2.5"><span className="w-4 pl-1 text-zinc-500 font-bold">@</span> <strong className="text-zinc-400 font-semibold w-16">Email:</strong> <span className="text-zinc-200 font-medium truncate">{selectedReservation.user?.email || "No registrado"}</span></p>
+                </div>
               </div>
 
-              <div className="bg-[#1a1410] p-4 rounded-lg border border-[#2a1f1a] flex flex-col gap-2">
-                <p className="flex items-center gap-2"><Calendar className="w-4 h-4 text-zinc-500" /> <strong className="text-zinc-100">Fecha:</strong> {new Date(selectedReservation.eventDate).toLocaleDateString()} a las {selectedReservation.serviceStartTime}</p>
-                <p className="flex items-center gap-2"><MapPin className="w-4 h-4 text-zinc-500" /> <strong className="text-zinc-100">Dirección:</strong> {selectedReservation.venueAddress}, {selectedReservation.city}</p>
-                <p className="flex items-center gap-2"><Users className="w-4 h-4 text-zinc-500" /> <strong className="text-zinc-100">Invitados:</strong> {selectedReservation.guestsCount} personas</p>
+              {/* Sección Evento */}
+              <div>
+                <span className="text-[10px] uppercase font-bold text-zinc-500 tracking-wider block mb-2">Especificaciones de Evento</span>
+                <div className="bg-[#19130f] p-4 rounded-xl border border-[#2a1f1a] space-y-2.5">
+                  <p className="flex items-center gap-2.5"><Calendar className="w-4 h-4 text-zinc-500" /> <strong className="text-zinc-400 font-semibold w-16">Planificado:</strong> <span className="text-zinc-200 font-medium">{new Date(selectedReservation.eventDate).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })} a las {selectedReservation.serviceStartTime}</span></p>
+                  <p className="flex items-start gap-2.5"><MapPin className="w-4 h-4 text-zinc-500 mt-0.5" /> <strong className="text-zinc-400 font-semibold w-16 shrink-0">Dirección:</strong> <span className="text-zinc-200 font-medium">{selectedReservation.venueAddress}, {selectedReservation.city}</span></p>
+                  <p className="flex items-center gap-2.5"><Users className="w-4 h-4 text-zinc-500" /> <strong className="text-zinc-400 font-semibold w-16">Aforo:</strong> <span className="text-zinc-200 font-medium">{selectedReservation.guestsCount} personas asignadas</span></p>
+                </div>
               </div>
 
+              {/* Notas */}
               {selectedReservation.notes && (
-                <div className="bg-[#1a1410] p-4 rounded-lg border border-[#2a1f1a]">
-                  <strong className="text-zinc-100 flex items-center gap-2 mb-2">
-                    <FileText className="w-4 h-4 text-zinc-500" /> Notas del cliente:
-                  </strong>
-                  <p className="text-zinc-400 italic pl-6">{selectedReservation.notes}</p>
+                <div>
+                  <span className="text-[10px] uppercase font-bold text-zinc-500 tracking-wider block mb-2">Comentarios del Cliente</span>
+                  <div className="bg-[#19130f] p-4 rounded-xl border border-[#2a1f1a] border-l-yellow-500/40">
+                    <p className="text-zinc-400 italic leading-relaxed">{selectedReservation.notes}</p>
+                  </div>
                 </div>
               )}
             </div>
 
-            <div className="p-6 border-t border-[#2a1f1a] bg-[#1a1410]">
-              <button onClick={() => setIsDetailsModalOpen(false)} className="w-full bg-zinc-800 hover:bg-zinc-700 text-white py-2.5 rounded-lg font-bold transition-colors flex items-center justify-center gap-2">
-                Cerrar Panel
+            <div className="p-4 border-t border-[#2a1f1a] bg-[#1a1410]">
+              <button onClick={() => setIsDetailsModalOpen(false)} className="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-100 py-2 rounded-lg font-bold transition-colors text-xs uppercase tracking-wider">
+                Cerrar Ventana
               </button>
             </div>
           </div>
@@ -300,35 +367,35 @@ export default function ReservationsAdmin() {
       )}
 
       {/* ==========================================
-          MODAL: EDITAR
+          MODAL: EDITAR (Look Limpio)
       ========================================== */}
       {isEditModalOpen && selectedReservation && (
-        <div className="fixed inset-0 z-[100] bg-black/80 flex items-center justify-center p-4 backdrop-blur-sm">
-          <div className="bg-[#15100c] border border-[#2a1f1a] rounded-xl p-6 max-w-md w-full shadow-2xl">
+        <div className="fixed inset-0 z-[100] bg-black/75 flex items-center justify-center p-4 backdrop-blur-sm">
+          <div className="bg-[#15100c] border border-[#2a1f1a] rounded-2xl p-6 max-w-md w-full shadow-2xl animate-in fade-in zoom-in-95 duration-150">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-black text-yellow-500 uppercase flex items-center gap-2">
-                <Edit className="w-5 h-5" /> Editar Reserva
+              <h3 className="text-sm font-black text-yellow-500 uppercase tracking-widest flex items-center gap-2">
+                <Edit className="w-4 h-4" /> Modificar Registro
               </h3>
-              <button onClick={() => setIsEditModalOpen(false)} className="text-zinc-500 hover:text-zinc-100 transition-colors">
-                <X className="w-5 h-5" />
+              <button onClick={() => setIsEditModalOpen(false)} className="text-zinc-500 hover:text-zinc-200 p-1.5 hover:bg-[#2a1f1a] rounded-lg transition-colors">
+                <X className="w-4 h-4" />
               </button>
             </div>
             
-            <p className="text-zinc-400 mb-6 text-sm">
-              Conecta tu formulario aquí para editar la dirección, hora o notas de la reserva #{selectedReservation.id}.
+            <p className="text-zinc-400 mb-6 text-xs leading-relaxed">
+              El panel de mutación se encuentra listo. Vincula los inputs de tu formulario aquí para actualizar los metadatos de la reserva <span className="text-yellow-500 font-mono">#{selectedReservation.id.substring(0,8)}...</span>
             </p>
 
-            <div className="flex gap-3">
-              <button onClick={() => setIsEditModalOpen(false)} className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-white py-2 rounded-lg font-bold transition-colors">
+            <div className="flex gap-3 text-xs">
+              <button onClick={() => setIsEditModalOpen(false)} className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 py-2.5 rounded-lg font-bold transition-colors uppercase tracking-wider">
                 Cancelar
               </button>
-              <button onClick={() => { toast.success("Guardado!"); setIsEditModalOpen(false); }} className="flex-1 bg-yellow-500 hover:bg-yellow-400 text-black py-2 rounded-lg font-bold transition-colors">
-                Guardar
+              <button onClick={() => { toast.success("Guardado!"); setIsEditModalOpen(false); }} className="flex-1 bg-yellow-500 hover:bg-yellow-400 text-black py-2.5 rounded-lg font-black transition-colors uppercase tracking-wider shadow-md shadow-yellow-500/10">
+                Confirmar
               </button>
             </div>
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }

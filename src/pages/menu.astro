@@ -3,7 +3,7 @@ import { Toaster } from "sonner";
 import "@/styles/globals.css";
 
 import { PublicNavbar } from "@/modules/user/components/PublicNavbar";
-import {MenuProducts} from "@/modules/admin/productos/components/MenuProducts";
+import { MenuProducts } from "@/modules/admin/productos/components/MenuProducts";
 ---
 
 <html lang="es">
@@ -15,19 +15,35 @@ import {MenuProducts} from "@/modules/admin/productos/components/MenuProducts";
   <body class="min-h-screen bg-[#0b0806] text-white">
     <PublicNavbar client:only="react" />
 
-    <main class="max-w-7xl mx-auto px-6 py-20">
-      <section class="text-center mb-16">
-        <h1 class="text-6xl font-bold">
-          Nuestro Menú
+    {/* ENCABEZADO DEL MENÚ */}
+    <section class="relative pt-40 pb-16 px-6 overflow-hidden border-b border-[#2d2016]/40">
+      {/* Resplandores ambientales */}
+      <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-yellow-500/5 rounded-full blur-[140px] pointer-events-none"></div>
+      <div class="grain-overlay"></div>
+
+      <div class="max-w-7xl mx-auto text-center relative z-10 animate-fade-in-up">
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-yellow-500/10 border border-yellow-500/30 text-yellow-500 text-xs font-black tracking-[0.2em] uppercase mb-5">
+          Carta DeParraSpitz
+        </span>
+
+        <h1 class="text-5xl sm:text-6xl md:text-7xl font-bold font-serif tracking-tight text-white">
+          Nuestro <span class="italic font-normal text-yellow-500 bg-gradient-to-r from-yellow-400 to-amber-500 bg-clip-text text-transparent">Menú</span>
         </h1>
 
-        <p class="text-zinc-300 mt-4">
-          Descubre nuestra selección de productos premium para tu evento
-        </p>
-      </section>
+        <div class="w-12 h-[2px] bg-yellow-500/40 mx-auto mt-5"></div>
 
+        <p class="text-zinc-400 mt-5 text-base sm:text-lg max-w-2xl mx-auto font-light leading-relaxed">
+          Descubre nuestra selección de platillos premium, pensados para
+          acompañar cada tipo de evento, desde reuniones íntimas hasta
+          grandes celebraciones.
+        </p>
+      </div>
+    </section>
+
+    <main class="max-w-7xl mx-auto px-6 py-16 relative">
       <MenuProducts client:load />
     </main>
-      <Toaster richColors position="top-right" client:load />
+
+    <Toaster richColors position="top-right" client:load />
   </body>
 </html>
