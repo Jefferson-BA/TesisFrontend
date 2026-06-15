@@ -1,22 +1,77 @@
+import { useState, useEffect } from "react";
 import { ChevronRight, Calendar, ChevronDown } from "lucide-react";
 
+const BACKGROUND_IMAGES = [
+  "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?q=80&w=2070&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1555244162-803834f70033?q=80&w=2070&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=2070&auto=format&fit=crop",
+];
+
 export const Hero = () => {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  // Cada imagen se muestra durante 9 segundos exactos antes de cambiar
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % BACKGROUND_IMAGES.length);
+    }, 9000);
+
+    return () => clearInterval(timer);
+  }, []);
+
   return (
-    <section
-      className="relative min-h-screen flex items-center justify-center bg-cover bg-center overflow-hidden"
-      style={{
-        backgroundImage:
-          "url('https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?q=80&w=2070&auto=format&fit=crop')",
-      }}
-    >
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-black">
+      
+      {/* CARRUSEL DE FONDO CON ANIMACIÓN PERFECTA */}
+      <div className="absolute inset-0 z-0 overflow-hidden">
+        {BACKGROUND_IMAGES.map((image, index) => {
+          const isActive = index === currentImageIndex;
+          return (
+            <div
+              key={image}
+              className={`absolute inset-0 bg-cover bg-center transition-opacity ease-in-out`}
+              style={{
+                backgroundImage: `url('${image}')`,
+                // Transición de opacidad cruzada de 2000ms (2 segundos de suavizado)
+                transitionDuration: "2000ms", 
+                opacity: isActive ? 1 : 0,
+                // Efecto Ken Burns (Zoom continuo e imperceptible) sincronizado a 9s
+                transform: isActive ? "scale(1.06)" : "scale(1.0)",
+                transitionProperty: "opacity, transform",
+                // Duración del zoom idéntica al ciclo de cambio para evitar saltos bruscos
+               transition: isActive
+    ? "opacity 2000ms ease-in-out, transform 9000ms linear"
+    : "opacity 2000ms ease-in-out, transform 2000ms ease-in-out",
+}}
+            />
+          );
+        })}
+      </div>
+
       {/* Overlay oscuro con degradado para fusionar con el fondo de la web */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/75 via-black/60 to-[#0b0806]"></div>
+      <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/65 to-[#0b0806] z-10"></div>
 
       {/* Textura de grano para profundidad */}
-      <div className="grain-overlay"></div>
+      <div className="grain-overlay z-10"></div>
+
+      {/* Indicadores del Carrusel laterales */}
+      <div className="absolute right-6 top-1/2 -translate-y-1/2 flex flex-col gap-2 z-20 hidden sm:flex">
+        {BACKGROUND_IMAGES.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => setCurrentImageIndex(index)}
+            className={`w-2 h-2 rounded-full transition-all duration-500 cursor-pointer ${
+              index === currentImageIndex 
+                ? "bg-yellow-500 h-6" 
+                : "bg-zinc-500/40 hover:bg-zinc-400"
+            }`}
+            aria-label={`Ir a la imagen ${index + 1}`}
+          />
+        ))}
+      </div>
 
       {/* Sello giratorio "estampa de catering" — elemento de firma */}
-      <div className="hidden lg:flex absolute top-28 right-12 w-28 h-28 items-center justify-center z-10">
+      <div className="hidden lg:flex absolute top-28 right-12 w-28 h-28 items-center justify-center z-20">
         <svg viewBox="0 0 100 100" className="absolute inset-0 spin-slow">
           <defs>
             <path id="circlePath" d="M 50,50 m -38,0 a 38,38 0 1,1 76,0 a 38,38 0 1,1 -76,0" />
@@ -33,14 +88,14 @@ export const Hero = () => {
       </div>
 
       {/* Contenido Principal */}
-      <div className="relative z-10 text-center px-4 sm:px-6 max-w-5xl mx-auto flex flex-col items-center">
+      <div className="relative z-20 text-center px-4 sm:px-6 max-w-5xl mx-auto flex flex-col items-center">
 
         {/* Kicker / Etiqueta Superior */}
         <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-yellow-500/10 border border-yellow-500/30 text-yellow-500 text-xs font-black tracking-[0.2em] uppercase mb-6 animate-fade-in-up glow-pulse">
           ✨ Experiencias Gastronómicas Premium
         </span>
 
-        {/* Título Principal (Combinando Sans y Serif para máxima elegancia) */}
+        {/* Título Principal */}
         <h1
           className="text-4xl sm:text-5xl md:text-7xl font-bold leading-[1.15] text-white tracking-tight drop-shadow-xl animate-fade-in-up"
           style={{ animationDelay: "0.1s" }}
@@ -102,13 +157,13 @@ export const Hero = () => {
       </div>
 
       {/* Indicador de scroll */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-zinc-500 animate-bounce-soft">
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-zinc-500 animate-bounce-soft z-20">
         <span className="text-[10px] tracking-[0.3em] uppercase">Descubre más</span>
         <ChevronDown className="w-4 h-4" />
       </div>
 
       {/* Decoración sutil: Línea difuminada inferior */}
-      <div className="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#3d2c1f] to-transparent"></div>
+      <div className="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#3d2c1f] to-transparent z-20"></div>
     </section>
   );
 };
