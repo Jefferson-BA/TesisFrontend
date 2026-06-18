@@ -8,12 +8,32 @@ interface OrderReservationFilterProps {
 export default function OrderReservationFilter({ onSelectReservation }: OrderReservationFilterProps) {
   const [reservations, setReservations] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [selectedValue, setSelectedValue] = useState<string>("");
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const urlId = params.get("reservationId");
+    if (urlId) {
+      setSelectedValue(urlId);
+    }
+  }, []);
 
   useEffect(() => {
     const fetchReservations = async () => {
       try {
         const data = await getActiveAdminReservations();
-        setReservations(Array.isArray(data) ? data : data.data || []);
+        const list = Array.isArray(data) ? data : data.data || [];
+        setReservations(list);
+
+        const params = new URLSearchParams(window.location.search);
+        const urlId = params.get("reservationId");
+
+        if (urlId) {
+          const found = list.find((r: any) => String(r.id) === String(urlId)); 
+          if (found) {
+            onSelectReservation(found);
+          }
+        }
       } catch (error) {
         console.error("Error cargando filtro de reservas:", error);
       } finally {
@@ -25,6 +45,8 @@ export default function OrderReservationFilter({ onSelectReservation }: OrderRes
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const val = e.target.value;
+    setSelectedValue(val);
+
     if (!val) {
       onSelectReservation(null);
       return;
@@ -35,18 +57,20 @@ export default function OrderReservationFilter({ onSelectReservation }: OrderRes
 
   return (
     <div className="flex flex-col gap-1.5 min-w-[240px]">
-      <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
+      <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
         Filtrar por Reserva Activa
       </label>
       <select
+        value={selectedValue}
         onChange={handleChange}
         disabled={loading}
-        className="w-full bg-zinc-950 border border-zinc-800 text-zinc-200 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none transition-all cursor-pointer disabled:opacity-50"
+        className="w-full bg-background border border-input text-foreground rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-ring focus:border-transparent outline-none transition-all cursor-pointer disabled:opacity-50"
       >
         <option value="">Ver todos los pedidos</option>
         {reservations.map((res) => (
           <option key={res.id} value={res.id}>
-            Reserva de {res.user?.name || res.customerName || res.clientName || `Ref: #${res.id}`}          </option>
+            Reserva de {res.user?.name || res.customerName || res.clientName || `Ref: #${res.id}`}
+          </option>
         ))}
       </select>
     </div>

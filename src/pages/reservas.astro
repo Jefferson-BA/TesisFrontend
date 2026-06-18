@@ -1,39 +1,29 @@
 ---
 // src/pages/reservas.astro
-import UserLayout from "@/layouts/UserLayout.astro";
-import ReservationWizard from "@/modules/user/components/ReservationWizard";
-import "@/styles/globals.css";
-import { Toaster } from "sonner";
+import UserLayout from '@/layouts/UserLayout.astro'; 
+import ReservationWizard from '@/modules/user/components/ReservationWizard'; // Componente de usuario
+import { Toaster } from 'sonner';
 ---
 
-<UserLayout title="Haz tu Reserva | DeParraSpitz">
-  <main class="min-h-screen bg-[#0b0806] pb-24">
-
-    {/* ENCABEZADO DE RESERVAS */}
-    <section class="relative pt-40 pb-14 px-4 overflow-hidden border-b border-[#2d2016]/40">
-      <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-yellow-500/5 rounded-full blur-[140px] pointer-events-none"></div>
-      <div class="grain-overlay"></div>
-
-      <div class="max-w-4xl mx-auto text-center relative z-10 animate-fade-in-up">
-        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-yellow-500/10 border border-yellow-500/30 text-yellow-500 text-xs font-black tracking-[0.2em] uppercase mb-5">
-          Reserva tu fecha
-        </span>
-
-        <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold font-serif tracking-tight text-white">
-          Reserva tu <span class="italic font-normal text-yellow-500 bg-gradient-to-r from-yellow-400 to-amber-500 bg-clip-text text-transparent">Evento</span>
+<UserLayout title="Reserva tu Mesa | DeParraSpitz">
+  {/* Usamos los colores oscuros/dorados que manejas en tu vista pública (PublicNavbar) */}
+  <main class="min-h-screen bg-[#0b0806] pt-32 pb-12 px-4 md:px-8">
+    <div class="max-w-4xl mx-auto space-y-8">
+      
+      <header class="text-center space-y-3">
+        <h1 class="text-4xl md:text-5xl font-black tracking-wider text-white uppercase font-serif">
+          Haz tu <span class="text-yellow-500">Reserva</span>
         </h1>
-
-        <div class="w-12 h-[2px] bg-yellow-500/40 mx-auto mt-5"></div>
-
-        <p class="text-zinc-400 mt-5 text-base sm:text-lg max-w-xl mx-auto font-light leading-relaxed">
-          Completa los datos en cuatro pasos sencillos y te enviaremos una
-          propuesta de catering a tu medida.
+        <p class="text-zinc-400 text-sm md:text-base max-w-xl mx-auto">
+          Asegura tu lugar en DeParraSpitz. Completa el formulario a continuación y prepárate para una experiencia gastronómica inolvidable.
         </p>
-      </div>
-    </section>
+      </header>
 
-    <div class="max-w-4xl mx-auto px-4">
-      <ReservationWizard client:load />
+      {/* Aquí cargamos el formulario paso a paso del usuario */}
+      <div class="bg-[#120d0a] border border-[#3d2c1f] rounded-2xl p-6 md:p-8 shadow-2xl shadow-yellow-500/5">
+        <ReservationWizard client:load />
+      </div>
+
     </div>
 
   </main>

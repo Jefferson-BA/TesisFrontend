@@ -13,12 +13,7 @@ export const ProductForm = ({ onProductCreated }: ProductFormProps) => {
   const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
-    name: "",
-    description: "",
-    price: "",
-    stock: "",
-    categoryId: "",
-    imageUrl: "",
+    name: "", description: "", price: "", stock: "", categoryId: "", imageUrl: "",
   });
 
   useEffect(() => {
@@ -55,7 +50,7 @@ export const ProductForm = ({ onProductCreated }: ProductFormProps) => {
       
       toast.success("Producto creado exitosamente");
       setFormData({ name: "", description: "", price: "", stock: "", categoryId: "", imageUrl: "" });
-      onProductCreated(); // Recarga la tabla de abajo automáticamente
+      onProductCreated();
     } catch (error) {
       console.error(error);
       toast.error("Error al guardar el producto");
@@ -65,10 +60,10 @@ export const ProductForm = ({ onProductCreated }: ProductFormProps) => {
   };
 
   return (
-    <section className="bg-[#15100e] border border-[#4a3824] rounded-2xl p-6 shadow-xl text-white">
+    <section className="bg-card border border-border rounded-2xl p-6 shadow-xl text-card-foreground">
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-yellow-500">Nuevo Producto</h2>
-        <p className="text-zinc-400 text-sm mt-1">
+        <h2 className="text-2xl font-bold text-primary">Nuevo Producto</h2>
+        <p className="text-muted-foreground text-sm mt-1">
           Registra los alimentos, bebidas o combos disponibles en el menú.
         </p>
       </div>
@@ -77,107 +72,47 @@ export const ProductForm = ({ onProductCreated }: ProductFormProps) => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           
           <div className="flex flex-col gap-2">
-            <label htmlFor="name" className="text-zinc-300 text-sm font-medium">Nombre del Producto *</label>
-            <input
-              id="name"
-              name="name"
-              type="text"
-              value={formData.name}
-              onChange={handleChange}
-              placeholder="Ej. Lomo Saltado"
-              className="h-11 px-4 bg-[#1c1613] border border-[#4a3824] text-white rounded-lg placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-              required
-            />
+            <label htmlFor="name" className="text-foreground text-sm font-medium">Nombre del Producto *</label>
+            <input id="name" name="name" type="text" value={formData.name} onChange={handleChange} placeholder="Ej. Lomo Saltado" className="h-11 px-4 bg-background border border-input text-foreground rounded-lg placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" required />
           </div>
 
           <div className="flex flex-col gap-2">
-            <label htmlFor="categoryId" className="text-zinc-300 text-sm font-medium">Categoría *</label>
-            <select
-              id="categoryId"
-              name="categoryId"
-              value={formData.categoryId}
-              onChange={handleChange}
-              className="h-11 px-3 bg-[#1c1613] border border-[#4a3824] text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
-              required
-            >
+            <label htmlFor="categoryId" className="text-foreground text-sm font-medium">Categoría *</label>
+            <select id="categoryId" name="categoryId" value={formData.categoryId} onChange={handleChange} className="h-11 px-3 bg-background border border-input text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-ring" required>
               <option value="">Selecciona una categoría</option>
               {categories.map((cat) => (
-                <option key={cat.id || cat._id} value={cat.id || cat._id}>
-                  {cat.name}
-                </option>
+                <option key={cat.id || cat._id} value={cat.id || cat._id}>{cat.name}</option>
               ))}
             </select>
           </div>
 
           <div className="flex flex-col gap-2">
-            <label htmlFor="price" className="text-zinc-300 text-sm font-medium">Precio (S/) *</label>
-            <input
-              id="price"
-              name="price"
-              type="number"
-              step="0.01"
-              value={formData.price}
-              onChange={handleChange}
-              placeholder="0.00"
-              className="h-11 px-4 bg-[#1c1613] border border-[#4a3824] text-white rounded-lg placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-              required
-            />
+            <label htmlFor="price" className="text-foreground text-sm font-medium">Precio (S/) *</label>
+            <input id="price" name="price" type="number" step="0.01" value={formData.price} onChange={handleChange} placeholder="0.00" className="h-11 px-4 bg-background border border-input text-foreground rounded-lg placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" required />
           </div>
 
           <div className="flex flex-col gap-2">
-            <label htmlFor="stock" className="text-zinc-300 text-sm font-medium">Stock Inicial</label>
-            <input
-              id="stock"
-              name="stock"
-              type="number"
-              value={formData.stock}
-              onChange={handleChange}
-              placeholder="Cantidad disponible"
-              className="h-11 px-4 bg-[#1c1613] border border-[#4a3824] text-white rounded-lg placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-            />
+            <label htmlFor="stock" className="text-foreground text-sm font-medium">Stock Inicial</label>
+            <input id="stock" name="stock" type="number" value={formData.stock} onChange={handleChange} placeholder="Cantidad disponible" className="h-11 px-4 bg-background border border-input text-foreground rounded-lg placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
           </div>
 
           <div className="md:col-span-2 flex flex-col gap-2">
-            <label htmlFor="imageUrl" className="text-zinc-300 text-sm font-medium">URL de la Imagen</label>
-            <input
-              id="imageUrl"
-              name="imageUrl"
-              type="text"
-              value={formData.imageUrl}
-              onChange={handleChange}
-              placeholder="https://ejemplo.com/imagen.jpg"
-              className="h-11 px-4 bg-[#1c1613] border border-[#4a3824] text-white rounded-lg placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-            />
+            <label htmlFor="imageUrl" className="text-foreground text-sm font-medium">URL de la Imagen</label>
+            <input id="imageUrl" name="imageUrl" type="text" value={formData.imageUrl} onChange={handleChange} placeholder="https://ejemplo.com/imagen.jpg" className="h-11 px-4 bg-background border border-input text-foreground rounded-lg placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
           </div>
 
           <div className="md:col-span-2 flex flex-col gap-2">
-            <label htmlFor="description" className="text-zinc-300 text-sm font-medium">Descripción del Plato</label>
-            <textarea
-              id="description"
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              placeholder="Detalla los ingredientes o la presentación..."
-              rows={3}
-              className="p-3 bg-[#1c1613] border border-[#4a3824] text-white rounded-lg placeholder-zinc-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 resize-none"
-            />
+            <label htmlFor="description" className="text-foreground text-sm font-medium">Descripción del Plato</label>
+            <textarea id="description" name="description" value={formData.description} onChange={handleChange} placeholder="Detalla los ingredientes o la presentación..." rows={3} className="p-3 bg-background border border-input text-foreground rounded-lg placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring resize-none" />
           </div>
 
         </div>
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full h-11 bg-yellow-500 hover:bg-yellow-400 disabled:bg-zinc-700 text-black disabled:text-zinc-400 font-bold rounded-lg flex items-center justify-center gap-2 transition-colors duration-200"
-        >
+        <button type="submit" disabled={loading} className="w-full h-11 bg-primary hover:bg-primary/90 disabled:opacity-50 text-primary-foreground font-bold rounded-lg flex items-center justify-center gap-2 transition-colors duration-200">
           {loading ? (
-            <>
-              <Loader2 className="h-5 w-5 animate-spin" /> Guardando...
-            </>
+            <><Loader2 className="h-5 w-5 animate-spin" /> Guardando...</>
           ) : (
-            <>
-              <PlusCircle className="h-5 w-5" /> Crear Producto
-            </>
+            <><PlusCircle className="h-5 w-5" /> Crear Producto</>
           )}
         </button>
       </form>

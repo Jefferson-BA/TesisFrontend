@@ -9,15 +9,15 @@ export default function AdminLayoutReact({ children }: { children: React.ReactNo
     <QueryProvider>
       <SidebarProvider>
         <AppSidebar role="admin" />
-        
+
         <main className="w-full min-h-screen flex flex-col flex-1 overflow-x-hidden">
-          <header className="sticky top-0 z-40 p-4 flex items-center border-b border-zinc-800 bg-zinc-950/90 backdrop-blur-md">
+          <header className="sticky top-0 z-40 p-4 flex items-center border-b border-border bg-background/90 backdrop-blur-md">
             <CustomTrigger />
-            <h1 className="ml-4 font-bold text-zinc-100 text-lg tracking-tight">
+            <h1 className="ml-4 font-bold text-foreground text-lg tracking-tight">
               Dashboard Administrativo
             </h1>
           </header>
-          
+
           <div className="p-6 flex-1 w-full max-w-7xl mx-auto min-w-0">
             {children}
           </div>
