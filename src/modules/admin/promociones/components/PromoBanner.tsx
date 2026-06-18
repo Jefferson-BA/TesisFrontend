@@ -16,11 +16,11 @@ export default function PromoBanner() {
         </div>
 
         <div className="promo-banner-grid">
-          {promos.map((promo, index) => (
+          {promos.map((promo, index: number) => (
             <div
               key={promo.id}
               className="promo-banner-card"
-              style={{ animationDelay: `${index * 0.1}s` }}
+              style={{ animationDelay: `${index * 0.12}s` }}
             >
               <div className="promo-banner-card-glow" />
 

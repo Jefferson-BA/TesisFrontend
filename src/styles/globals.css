@@ -1,21 +1,12 @@
-/* ═══════════════════════════════════════════════════════════════
-   GLOBAL.CSS — De Parras & Pitz
-   REGLA: todos los @import SIEMPRE al inicio, sin excepción
-═══════════════════════════════════════════════════════════════ */
-
-/* ── Librerías Tailwind / Shadcn ── */
+/* ── 1. IMPORTACIONES ABSOLUTAS (SIEMPRE PRIMERO) ── */
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/geist";
-
-/* ── Google Fonts (DEBEN ir aquí, no en medio del archivo) ── */
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Manrope:wght@300;400;500;600;700;800&display=swap');
 
-/* ── Tailwind dark variant ── */
+/* ── 2. CONFIGURACIONES Y VARIANTES DE TAILWIND ── */
 @custom-variant dark (&:is(.dark *));
-
-
 /* ═══════════════════════════════════════════════════════════════
    TAILWIND THEME
 ═══════════════════════════════════════════════════════════════ */
@@ -1149,4 +1140,217 @@ body:has(.split-left) {
     animation: none !important;
     transition: opacity 0.3s ease !important;
   }
+}
+/* Custom Animations & Keyframes for Buffet Section */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(36px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)   scale(1);    }
+}
+@keyframes shimmerGold {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+@keyframes dividerGrow {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+@keyframes floatBadge {
+  0%, 100% { transform: translateY(0px);   }
+  50%       { transform: translateY(-3px);  }
+}
+@keyframes arrowBounce {
+  0%, 100% { transform: translateX(0);    }
+  50%       { transform: translateX(4px); }
+}
+@keyframes glowAmbient {
+  0%, 100% { opacity: 0.4; }
+  50%       { opacity: 0.8; }
+}
+
+/* Custom Utility Classes */
+.s-fade-up { 
+  animation: fadeUp 0.7s cubic-bezier(.22,1,.36,1) both; 
+}
+
+.s-shimmer {
+  background: linear-gradient(
+    90deg,
+    #b45309 0%, #fde68a 35%, #eab308 50%, #fde68a 65%, #b45309 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmerGold 4s linear infinite;
+}
+
+.s-badge-float { 
+  animation: floatBadge 3s ease-in-out infinite; 
+}
+
+.s-arrow-bounce:hover .arrow-icon { 
+  animation: arrowBounce 0.6s ease-in-out infinite; 
+}
+
+.s-ambient { 
+  animation: glowAmbient 3s ease-in-out infinite; 
+}
+
+.s-card {
+  transform-style: preserve-3d;
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+.s-card-inner {
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.s-img {
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+.s-divider {
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+.s-divider-in {
+  animation: dividerGrow 0.8s 0.3s cubic-bezier(.22,1,.36,1) forwards;
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+
+/* ==========================================
+   CONFIGURACIÓN DE FONDO GLOBAL
+   ========================================== */
+
+/* Por defecto (Modo Claro): Todo blanco */
+html, body {
+  background-color: #ffffff !important;
+  color: #1c1917 !important;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Cuando se activa el Modo Oscuro */
+html.dark, html.dark body {
+  background-color: #0b0806 !important;
+  color: #ffffff !important;
+}
+
+/* Forzar que tu header cambie correctamente entre temas */
+header {
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+html:not(.dark) header {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  border-color: #e7e5e4 !important;
+}
+
+html.dark header {
+  background-color: rgba(11, 8, 6, 0.8) !important;
+  border-color: rgba(61, 44, 31, 0.4) !important;
+}
+/* Reglas base para las transiciones de fondo de la aplicación */
+html, body {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* El fondo por defecto cuando está activo el Modo Oscuro */
+html.dark body {
+  background-color: #0b0806;
+}
+
+/* El fondo por defecto cuando pasas al Modo Claro */
+html:not(.dark) body {
+  background-color: #fcfbf9; /* Un blanco hueso elegante para restaurantes */
+}
+/* Transiciones fluidas */
+html, body {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Fondo del Modo Oscuro (Tu diseño premium por defecto) */
+html.dark body {
+  background-color: #0b0806;
+}
+
+/* Fondo del Modo Claro (Un color limpio, sin alterar tus componentes internos) */
+html:not(.dark) body {
+  background-color: #fcfbf9;
+}
+
+/* ==========================================================================
+   INTERCEPCIÓN GLOBAL PARA SECCIONES CON FONDOS OSCUROS FIJOS
+   ========================================================================== */
+
+/* Cuando NO está la clase .dark (Modo Claro activado) */
+html:not(.dark) section,
+html:not(.dark) main,
+html:not(.dark) footer,
+html:not(.dark) .bg-\[\#0b0806\], 
+html:not(.dark) [class*="bg-zinc-950"],
+html:not(.dark) [class*="bg-stone-950"],
+html:not(.dark) [class*="bg-neutral-950"] {
+  background-color: #fcfbf9 !important; /* Fuerza el fondo de la pantalla claro */
+  background-image: none !important;    
+}
+
+/* Forzar títulos de sección fuera de las tarjetas */
+html:not(.dark) h1,
+html:not(.dark) h2,
+html:not(.dark) h4 {
+  color: #111827 !important; 
+}
+
+/* Forzar textos descriptivos generales de la web a oscuros (MENOS los de las tarjetas) */
+html:not(.dark) main p:not([class*="text-amber"]):not([class*="text-yellow"]):not(article p),
+html:not(.dark) main span:not([class*="text-amber"]):not([class*="text-yellow"]):not(article span) {
+  color: #4b5563 !important; 
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PROTECCIÓN ABSOLUTA DE LAS CARDS (SABOR DE CASA / BUFFETS)
+   Siempre oscuras con texto blanco, sin importar el modo
+   ═══════════════════════════════════════════════════════════════ */
+html:not(.dark) article,
+html:not(.dark) [class*="bg-[#120d0a]"],
+html:not(.dark) [class*="bg-zinc-900"],
+html:not(.dark) [class*="bg-stone-900"] {
+  background-color: #120d0a !important; /* Mantiene tu fondo oscuro original de la card */
+  border-color: rgba(217, 119, 6, 0.2) !important;
+}
+
+/* Forzar que las letras DENTRO de las cards se queden en BLANCO */
+html:not(.dark) article h3,
+html:not(.dark) [class*="bg-[#120d0a]"] h3,
+html:not(.dark) [class*="bg-zinc-900"] h3,
+html:not(.dark) article p,
+html:not(.dark) [class*="bg-[#120d0a]"] p,
+html:not(.dark) [class*="bg-zinc-900"] p,
+html:not(.dark) article span,
+html:not(.dark) [class*="bg-[#120d0a]"] span {
+  color: #ffffff !important; /* ¡Letra blanca garantizada! */
+}
+
+/* Mantener el enlace "Explorar propuesta" en su dorado original */
+html:not(.dark) article a,
+html:not(.dark) article [class*="text-yellow"] {
+  color: #f59e0b !important;
+}
+
+/* Tarjetas de testimonios blancas (Como las de abajo de Carlos Ramírez) */
+html:not(.dark) .grid div[class*="bg-white"] p,
+html:not(.dark) .grid div[class*="bg-white"] h3 {
+  color: #111827 !important;
 }

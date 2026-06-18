@@ -11,6 +11,8 @@ import {
 } from "lucide-react";
 import { useCartStore } from "@/modules/admin/promociones/store/cartStore";
 import { useUser } from "@/modules/user/hooks/useUser";
+// 1. IMPORTAMOS EL COMPONENTE SWITCH DEL THEME
+import ThemeToggle from "./Themetoggle";
 
 export function PublicNavbar() {
   const cart = useCartStore((state) => state.cart);
@@ -99,6 +101,12 @@ export function PublicNavbar() {
 
         {/* ACTIONS AREA */}
         <div className="flex items-center gap-4 text-sm">
+          
+          {/* 2. AGREGADO AQUÍ EL SWITCH DE TEMA */}
+          <div className="flex items-center justify-center">
+            <ThemeToggle />
+          </div>
+
           {/* USER SECTIONS */}
           {!isMounted ? (
             <div className="w-20 h-9 bg-zinc-800/20 animate-pulse rounded-lg hidden md:block"></div>
