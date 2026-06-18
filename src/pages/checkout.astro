@@ -1,21 +1,32 @@
 ---
-import { Toaster } from "sonner";
-import "@/styles/globals.css";
-import { PublicNavbar } from "@/modules/user/components/PublicNavbar";
-import CheckoutPage from "@/modules/user/components/CheckoutPage";---
+import UserLayout from '@/layouts/UserLayout.astro';
+import CheckoutPage from '@/modules/user/components/CheckoutPage';
+import { Toaster } from 'sonner';
 
-<html lang="es">
-  <head>
-    <meta charset="utf-8" />
-    <title>Checkout | DeParraSpitz</title>
-  </head>
+// Obtenemos el ID de la orden desde la URL (Ej: /checkout?orderId=45&total=150)
+const url = new URL(Astro.request.url);
+const orderId = url.searchParams.get('orderId') || '0';
+const totalAmount = parseFloat(url.searchParams.get('total') || '0.00');
 
-  <body class="min-h-screen bg-[#0b0806] text-white">
-    <PublicNavbar client:only="react" />
+// Si no hay datos válidos de orden, redirigimos preventivamente al menú
+if (orderId === '0' || totalAmount === 0) {
+  return Astro.redirect('/menu');
+}
+---
 
-    <main class="max-w-6xl mx-auto px-6 py-16">
-      <CheckoutPage client:load />
-    </main>
-      <Toaster richColors position="top-right" client:load />
-  </body>
-</html>
+<UserLayout title="Finalizar Pago | DeParraSpitz">
+  <main class="min-h-screen bg-[#0b0806] pt-32 pb-12 px-4 flex items-center justify-center">
+    <div class="w-full space-y-6">
+      
+      <div class="text-center space-y-2">
+  <p class="text-xs uppercase...">Pasarela de Pago</p>
+  </div>
+
+      {/* Cargamos nuestro componente React interactivo en el cliente */}
+      <CheckoutPage orderId={orderId} totalAmount={totalAmount} client:load />
+
+    </div>
+  </main>
+
+  <Toaster richColors position="top-right" client:load />
+</UserLayout>

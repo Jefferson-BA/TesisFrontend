@@ -82,11 +82,21 @@ function LoginFormInner() {
     login(data, {
       onSuccess: () =>
         toast.success("Bienvenido de nuevo 👋", {
-          style: { background: "#120d0a", color: "#fff", border: "1px solid #4a3824" },
+          // Cambiamos colores hardcodeados por variables CSS del tema
+          style: { 
+            background: "var(--background)", 
+            color: "var(--foreground)", 
+            border: "1px solid var(--border)" 
+          },
         }),
       onError: () =>
         toast.error("Credenciales incorrectas", {
-          style: { background: "#120d0a", color: "#fff", border: "1px solid #e11d48" },
+          // Usamos la variable --destructive para el rojo del error
+          style: { 
+            background: "var(--background)", 
+            color: "var(--foreground)", 
+            border: "1px solid var(--destructive)" 
+          },
         }),
     });
   };
@@ -119,7 +129,8 @@ function LoginFormInner() {
         {/* ─── Left · Info Panel ─── */}
         <div className="lp-info">
           <div className="lp-brand">
-            <ChefHat size={40} color="#eab308" />
+            {/* Reemplazamos color="#eab308" por className="text-primary" */}
+            <ChefHat size={40} className="text-primary" />
             <div>
               <div className="lp-brand-name">De Parras &amp; Pitz</div>
               <div className="lp-brand-tagline">Parrilla &amp; Brasas</div>
@@ -171,7 +182,8 @@ function LoginFormInner() {
           <div className="lf-header">
             <div className="lf-icon-wrap">
               <div className="lf-icon-bg">
-                <ChefHat size={34} color="#eab308" />
+                {/* Reemplazamos color="#eab308" por className="text-primary" */}
+                <ChefHat size={34} className="text-primary" />
               </div>
               <div className="lf-orbit-dot" />
               <div className="lf-orbit-dot-2" />

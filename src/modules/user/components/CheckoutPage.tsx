@@ -1,304 +1,135 @@
-import { useState } from "react";
-import { CheckCircle2 } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { processPayment } from "../services/payment.service";
 import { toast } from "sonner";
-import { createOrder } from "@/modules/admin/pedidos/services/order.service";
-import { useCartStore } from "@/modules/admin/promociones/store/cartStore";
+import { CreditCard, Loader2 } from "lucide-react";
 
-export default function CheckoutPage() {
-  const cart = useCartStore((state) => state.cart);
-  const clearCart = useCartStore((state) => state.clearCart);
+// Declaraciones de tipos para evitar que TypeScript se queje de Culqi en el objeto window
+declare global {
+  interface Window {
+    Culqi: any;
+    culqi: () => void;
+  }
+}
 
-  const [form, setForm] = useState({
-    phone: "",
-    shippingAddress: "",
-    city: "",
-    postalCode: "",
-    paymentMethod: "card",
-  });
+interface CheckoutPageProps {
+  orderId: string;
+  totalAmount: number;
+}
 
-  const total = cart.reduce(
-    (sum, item) => sum + Number(item.price) * Number(item.quantity),
-    0,
-  );
+export default function CheckoutPage({ orderId, totalAmount }: CheckoutPageProps) {
+  const [isScriptLoaded, setIsScriptLoaded] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  const handleChange = (e: any) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value,
-    });
-  };
+  useEffect(() => {
+    // 1. Cargar el script de Culqi dinámicamente si no existe
+    const existingScript = document.getElementById("culqi-js");
+    if (!existingScript) {
+      const script = document.createElement("script");
+      script.src = "https://checkout.culqi.com/js/v4";
+      script.id = "culqi-js";
+      script.async = true;
+      script.onload = () => setIsScriptLoaded(true);
+      document.body.appendChild(script);
+    } else {
+      setIsScriptLoaded(true);
+    }
 
-  const handleSubmit = async (e: any) => {
-    e.preventDefault();
+    // 2. Configurar la función global de escucha obligatoria que Culqi llama al cerrar el formulario
+    window.culqi = async () => {
+      if (window.Culqi.token) {
+        const token = window.Culqi.token.id;
+        setIsProcessing(true);
+        toast.loading("Procesando pago con el servidor...", { id: "payment-toast" });
 
-    if (cart.length === 0) {
-      toast.error("Tu carrito está vacío");
+        try {
+          // Enviamos el token al endpoint del Backend
+          await processPayment(orderId, token);
+          
+          toast.success("¡Pago exitoso! Tu orden ha sido procesada.", { id: "payment-toast" });
+          
+          // Redirección inmediata al perfil del usuario para que vea sus órdenes (UserOrders.tsx)
+          setTimeout(() => {
+            window.location.href = "/user/profile";
+          }, 1500);
+
+        } catch (error: any) {
+          setIsProcessing(false);
+          // Si la tarjeta fue rechazada o hubo un Bad Request (400), alertamos al usuario
+          const errorMessage = error.response?.data?.message || "La tarjeta fue rechazada. Intenta con otra.";
+          toast.error(`Error en el pago: ${errorMessage}`, { id: "payment-toast" });
+        }
+      } else if (window.Culqi.error) {
+        // Captura errores del formulario flotante de Culqi (ej. cerró el modal o datos inválidos en el front)
+        setIsProcessing(false);
+        toast.error(window.Culqi.error.user_message || "Error al generar el token de la tarjeta.");
+      }
+    };
+
+    return () => {
+      // Limpieza preventiva si se desmonta el componente
+      window.culqi = () => {};
+    };
+  }, [orderId]);
+
+  const handlePayClick = () => {
+    if (!isScriptLoaded || !window.Culqi) {
+      toast.error("La pasarela de pago aún se está cargando. Por favor espera.");
       return;
     }
 
-    const items = cart.map((item) => ({
-      productId: item.id,
-      quantity: Number(item.quantity),
-    }));
+    // Inicializamos con la llave de pruebas provista por tu backend
+    window.Culqi.publicKey = "pk_test_AQUI_PEGAS_TU_LLAVE_PUBLICA";
 
-    const orderData = {
-      shippingAddress: form.shippingAddress,
-      city: form.city,
-      postalCode: form.postalCode,
-      phone: form.phone,
-      paymentMethod: form.paymentMethod,
-      items,
-    };
+    // Configuramos los ajustes del modal de pago
+    window.Culqi.settings({
+      title: "DeParraSpitz Catering",
+      currency: "PEN", // Soles peruanos (S/)
+      amount: totalAmount * 100, // Culqi recibe el dinero en céntimos (Ej: S/. 50.00 -> 5000)
+      order: orderId
+    });
 
-    try {
-      await createOrder(orderData);
-      clearCart();
-      toast.success("Pedido registrado correctamente");
-      setTimeout(() => {
-        window.location.href = "/menu";
-      }, 1000);
-    } catch (error: any) {
-      console.error(error);
-      toast.error(error.response?.data?.message?.[0] || "Error al registrar pedido");
-    }
+    // Abrimos el formulario de Culqi
+    window.Culqi.open();
   };
 
   return (
-    <main className="max-w-7xl mx-auto px-6 py-16">
-      <a href="/cart" className="text-[#f1d8b5] hover:text-yellow-500">
-        ← Volver al carrito
-      </a>
-
-      <h1 className="text-5xl font-serif font-bold mt-8 mb-10">
-        Finalizar Compra
-      </h1>
-
-      <form
-        onSubmit={handleSubmit}
-        className="grid grid-cols-1 lg:grid-cols-3 gap-8"
-      >
-        <div className="lg:col-span-2 space-y-8">
-          <section className="bg-[#15100e] border border-[#4a3824] rounded-2xl p-8">
-            <h2 className="text-xl font-bold mb-8">
-              Datos del Cliente y Evento
-            </h2>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="font-bold text-sm">Nombre Completo *</label>
-                <input
-                  className="mt-2 w-full bg-black border border-[#4a3824] rounded-lg p-4"
-                  placeholder="Nombre completo"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="font-bold text-sm">Correo Electrónico *</label>
-                <input
-                  type="email"
-                  className="mt-2 w-full bg-black border border-[#4a3824] rounded-lg p-4"
-                  placeholder="correo@gmail.com"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="font-bold text-sm">Teléfono *</label>
-                <input
-                  name="phone"
-                  value={form.phone}
-                  onChange={handleChange}
-                  className="mt-2 w-full bg-black border border-[#4a3824] rounded-lg p-4"
-                  placeholder="+51 985 212 313"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="font-bold text-sm">Ciudad *</label>
-                <input
-                  name="city"
-                  value={form.city}
-                  onChange={handleChange}
-                  className="mt-2 w-full bg-black border border-[#4a3824] rounded-lg p-4"
-                  placeholder="Lima"
-                  required
-                />
-              </div>
-
-              <div className="md:col-span-2">
-                <label className="font-bold text-sm">
-                  Dirección del Evento *
-                </label>
-                <input
-                  name="shippingAddress"
-                  value={form.shippingAddress}
-                  onChange={handleChange}
-                  className="mt-2 w-full bg-black border border-[#4a3824] rounded-lg p-4"
-                  placeholder="Av. Principal 123"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="font-bold text-sm">Código Postal *</label>
-                <input
-                  name="postalCode"
-                  value={form.postalCode}
-                  onChange={handleChange}
-                  className="mt-2 w-full bg-black border border-[#4a3824] rounded-lg p-4"
-                  placeholder="1234"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="font-bold text-sm">Fecha del Evento *</label>
-                <input
-                  type="date"
-                  className="mt-2 w-full bg-black border border-[#4a3824] rounded-lg p-4"
-                />
-              </div>
-
-              <div className="md:col-span-2">
-                <label className="font-bold text-sm">Notas Especiales</label>
-                <textarea
-                  className="mt-2 w-full bg-black border border-[#4a3824] rounded-lg p-4"
-                  placeholder="Alergias, requerimientos específicos..."
-                  rows={4}
-                />
-              </div>
-            </div>
-          </section>
-
-          <section className="bg-[#15100e] border border-[#4a3824] rounded-2xl p-8">
-            <h2 className="text-xl font-bold mb-8">Método de Pago</h2>
-
-            <div className="grid grid-cols-3 gap-3 bg-[#211814] rounded-lg p-2 mb-6">
-              {[
-                ["card", "Tarjeta"],
-                ["yape", "Yape"],
-                ["plin", "Plin"],
-              ].map(([value, label]) => (
-                <button
-                  key={value}
-                  type="button"
-                  onClick={() => setForm({ ...form, paymentMethod: value })}
-                  className={`py-3 rounded-lg font-bold ${
-                    form.paymentMethod === value
-                      ? "bg-black text-white"
-                      : "text-[#f1d8b5]"
-                  }`}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-
-            {form.paymentMethod === "card" && (
-              <div className="space-y-5">
-                <div>
-                  <label className="font-bold text-sm">Número de Tarjeta</label>
-                  <input
-                    className="mt-2 w-full bg-black border border-[#4a3824] rounded-lg p-4"
-                    placeholder="0000 0000 0000 0000"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-5">
-                  <div>
-                    <label className="font-bold text-sm">Vencimiento</label>
-                    <input
-                      className="mt-2 w-full bg-black border border-[#4a3824] rounded-lg p-4"
-                      placeholder="MM/YY"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="font-bold text-sm">CVV</label>
-                    <input
-                      className="mt-2 w-full bg-black border border-[#4a3824] rounded-lg p-4"
-                      placeholder="123"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="font-bold text-sm">
-                    Nombre en la tarjeta
-                  </label>
-                  <input
-                    className="mt-2 w-full bg-black border border-[#4a3824] rounded-lg p-4"
-                    placeholder="Nombre completo"
-                  />
-                </div>
-              </div>
-            )}
-          </section>
+    <div className="w-full max-w-md mx-auto p-6 bg-[#120d0a] border border-[#3d2c1f] rounded-2xl shadow-xl text-white">
+      <h2 className="text-xl font-bold mb-4 border-b border-[#3d2c1f] pb-2 font-serif text-yellow-500">
+        Resumen de Pago
+      </h2>
+      
+      <div className="space-y-3 mb-6 text-sm">
+        <div className="flex justify-between">
+          <span className="text-zinc-400">ID de la Orden:</span>
+          <span className="font-mono text-zinc-200">#{orderId}</span>
         </div>
+        <div className="flex justify-between text-base font-bold border-t border-[#3d2c1f] pt-3">
+          <span>Total a pagar:</span>
+          <span className="text-yellow-500">S/ {totalAmount.toFixed(2)}</span>
+        </div>
+      </div>
 
-        <aside className="bg-[#15100e] border border-[#4a3824] rounded-2xl h-fit overflow-hidden">
-          <div className="p-8 border-b border-[#4a3824]">
-            <h2 className="text-2xl font-bold">Resumen del Pedido</h2>
-          </div>
+      <button
+        onClick={handlePayClick}
+        disabled={isProcessing || !isScriptLoaded}
+        className="w-full bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {isProcessing ? (
+          <>
+            <Loader2 className="w-5 h-5 animate-spin" />
+            Procesando...
+          </>
+        ) : (
+          <>
+            <CreditCard className="w-5 h-5" />
+            Pagar con Tarjeta (Culqi)
+          </>
+        )}
+      </button>
 
-          <div className="p-8 space-y-5">
-            {cart.map((item) => (
-              <div
-                key={item.id}
-                className="flex items-center justify-between gap-4"
-              >
-                <div className="flex items-center gap-4 min-w-0">
-                  <img
-                    src={item.imageUrl || item.image || "https://placehold.co/100x100"}
-                    alt={item.name}
-                    className="w-20 h-20 rounded-xl object-cover border border-[#4a3824]"
-                  />
-
-                  <div>
-                    <h3 className="font-bold text-lg line-clamp-2">
-                      {item.name}
-                    </h3>
-
-                    <p className="text-[#f1d8b5] text-sm">
-                      Cant: {item.quantity} x S/ {Number(item.price).toFixed(2)}
-                    </p>
-                  </div>
-                </div>
-
-                <strong className="text-yellow-500 text-lg">
-                  S/ {(Number(item.price) * Number(item.quantity)).toFixed(2)}
-                </strong>
-              </div>
-            ))}
-
-            <hr className="border-[#4a3824]" />
-
-            <div className="flex justify-between text-[#f1d8b5]">
-              <span>Subtotal</span>
-              <span>S/ {total.toFixed(2)}</span>
-            </div>
-
-            <div className="flex justify-between items-center">
-              <span className="text-xl font-bold">Total a Pagar</span>
-
-              <span className="text-yellow-500 text-3xl font-bold">
-                S/ {total.toFixed(2)}
-              </span>
-            </div>
-
-            <button
-              type="submit"
-              disabled={cart.length === 0}
-              className="w-full bg-yellow-500 hover:bg-yellow-400 disabled:opacity-50 text-black font-bold py-4 rounded-lg mt-5 flex items-center justify-center gap-2"
-            >
-              <CheckCircle2 size={18} />
-              Confirmar Pedido
-            </button>
-          </div>
-        </aside>
-      </form>
-    </main>
+      <p className="text-[11px] text-zinc-500 text-center mt-4">
+        🔒 Conexión segura encriptada. Cumple con normativas PCI-DSS.
+      </p>
+    </div>
   );
 }
