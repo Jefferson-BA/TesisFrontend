@@ -130,7 +130,7 @@ export default function ReservationsAdmin() {
                   <th className={`${THEME.tableTh} text-center`}>Acciones</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#2a1f1a]/40">
+              <tbody>
                 {reservations.length === 0 ? (
                   <tr>
                     <td colSpan={4} className="px-6 py-12 text-center text-muted-foreground">
@@ -339,6 +339,6 @@ export default function ReservationsAdmin() {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
