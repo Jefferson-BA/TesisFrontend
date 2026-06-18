@@ -1,0 +1,33 @@
+---
+import { PublicNavbar } from "@/modules/user/components/PublicNavbar";
+import ChatbotWidget from "@/modules/user/components/ChatbotWidget";
+import "@/styles/globals.css";
+
+interface Props {
+  title?: string;
+}
+
+const { title = "Hojas de Parra Spitz - Catering & Eventos" } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+  </head>
+
+  <body class="bg-[#0b0806] text-zinc-200 antialiased min-h-screen flex flex-col">
+    
+    <PublicNavbar client:load />
+
+    <div class="pt-[82px] flex-1">
+      <slot />
+    </div>
+
+    <!-- Chatbot global para todas las páginas públicas -->
+    <ChatbotWidget client:load />
+
+  </body>
+</html>

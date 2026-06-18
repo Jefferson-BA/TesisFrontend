@@ -1,0 +1,68 @@
+---
+import "@/styles/globals.css";
+
+import { PublicNavbar } from "@/modules/user/components/PublicNavbar";
+
+import UserProfileCard from "@/modules/admin/usuarios/components/UserProfileCard";
+import UserOrders from "@/modules/user/components/UserOrders";
+import EditProfileForm from "@/modules/admin/usuarios/components/EditProfileForm";
+
+import { Toaster } from "sonner";
+---
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>Mi Perfil | DeParraSpitz</title>
+    <!-- Evita el "flash" de tema incorrecto al cargar la página -->
+    <script is:inline>
+      (function () {
+        const stored = localStorage.getItem("theme");
+        const prefersLight = window.matchMedia("(prefers-color-scheme: light)").matches;
+        const theme = stored === "dark" || stored === "light" ? stored : (prefersLight ? "light" : "dark");
+        document.documentElement.classList.add(theme);
+      })();
+    </script>
+  </head>
+
+  <body class="min-h-screen bg-stone-50 dark:bg-[#0b0806] text-stone-900 dark:text-white transition-colors duration-500">
+
+    <PublicNavbar client:only="react" />
+
+    <main class="pt-[120px] max-w-7xl mx-auto px-6 pb-20">
+
+      <div class="mb-10 flex items-start justify-between gap-6">
+        <div>
+          <h1 class="text-5xl font-serif font-bold">
+            Mi Perfil
+          </h1>
+
+          <p class="text-amber-700 dark:text-[#f1d8b5] mt-3">
+            Revisa tus datos personales y tu historial de pedidos.
+          </p>
+        </div>
+
+      </div>
+
+      <section class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+        <UserProfileCard client:only="react" />
+
+        <EditProfileForm client:only="react" />
+
+        <div class="lg:col-span-2">
+          <UserOrders client:only="react" />
+        </div>
+
+      </section>
+
+    </main>
+
+    <Toaster
+      richColors
+      position="top-right"
+      client:only="react"
+    />
+
+  </body>
+</html>

@@ -1,0 +1,24 @@
+---
+import AdminLayout from "@/layouts/AdminLayout.astro";
+import "@/styles/globals.css";
+import ProductDashboard from "@/modules/admin/productos/components/ProductDashboard";
+---
+
+<AdminLayout title="Dashboard | Productos">
+  <main class="max-w-7xl mx-auto px-6 py-10 space-y-8">
+    
+    <!-- Cabecera de la página -->
+    <div>
+      <h1 class="text-5xl font-bold text-white">
+        Gestión de Productos
+      </h1>
+      <p class="text-zinc-400 mt-2">
+        Administra el catálogo del restaurante
+      </p>
+    </div>
+
+    <!-- Módulo Unificado Vertical (Formulario + Lista del Catálogo) -->
+    <ProductDashboard client:load />
+
+  </main>
+</AdminLayout>

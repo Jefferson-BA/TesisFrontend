@@ -1,10 +1,15 @@
-import { 
-  LayoutDashboard, 
-  Users, 
-  Settings, 
-  Package, 
+import {
+  LayoutDashboard,
+  Users,
+  Settings,
+  Package,
   ShieldCheck,
-  LogOut 
+  ShoppingBag,
+  UtensilsCrossed,
+  Tag,
+  Tags, // 🔹 NUEVO: Ícono para Categorías
+  LogOut,
+  Calendar,
 } from "lucide-react";
 
 import {
@@ -22,14 +27,23 @@ import {
 
 import { useAuthStore } from "@/modules/auth/store/authStore";
 
-// Definimos los menús según el rol
+// 🔹 Menús fusionados sin perder lógica original
 const menuByRole = {
   admin: [
     { title: "Dashboard", url: "/admin/dashboard", icon: LayoutDashboard },
-    { title: "Productos", url: "/admin/productos", icon: Package },
+
+    // 🔹 Nuevos módulos agregados
+    { title: "Pedidos", url: "/admin/pedidos", icon: ShoppingBag },
+    { title: "Reservas", url: "/admin/reservas", icon: Calendar }, 
+    { title: "Productos", url: "/admin/productos", icon: UtensilsCrossed },
+    { title: "Categorías", url: "/admin/categorias", icon: Tags }, // 🔹 NUEVA LÍNEA AQUÍ
+    { title: "Promociones", url: "/admin/promociones", icon: Tag },
+
+    // 🔹 Originales
     { title: "Usuarios", url: "/admin/users", icon: Users },
     { title: "Configuración", url: "/admin/settings", icon: Settings },
   ],
+
   superadmin: [
     { title: "Panel Global", url: "/superadmin/dashboard", icon: ShieldCheck },
     { title: "Gestionar Admins", url: "/superadmin/manage-admins", icon: Users },
@@ -44,45 +58,43 @@ interface AppSidebarProps {
 export function AppSidebar({ role }: AppSidebarProps) {
   const items = menuByRole[role];
 
-  // 🔹 NUEVO: obtener usuario del store
+  // 🔹 Usuario desde Zustand
   const user = useAuthStore((state) => state.user);
 
-  return (
-    <Sidebar className="border-zinc-800 bg-zinc-950 text-zinc-100">
-      
-      {/* 🔹 HEADER ORIGINAL + USER INFO */}
-      <SidebarHeader className="p-4 border-b border-zinc-800">
-        <h2 className="text-xl font-bold text-cyan-500 tracking-tight italic">
-          NOVA PANEL
-        </h2>
+  // 🔹 Logout conservando tu lógica nueva
+  const handleLogout = () => {
+    document.cookie =
+      "user-role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
 
-        {/* 🔹 INFO DEL USUARIO (sin romper tu diseño) */}
-        <div className="mt-3 flex flex-col">
-          <span className="text-sm font-bold text-white">
-            {user?.name || "Cargando..."}
-          </span>
-          <span className="text-xs text-zinc-500">
-            {user?.email}
-          </span>
-        </div>
-      </SidebarHeader>
+    window.location.href = "/login";
+  };
+
+  return (
+    <Sidebar className="border-r border-zinc-800 bg-zinc-950 text-zinc-100">
       
-      <SidebarContent>
+      {/* 🔹 CONTENIDO */}
+      <SidebarContent className="bg-zinc-950 text-zinc-200">
         <SidebarGroup>
-          <SidebarGroupLabel className="text-zinc-500 uppercase text-xs font-bold">
-            Menu Principal
+          <SidebarGroupLabel className="text-zinc-500 uppercase text-xs font-bold tracking-wider px-4 py-2">
+            MENU PRINCIPAL
           </SidebarGroupLabel>
+
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className="space-y-1 px-2">
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton 
-                    asChild 
-                    className="hover:bg-zinc-900 hover:text-cyan-400 transition-colors"
+                  <SidebarMenuButton
+                    asChild
+                    className="hover:bg-zinc-900 hover:text-cyan-400 transition-colors py-5 rounded-lg"
                   >
                     <a href={item.url} className="flex items-center gap-3">
-                      <item.icon className="h-5 w-5" />
-                      <span>{item.title}</span>
+                      
+                      {/* 🔹 Mantiene estilo moderno */}
+                      <item.icon className="h-5 w-5 text-emerald-500" />
+
+                      <span className="font-medium text-sm">
+                        {item.title}
+                      </span>
                     </a>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -92,10 +104,14 @@ export function AppSidebar({ role }: AppSidebarProps) {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="p-4 border-t border-zinc-800">
-        <button className="flex items-center gap-3 text-zinc-400 hover:text-red-400 transition-colors w-full">
+      {/* 🔹 FOOTER ORIGINAL + lógica nueva */}
+      <SidebarFooter className="p-4 border-t border-zinc-800 bg-zinc-950">
+        <button
+          onClick={handleLogout}
+          className="flex w-full items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-red-400 hover:bg-red-950/30 hover:text-red-300 transition-colors"
+        >
           <LogOut className="h-5 w-5" />
-          <span className="font-medium">Cerrar Sesión</span>
+          <span>Cerrar Sesión</span>
         </button>
       </SidebarFooter>
     </Sidebar>

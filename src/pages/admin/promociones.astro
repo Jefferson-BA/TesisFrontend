@@ -1,0 +1,24 @@
+---
+import AdminLayout from "@/layouts/AdminLayout.astro";
+import "@/styles/globals.css";
+import PromoForm from "@/modules/admin/promociones/components/PromoForm";
+import CategoryForm from "@/modules/admin/productos/components/CategoryForm";
+import PromoBanner from '@/modules/admin/promociones/components/PromoBanner';
+---
+<AdminLayout>
+  <div class="space-y-6">
+    <div>
+      <h1 class="text-3xl font-bold tracking-tight text-zinc-100">Promociones y Categorías</h1>
+      <p class="text-zinc-400 text-sm">Administra los descuentos del restaurante y organiza tu menú.</p>
+    </div>
+    
+    <div class="grid gap-6 md:grid-cols-2">
+      <div class="rounded-xl border border-zinc-800 bg-zinc-900/30 p-6">
+        <PromoForm client:load />
+      </div>
+      <div class="rounded-xl border border-zinc-800 bg-zinc-900/30 p-6">
+        <CategoryForm client:load />
+      </div>
+    </div>
+  </div>
+</AdminLayout>

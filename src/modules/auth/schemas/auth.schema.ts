@@ -1,15 +1,25 @@
 import { z } from "zod";
 
+// ── SCHEMA DE LOGIN ──
 export const loginSchema = z.object({
   email: z.string().email("Email no válido"),
   password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres"),
 });
 
-// Exportamos el tipo para que el Service lo reconozca
 export type LoginFormData = z.infer<typeof loginSchema>;
-// Añade esto al final de tu auth.schema.ts
+
+
+// ── SCHEMA DE REGISTRO (CON TELÉFONO AÑADIDO) ──
 export const registerSchema = z.object({
   name: z.string().min(2, "El nombre es obligatorio"),
+  
+  // Campo de teléfono agregado con validación para números
+  phone: z
+    .string()
+    .min(9, "El número de celular debe tener al menos 9 dígitos")
+    .max(15, "El número de celular es demasiado largo")
+    .regex(/^[0-9+]+$/, "Ingresa un número de teléfono válido (solo números)"),
+    
   email: z.string().email("Formato de correo inválido"),
   password: z.string().min(8, "La contraseña debe tener al menos 8 caracteres"),
   confirmPassword: z.string(),

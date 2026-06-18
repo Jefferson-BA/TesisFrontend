@@ -1,0 +1,16 @@
+---
+import AdminLayout from "@/layouts/AdminLayout.astro";
+import "@/styles/globals.css";
+import AdminOrdersTable from '@/modules/admin/pedidos/components/AdminOrdersTable';---
+<AdminLayout>
+  <div class="space-y-6">
+    <div>
+      <h1 class="text-3xl font-bold tracking-tight text-zinc-100">Gestión de Pedidos</h1>
+      <p class="text-zinc-400 text-sm">Monitorea y despacha las órdenes de comida en tiempo real.</p>
+    </div>
+    
+    <div class="rounded-xl border border-zinc-800 bg-zinc-900/30 p-6">
+      <AdminOrdersTable client:load />
+    </div>
+  </div>
+</AdminLayout>

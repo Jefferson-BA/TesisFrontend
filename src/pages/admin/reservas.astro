@@ -1,0 +1,25 @@
+---
+// src/pages/admin/reservas.astro
+import Layout from '@/layouts/AdminLayout.astro'; 
+// Le agregamos el .tsx al final para romper cualquier error de resolución
+import ReservationsAdmin from '@/modules/admin/reservas/components/ReservationsAdmin.tsx';
+import { Toaster } from 'sonner';
+---
+
+<Layout title="Administrar Reservas | Panel">
+  <main class="min-h-screen bg-black p-4 md:p-8">
+    <div class="max-w-6xl mx-auto space-y-6 pt-20">
+      
+      <header>
+        <h1 class="text-3xl font-black tracking-wider text-white uppercase">
+          Reservas <span class="text-yellow-500">Eventos</span>
+        </h1>
+      </header>
+
+      <ReservationsAdmin client:load />
+
+    </div>
+  </main>
+  
+  <Toaster richColors position="top-right" client:load />
+</Layout>

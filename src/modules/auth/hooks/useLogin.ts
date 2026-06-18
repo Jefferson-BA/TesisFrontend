@@ -8,30 +8,57 @@ export const useLogin = () => {
 
   return useMutation({
     mutationFn: (data: any) => authService.login(data),
-    onSuccess: (response) => {
-      setAuth(response.user, response.accessToken);
 
-      // Forzamos el rol a minúsculas para que coincida con el middleware
-      const role = response.user.role.toLowerCase();
+    onSuccess: (response: any) => {
+      console.log("LOGIN RESPONSE:", response);
 
-      // Guardamos la cookie
+      const token =
+        response.token ||
+        response.access_token ||
+        response.accessToken ||
+        response.jwt;
+
+      const user =
+        response.user ||
+        response.usuario ||
+        response.data?.user ||
+        response.data?.usuario;
+
+      if (token) {
+        localStorage.setItem("token", token);
+      }
+
+      if (user) {
+        localStorage.setItem("user", JSON.stringify(user));
+      }
+
+      if (user && token) {
+        setAuth(user, token);
+      }
+
+      const role = (
+        user?.role ||
+        user?.rol ||
+        user?.role?.name ||
+        user?.roles?.[0]?.name ||
+        "user"
+      )
+        .toString()
+        .toLowerCase();
+
       document.cookie = `user-role=${role}; path=/; max-age=86400; SameSite=Lax`;
 
-      // Pequeño retraso de 100ms para asegurar que la cookie se escriba antes de redirigir
-      // Fragmento de tu useLogin.ts
       setTimeout(() => {
-        if (role === 'superadmin') {
-          // 👇 Ahora sí te llevará a la página que acabamos de crear
+        if (role === "superadmin") {
           window.location.href = "/superadmin/dashboard";
-        } else if (role === 'admin') {
+        } else if (role === "admin") {
           window.location.href = "/admin/dashboard";
         } else {
           window.location.href = "/";
         }
       }, 100);
     },
-    onError: (error: any) => {
-      alert(error.response?.data?.message || "Error al iniciar sesión");
-    }
+
+    
   });
 };

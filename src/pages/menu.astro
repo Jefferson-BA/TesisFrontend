@@ -1,0 +1,31 @@
+---
+import { Toaster } from "sonner";
+import "@/styles/globals.css";
+
+import { PublicNavbar } from "@/modules/user/components/PublicNavbar";
+import { MenuProducts } from "@/modules/admin/productos/components/MenuProducts";
+---
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Menú | DeParraSpitz</title>
+  </head>
+
+  <body class="min-h-screen bg-[#0b0806] text-white">
+    <!-- Navbar público -->
+    <PublicNavbar client:only="react" />
+
+    {/* 
+      Se eliminó la sección estática <section> que causaba el duplicado.
+      Ahora MenuProducts maneja tanto el Hero dinámico como la cuadrícula.
+    */}
+    <main class="w-full relative">
+      <MenuProducts client:load />
+    </main>
+
+    <!-- Notificaciones del sistema -->
+    <Toaster richColors position="top-right" client:load />
+  </body>
+</html>

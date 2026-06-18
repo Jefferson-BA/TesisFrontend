@@ -1,20 +1,75 @@
 ---
 import '@/styles/globals.css';
 import { RegisterForm } from '@/modules/auth/components/RegisterForm';
-// 👇 1. Asegúrate de tener esta importación
 import { Toaster } from 'sonner'; 
 ---
 
 <html lang="es">
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Registro | Hojas de Parra Spitz</title>
   </head>
-  <body class="flex min-h-screen items-center justify-center bg-zinc-950 p-4">
-    <main>
-      <RegisterForm client:only="react" />
-    </main>
-    
+  <body>
+
+    <div class="login-bg">
+      <img
+        src="https://cdcgourmet.com/storage/2023/03/tipos-catering-gourmet-empresas.jpg"
+        alt=""
+        class="login-bg-img"
+        aria-hidden="true"
+      />
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+      <div class="orb orb-3"></div>
+    </div>
+
+    <div class="grain"></div>
+
+    <div class="split-left">
+      <div class="brand-block">
+        <a href="/" class="brand-logo">
+          <div class="brand-logo-dot"></div>
+          <span class="brand-name">
+            Hojas de Parra <em>Spitz</em>
+          </span>
+        </a>
+
+        <p class="brand-tag">
+          Auténtica cocina mediterránea · Lima, Perú
+        </p>
+
+        <div class="brand-stats">
+          <div class="bstat">
+            <span class="bstat-num">5K+</span>
+            <span class="bstat-label">Clientes</span>
+          </div>
+
+          <div class="bstat">
+            <span class="bstat-num">12</span>
+            <span class="bstat-label">Años</span>
+          </div>
+
+          <div class="bstat">
+            <span class="bstat-num">4.9★</span>
+            <span class="bstat-label">Rating</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="split-right">
+      <div class="right-inner">
+        <a href="/login" class="back-link">
+          <span class="back-arrow">←</span>
+          <span>Volver al inicio de sesión</span>
+        </a>
+
+        <RegisterForm client:only="react" />
+      </div>
+    </div>
+
     <Toaster client:only="react" richColors position="top-right" />
+
   </body>
 </html>
