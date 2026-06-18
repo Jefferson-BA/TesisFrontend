@@ -2,17 +2,17 @@
 import { useAdminStats } from "@/modules/admin/dashboard/hooks/useAdminStats";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
-  BarChart, Bar, AreaChart, Area, PieChart, Pie, Cell,
-  XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid
+  BarChart, Bar, LineChart, Line, PieChart, Pie, Cell,
+  XAxis, YAxis, Tooltip, ResponsiveContainer
 } from "recharts";
-import { BarChart3, TrendingUp, PieChart as PieIcon, Loader2, AlertCircle } from "lucide-react";
 
+// 1. Instanciamos el cliente de React Query localmente
 const queryClient = new QueryClient();
 
+// 2. Renombramos tu componente original a una función interna
 function ChartsContent() {
   const { ventasPorMes, usuariosData, estadoReservas, isLoading, isError } = useAdminStats();
 
-  // Estados de Carga Premium (Sincronizados con el ecosistema visual de la marca)
   if (isLoading) {
     return (
       <div className="w-full h-48 flex items-center justify-center border border-border rounded-xl bg-muted/50">
@@ -28,9 +28,6 @@ function ChartsContent() {
       </div>
     );
   }
-
-  // Colores sofisticados para el gráfico de torta (Ámbar, Jade, Carmesí)
-  const PIE_COLORS = ["#eab308", "#10b981", "#ef4444"];
 
   return (
     <section className="grid grid-cols-1 lg:grid-cols-3 gap-6 min-w-0 w-full">
@@ -88,12 +85,6 @@ function ChartsContent() {
               />
             </PieChart>
           </ResponsiveContainer>
-          
-          {/* Leyenda central minimalista en el ojo de la dona */}
-          <div className="absolute flex flex-col items-center justify-center pointer-events-none">
-            <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-widest">Gala</span>
-            <span className="text-xl font-serif font-black text-zinc-200 mt-0.5">ERP</span>
-          </div>
         </div>
       </div>
 
@@ -101,6 +92,7 @@ function ChartsContent() {
   );
 }
 
+// 3. Exportamos el componente YA ENVUELTO para que Astro no rompa el contexto
 export default function AdminStatsCharts() {
   return (
     <QueryClientProvider client={queryClient}>
