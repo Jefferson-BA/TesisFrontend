@@ -1,170 +1,20 @@
 ---
 import '@/styles/globals.css';
 import { LoginForm } from '@/modules/auth/components/LoginForm';
+import { QueryProvider } from '@/components/shared/QueryProvider'; // <-- Importamos el provider
 import { Toaster } from 'sonner';
 ---
 
 <html lang="es">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Iniciar Sesión | Hojas de Parra Spitz</title>
-    <style>
-      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-      body {
-        font-family: 'Geist Variable', 'Inter', system-ui, sans-serif;
-        min-height: 100vh; display: flex; overflow: hidden; position: relative;
-      }
-
-      /* ── Fondo con imagen y orbes animados ── */
-      .login-bg {
-        position: fixed; inset: 0; z-index: 0; background: #07050403; overflow: hidden;
-      }
-      .login-bg-img {
-        position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
-        filter: brightness(0.22) saturate(0.6);
-      }
-      .login-bg::after {
-        content: ''; position: absolute; inset: 0;
-        background: radial-gradient(ellipse at center, transparent 20%, rgba(7,5,4,0.85) 100%);
-      }
-
-      .orb { position: absolute; border-radius: 50%; pointer-events: none; filter: blur(80px); }
-      .orb-1 {
-        width: 500px; height: 500px;
-        background: radial-gradient(circle, rgba(234,179,8,0.06) 0%, transparent 70%);
-        top: -100px; right: 10%;
-        animation: orbDrift 12s ease-in-out infinite;
-      }
-      .orb-2 {
-        width: 350px; height: 350px;
-        background: radial-gradient(circle, rgba(180,83,9,0.05) 0%, transparent 70%);
-        bottom: -80px; left: 5%;
-        animation: orbDrift 9s ease-in-out infinite reverse;
-        animation-delay: -4s;
-      }
-      .orb-3 {
-        width: 200px; height: 200px;
-        background: radial-gradient(circle, rgba(234,179,8,0.04) 0%, transparent 70%);
-        top: 40%; left: 30%;
-        animation: orbDrift 15s ease-in-out infinite;
-        animation-delay: -7s;
-      }
-      @keyframes orbDrift {
-        0%,100% { transform: translate(0,0) scale(1); }
-        33%  { transform: translate(20px,-30px) scale(1.05); }
-        66%  { transform: translate(-15px,20px) scale(0.97); }
-      }
-
-      /* Textura grain sutil */
-      .grain {
-        position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: 0.025;
-        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-        background-size: 200px 200px;
-      }
-
-      /* ── Panel izquierdo con branding ── */
-      .split-left {
-        display: none; flex: 1; position: relative; z-index: 2;
-        align-items: flex-end; padding: 3rem;
-      }
-      @media (min-width: 900px) { .split-left { display: flex; } }
-
-      @keyframes brandIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
-      .brand-block { animation: brandIn 1s ease 0.4s both; }
-
-      .brand-logo {
-        display: inline-flex; align-items: center; gap: 10px; margin-bottom: 1rem;
-        text-decoration: none;
-      }
-      .brand-logo-dot {
-        width: 10px; height: 10px; border-radius: 50%; background: #eab308;
-        box-shadow: 0 0 12px rgba(234,179,8,0.8);
-        animation: dotPulse 2s ease-in-out infinite;
-      }
-      @keyframes dotPulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.6;transform:scale(0.75)} }
-      .brand-name { font-size: 2rem; font-weight: 900; color: #fff; letter-spacing: -0.03em; }
-      .brand-name em { color: #eab308; font-style: normal; }
-      .brand-tag { color: rgba(255,255,255,0.45); font-size: 0.875rem; letter-spacing: 0.05em; }
-
-      .brand-stats { display: flex; gap: 2rem; margin-top: 2rem; }
-      .bstat { display: flex; flex-direction: column; gap: 3px; }
-      .bstat-num { font-size: 1.4rem; font-weight: 900; color: #eab308; }
-      .bstat-label { font-size: 0.72rem; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.1em; }
-
-      /* ── Panel derecho con el formulario ── */
-      .split-right {
-        position: relative; z-index: 2;
-        width: 100%; max-width: 540px; flex-shrink: 0;
-        display: flex; align-items: center; justify-content: center;
-        padding: 2rem;
-      }
-      @media (min-width: 900px) { .split-right { width: 540px; } }
-
-      .right-inner { width: 100%; max-width: 430px; }
-
-      .back-link {
-        display: inline-flex; align-items: center; gap: 7px;
-        color: #52525b; font-size: 0.82rem; text-decoration: none;
-        margin-bottom: 2rem; transition: all 0.2s ease; font-weight: 500;
-      }
-      .back-link:hover { color: #eab308; gap: 10px; }
-      .back-arrow { transition: transform 0.2s ease; }
-      .back-link:hover .back-arrow { transform: translateX(-3px); }
-    </style>
+    <title>Login | Hojas de Parra Spitz</title>
   </head>
-  <body>
-
-    <div class="login-bg">
-      <img
-        src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1800&q=80"
-        alt=""
-        class="login-bg-img"
-        aria-hidden="true"
-      />
-      <div class="orb orb-1"></div>
-      <div class="orb orb-2"></div>
-      <div class="orb orb-3"></div>
-    </div>
-    <div class="grain"></div>
-
-    <!-- Branding izquierdo -->
-    <div class="split-left">
-      <div class="brand-block">
-        <a href="/" class="brand-logo">
-          <div class="brand-logo-dot"></div>
-          <span class="brand-name">Hojas de Parra <em>Spitz</em></span>
-        </a>
-        <p class="brand-tag">Auténtica cocina mediterránea · Lima, Perú</p>
-        <div class="brand-stats">
-          <div class="bstat">
-            <span class="bstat-num">5K+</span>
-            <span class="bstat-label">Clientes</span>
-          </div>
-          <div class="bstat">
-            <span class="bstat-num">12</span>
-            <span class="bstat-label">Años</span>
-          </div>
-          <div class="bstat">
-            <span class="bstat-num">4.9★</span>
-            <span class="bstat-label">Rating</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Formulario derecho -->
-    <div class="split-right">
-      <div class="right-inner">
-        <a href="/" class="back-link">
-          <span class="back-arrow">←</span>
-          <span>Volver al inicio</span>
-        </a>
-        <LoginForm client:only="react" />
-      </div>
-    </div>
-
+  <body class="min-h-screen bg-zinc-950">
+    <main class="min-h-screen">
+      <LoginForm client:only="react" />
+    </main>
+    
     <Toaster client:only="react" richColors position="top-right" />
   </body>
 </html>
