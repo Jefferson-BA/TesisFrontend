@@ -18,7 +18,7 @@ const { title = "Hojas de Parra Spitz - Catering & Eventos" } = Astro.props;
     <title>{title}</title>
   </head>
 
-  <body class="bg-[#0b0806] text-zinc-200 antialiased min-h-screen flex flex-col">
+  <body class="bg-background text-foreground antialiased min-h-screen flex flex-col transition-colors duration-300">
     
     <PublicNavbar client:load />
 
@@ -26,7 +26,6 @@ const { title = "Hojas de Parra Spitz - Catering & Eventos" } = Astro.props;
       <slot />
     </div>
 
-    <!-- Chatbot global para todas las páginas públicas -->
     <ChatbotWidget client:load />
 
   </body>
