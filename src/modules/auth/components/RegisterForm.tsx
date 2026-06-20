@@ -6,58 +6,35 @@ import { Loader2, Mail, Lock, User, Phone, UserPlus, ChefHat, Flame, Star, Clock
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useState, useRef, useEffect } from "react";
-import "../../../styles/globals.css";
 
 const queryClient = new QueryClient();
 
 const CAROUSEL_IMAGES = [
-  {
-    url: "https://images.unsplash.com/photo-1544025162-d76694265947?w=1600&q=80",
-    label: "Cortes Premium a la Brasa",
-  },
-  {
-    url: "https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=1600&q=80",
-    label: "Parrilla Tradicional Argentina",
-  },
-  {
-    url: "https://images.unsplash.com/photo-1558030006-450675393462?w=1600&q=80",
-    label: "Costillas de Cerdo BBQ",
-  },
-  {
-    url: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=1600&q=80",
-    label: "Brochetas Artesanales",
-  },
-  {
-    url: "https://images.unsplash.com/photo-1432139555190-58524dae6a55?w=1600&q=80",
-    label: "Entrañas al Carbón",
-  },
+  { url: "https://images.unsplash.com/photo-1544025162-d76694265947?w=1600&q=80", label: "Cortes Premium a la Brasa" },
+  { url: "https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=1600&q=80", label: "Parrilla Tradicional Argentina" },
+  { url: "https://images.unsplash.com/photo-1558030006-450675393462?w=1600&q=80", label: "Costillas de Cerdo BBQ" },
+  { url: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=1600&q=80", label: "Brochetas Artesanales" },
+  { url: "https://images.unsplash.com/photo-1432139555190-58524dae6a55?w=1600&q=80", label: "Entrañas al Carbón" },
 ];
 
 const INFO_ITEMS = [
-  { icon: <Flame size={18} />, title: "Desde 1998", desc: "Más de 25 años perfeccionando el arte de la parrilla" },
-  { icon: <Star size={18} />, title: "4.9 ★ Google", desc: "Más de 2,000 reseñas de nuestros clientes satisfechos" },
-  { icon: <Clock size={18} />, title: "Horario", desc: "Lunes a Domingo · 12:00 pm – 11:00 pm" },
-  { icon: <MapPin size={18} />, title: "Ubicación", desc: "Av. Principal 420, San Isidro · Lima, Perú" },
+  { icon: <Flame size={16} />, title: "Desde 1998", desc: "Más de 25 años perfeccionando el arte de la parrilla" },
+  { icon: <Star size={16} />, title: "4.9 ★ Google", desc: "Más de 2,000 reseñas de nuestros clientes satisfechos" },
+  { icon: <Clock size={16} />, title: "Horario", desc: "Lunes a Domingo · 12:00 pm – 11:00 pm" },
+  { icon: <MapPin size={16} />, title: "Ubicación", desc: "Av. Principal 420, San Isidro · Lima, Perú" },
 ];
 
 function RegisterFormInner() {
   const { mutate: signup, isPending } = useSignup();
   const [focused, setFocused] = useState<string | null>(null);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const [isVisible, setIsVisible] = useState(false);
+  const [mousePos, setMousePos] = useState({ x: 50, y: 50 });
   const [currentSlide, setCurrentSlide] = useState(0);
-  const cardRef = useRef<HTMLDivElement>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  useEffect(() => {
-    const t = setTimeout(() => setIsVisible(true), 60);
-    return () => clearTimeout(t);
-  }, []);
 
   useEffect(() => {
     intervalRef.current = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % CAROUSEL_IMAGES.length);
-    }, 4500);
+    }, 5000);
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
@@ -75,260 +52,155 @@ function RegisterFormInner() {
     resolver: zodResolver(registerSchema),
   });
 
-  const nameReg = register("name");
-  const phoneReg = register("phone"); // Registro para el campo de número/teléfono
-  const emailReg = register("email");
-  const passReg = register("password");
-  const confirmPassReg = register("confirmPassword");
-
   const onSubmit = (data: RegisterFormData) => {
     signup(data, {
-      onSuccess: () =>
-        toast.success("¡Cuenta creada con éxito! 🎉", {
-          style: { background: "#120d0a", color: "#fff", border: "1px solid #4a3824" },
-        }),
-      onError: () =>
-        toast.error("Error al registrar usuario", {
-          style: { background: "#120d0a", color: "#fff", border: "1px solid #e11d48" },
-        }),
+      onSuccess: () => toast.success("¡Cuenta creada con éxito! 🎉"),
+      onError: () => toast.error("Error al registrar usuario"),
     });
   };
 
-  const goToSlide = (idx: number) => {
-    setCurrentSlide(idx);
-    if (intervalRef.current) clearInterval(intervalRef.current);
-    intervalRef.current = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % CAROUSEL_IMAGES.length);
-    }, 4500);
-  };
-
   return (
-    <div className="lp-root">
-      {/* ── Background Carousel ── */}
-      <div className="lp-carousel" aria-hidden="true">
-        {CAROUSEL_IMAGES.map((img, i) => (
-          <div
-            key={i}
-            className={`lp-slide${i === currentSlide ? " active" : ""}`}
-            style={{ backgroundImage: `url(${img.url})` }}
-          />
-        ))}
-        <div className="lp-overlay" />
-      </div>
+    <div className="min-h-screen w-full bg-[var(--char-deep)] text-foreground grid grid-cols-1 lg:grid-cols-2">
+      
+      {/* ─── COLUMNA IZQUIERDA: CARRUSEL E INFO ─── */}
+      <div className="relative isolate flex min-h-[50vh] flex-col justify-between gap-8 overflow-hidden px-8 py-10 text-white sm:px-12 lg:min-h-screen lg:px-14 lg:py-14 bg-[var(--char-deep)]">
+        
+        {/* Imágenes del Carrusel */}
+        <div className="absolute inset-0 -z-10 bg-black" aria-hidden="true">
+          {CAROUSEL_IMAGES.map((img, i) => (
+            <div
+              key={i}
+              className={`absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out ${
+                i === currentSlide ? "opacity-40 scale-100" : "opacity-0 scale-105"
+              }`}
+              style={{ backgroundImage: `url(${img.url})` }}
+            />
+          ))}
+          {/* Degradado superpuesto (Overlay) */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[var(--char-deep)]/80 via-[var(--char-deep)]/40 to-[var(--char-deep)]" />
+        </div>
 
-      {/* ── Main Layout ── */}
-      <div className={`lp-layout${isVisible ? " visible" : ""}`}>
-
-        {/* ─── Left · Info Panel ─── */}
-        <div className="lp-info">
-          <div className="lp-brand">
-            <ChefHat size={40} color="#eab308" />
-            <div>
-              <div className="lp-brand-name">De Parras &amp; Pitz</div>
-              <div className="lp-brand-tagline">Parrilla &amp; Brasas</div>
-            </div>
+        {/* Marca */}
+        <div className="flex items-center gap-3">
+          <ChefHat size={36} className="text-[var(--ember)]" />
+          <div>
+            <div className="font-display text-[1.65rem] font-bold leading-tight tracking-tight sm:text-3xl text-white">De Parras &amp; Pitz</div>
+            <div className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--ember)]/85">Parrilla &amp; Brasas</div>
           </div>
+        </div>
 
-          <div className="lp-slide-label">
-            <Flame size={14} />
-            <span>{CAROUSEL_IMAGES[currentSlide].label}</span>
-          </div>
+        {/* Label Dinámico del Slide */}
+        <div className="flex items-center gap-2 self-start text-[13px] font-medium text-white/70 bg-black/30 px-3 py-1.5 rounded-full backdrop-blur-sm border border-white/10 transition-all">
+          <Flame size={14} className="text-[var(--ember)] animate-pulse" />
+          <span>{CAROUSEL_IMAGES[currentSlide].label}</span>
+        </div>
 
-          <div className="lp-info-grid">
+        {/* Grid de Información Inferior */}
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 gap-x-6 gap-y-4 border-t border-white/12 pt-6 sm:grid-cols-2">
             {INFO_ITEMS.map((item, i) => (
-              <div className="lp-info-card" key={i}>
-                <div className="lp-info-icon">{item.icon}</div>
+              <div className="flex items-start gap-2.5" key={i}>
+                <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center text-[var(--ember)]/75">{item.icon}</div>
                 <div>
-                  <div className="lp-info-title">{item.title}</div>
-                  <div className="lp-info-desc">{item.desc}</div>
+                  <div className="text-[12px] font-semibold uppercase tracking-wide text-white/85">{item.title}</div>
+                  <div className="mt-0.5 text-[12.5px] leading-snug text-white/50">{item.desc}</div>
                 </div>
               </div>
             ))}
           </div>
 
-          {/* Carousel dots */}
-          <div className="lp-dots">
+          {/* Indicadores de Páginas (Dots) */}
+          <div className="flex items-center gap-2">
             {CAROUSEL_IMAGES.map((_, i) => (
               <button
                 key={i}
-                className={`lp-dot${i === currentSlide ? " active" : ""}`}
-                onClick={() => goToSlide(i)}
-                aria-label={`Slide ${i + 1}`}
+                onClick={() => setCurrentSlide(i)}
+                className={`h-1.5 rounded-full transition-all duration-300 ${i === currentSlide ? "w-8 bg-[var(--ember)]" : "w-2 bg-white/20"}`}
+                aria-label={`Ir al slide ${i + 1}`}
               />
             ))}
           </div>
         </div>
+      </div>
 
-        {/* ─── Right · Register Card ─── */}
-        <div
-          className="lf-card"
-          ref={cardRef}
-          onMouseMove={handleMouseMove}
-          style={{ "--mx": `${mousePos.x}%`, "--my": `${mousePos.y}%` } as React.CSSProperties}
-        >
-          <div className="lf-spotlight" />
-          <div className="lf-ring lf-ring-1" />
-          <div className="lf-ring lf-ring-2" />
+      {/* ─── COLUMNA DERECHA: FORMULARIO ─── */}
+      <div 
+        onMouseMove={handleMouseMove}
+        className="relative flex flex-col justify-center overflow-hidden px-6 py-14 sm:px-10 lg:px-16 bg-gradient-to-tr from-[var(--card)] via-[var(--card)] to-[var(--ember)]/5"
+      >
+        {/* Efecto Spotlight dinámico */}
+        <div 
+          className="pointer-events-none absolute inset-0 opacity-0 lg:opacity-100 transition-opacity duration-300"
+          style={{ background: `radial-gradient(600px circle at ${mousePos.x}% ${mousePos.y}%, var(--ember-glow), transparent 70%)` }}
+        />
 
+        <div className="relative z-10 mx-auto flex w-full max-w-md flex-col gap-8">
           {/* Header */}
-          <div className="lf-header">
-            <div className="lf-icon-wrap">
-              <div className="lf-icon-bg">
-                <UserPlus size={34} color="#eab308" />
-              </div>
-              <div className="lf-orbit-dot" />
-              <div className="lf-orbit-dot-2" />
+          <div className="flex flex-col items-start gap-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-[var(--ember)]/20 bg-[var(--ember)]/10 text-[var(--ember)]">
+              <UserPlus size={24} />
             </div>
-            <div style={{ textAlign: "center" }}>
-              <div className="lf-title">Crear Cuenta</div>
-              <div className="lf-subtitle">Regístrate para acceder al panel administrativo</div>
-            </div>
-            <div className="lf-divider">
-              <div className="lf-divider-line" />
-              <div className="lf-divider-dot" />
-              <div className="lf-divider-line" />
+            <div>
+              <h2 className="font-display text-3xl font-bold tracking-tight text-foreground">Crear Cuenta</h2>
+              <p className="text-sm text-muted-foreground mt-1">Regístrate para acceder al panel administrativo</p>
             </div>
           </div>
 
-          {/* Form */}
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <div className="lf-body">
-              
-              {/* Full Name */}
-              <div className={`lf-field${focused === "name" ? " focused" : ""}`}>
-                <label className="lf-label">Nombre completo</label>
-                <div className="lf-input-wrap">
-                  <User size={17} className="lf-input-icon" />
+          {/* Formulario */}
+          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+            {[
+              { id: "name", label: "Nombre completo", type: "text", placeholder: "Tu nombre y apellido", icon: <User size={18} /> },
+              { id: "phone", label: "Número de celular", type: "tel", placeholder: "Ej: 987654321", icon: <Phone size={18} /> },
+              { id: "email", label: "Correo electrónico", type: "email", placeholder: "usuario@deparraspitz.com", icon: <Mail size={18} /> },
+              { id: "password", label: "Contraseña", type: "password", placeholder: "••••••••", icon: <Lock size={18} /> },
+              { id: "confirmPassword", label: "Confirmar contraseña", type: "password", placeholder: "••••••••", icon: <Lock size={18} /> },
+            ].map((field) => (
+              <div key={field.id} className="flex flex-col gap-1.5">
+                <label className={`text-xs font-semibold transition-colors ${focused === field.id ? "text-[var(--ember-deep)]" : "text-foreground"}`}>
+                  {field.label}
+                </label>
+                <div className="relative flex items-center">
+                  <span className={`absolute left-3 transition-colors ${focused === field.id ? "text-[var(--ember)]" : "text-muted-foreground"}`}>
+                    {field.icon}
+                  </span>
                   <input
-                    {...nameReg}
-                    type="text"
-                    placeholder="Tu nombre y apellido"
-                    className="lf-input"
-                    onFocus={() => setFocused("name")}
-                    onBlur={(e) => { nameReg.onBlur(e); setFocused(null); }}
-                    autoComplete="name"
+                    {...register(field.id as keyof RegisterFormData)}
+                    type={field.type}
+                    placeholder={field.placeholder}
+                    onFocus={() => setFocused(field.id)}
+                    onBlur={() => setFocused(null)}
+                    className="h-11 w-full rounded-xl border border-border/60 bg-muted/20 pl-10 pr-4 text-sm text-foreground outline-none transition-all focus:border-[var(--ember)] focus:ring-4 focus:ring-[var(--ember)]/10"
                   />
-                  <div className="lf-input-underline" />
                 </div>
-                {errors.name && <span className="lf-error">{errors.name.message}</span>}
+                {errors[field.id as keyof RegisterFormData] && (
+                  <span className="text-xs font-medium text-destructive">{errors[field.id as keyof RegisterFormData]?.message}</span>
+                )}
               </div>
+            ))}
 
-              {/* Phone / Celular */}
-              <div className={`lf-field${focused === "phone" ? " focused" : ""}`}>
-                <label className="lf-label">Número de celular</label>
-                <div className="lf-input-wrap">
-                  <Phone size={17} className="lf-input-icon" />
-                  <input
-                    {...phoneReg}
-                    type="tel"
-                    placeholder="Ej: 987654321"
-                    className="lf-input"
-                    onFocus={() => setFocused("phone")}
-                    onBlur={(e) => { phoneReg.onBlur(e); setFocused(null); }}
-                    autoComplete="tel"
-                  />
-                  <div className="lf-input-underline" />
-                </div>
-                {errors.phone && <span className="lf-error">{errors.phone.message}</span>}
-              </div>
-
-              {/* Email */}
-              <div className={`lf-field${focused === "email" ? " focused" : ""}`}>
-                <label className="lf-label">Correo electrónico</label>
-                <div className="lf-input-wrap">
-                  <Mail size={17} className="lf-input-icon" />
-                  <input
-                    {...emailReg}
-                    type="email"
-                    placeholder="usuario@deparraspitz.com"
-                    className="lf-input"
-                    onFocus={() => setFocused("email")}
-                    onBlur={(e) => { emailReg.onBlur(e); setFocused(null); }}
-                    autoComplete="email"
-                  />
-                  <div className="lf-input-underline" />
-                </div>
-                {errors.email && <span className="lf-error">{errors.email.message}</span>}
-              </div>
-
-              {/* Password */}
-              <div className={`lf-field${focused === "pass" ? " focused" : ""}`}>
-                <label className="lf-label">Contraseña</label>
-                <div className="lf-input-wrap">
-                  <Lock size={17} className="lf-input-icon" />
-                  <input
-                    {...passReg}
-                    type="password"
-                    placeholder="••••••••"
-                    className="lf-input"
-                    onFocus={() => setFocused("pass")}
-                    onBlur={(e) => { passReg.onBlur(e); setFocused(null); }}
-                    autoComplete="new-password"
-                  />
-                  <div className="lf-input-underline" />
-                </div>
-                {errors.password && <span className="lf-error">{errors.password.message}</span>}
-              </div>
-
-              {/* Confirm Password */}
-              <div className={`lf-field${focused === "confirmPass" ? " focused" : ""}`}>
-                <label className="lf-label">Confirmar contraseña</label>
-                <div className="lf-input-wrap">
-                  <Lock size={17} className="lf-input-icon" />
-                  <input
-                    {...confirmPassReg}
-                    type="password"
-                    placeholder="••••••••"
-                    className="lf-input"
-                    onFocus={() => setFocused("confirmPass")}
-                    onBlur={(e) => { confirmPassReg.onBlur(e); setFocused(null); }}
-                    autoComplete="new-password"
-                  />
-                  <div className="lf-input-underline" />
-                </div>
-                {errors.confirmPassword && <span className="lf-error">{errors.confirmPassword.message}</span>}
-              </div>
-
-              {/* Submit */}
-              <button
-                type="submit"
-                className="lf-submit"
-                disabled={isPending}
-                onClick={(e) => {
-                  if (isPending) return;
-                  const btn = e.currentTarget;
-                  const ripple = document.createElement("div");
-                  ripple.className = "lf-submit-ripple";
-                  const rect = btn.getBoundingClientRect();
-                  ripple.style.left = `${e.clientX - rect.left}px`;
-                  ripple.style.top = `${e.clientY - rect.top}px`;
-                  btn.appendChild(ripple);
-                  setTimeout(() => ripple.remove(), 600);
-                }}
-              >
-                <span className="lf-submit-content">
-                  {isPending
-                    ? <Loader2 size={18} className="animate-spin" />
-                    : <><span>Registrarme</span><span className="lf-submit-arrow">→</span></>
-                  }
-                </span>
-              </button>
-            </div>
+            <button
+              type="submit"
+              disabled={isPending}
+              className="mt-4 flex h-11 w-full items-center justify-center rounded-xl bg-[var(--ember)] text-sm font-semibold text-[var(--char-deep)] hover:brightness-105 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isPending ? <Loader2 size={18} className="animate-spin" /> : "Registrarme"}
+            </button>
           </form>
 
           {/* Footer */}
-          <div className="lf-footer">
-            <p className="lf-footer-text">
+          <div className="flex flex-col items-start gap-4 border-t border-border/40 pt-4">
+            <p className="text-sm text-muted-foreground">
               ¿Ya tienes cuenta?{" "}
-              <a href="/login" className="lf-footer-link">Inicia sesión</a>
+              <a href="/login" className="font-semibold text-[var(--ember-deep)] hover:underline">Inicia sesión</a>
             </p>
-            <div className="lf-security">
-              <div className="lf-security-dot" />
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground/70">
+              <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
               Conexión segura · SSL encriptado
             </div>
           </div>
         </div>
       </div>
+
     </div>
   );
 }

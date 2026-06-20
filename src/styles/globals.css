@@ -56,36 +56,26 @@
 /* === MODO CLARO === */
 :root {
   --background: oklch(0.985 0 0);
-  /* Blanco suave */
   --foreground: oklch(0.141 0.005 285.823);
-  /* Texto casi negro */
   --card: oklch(1 0 0);
-  /* Fondo blanco puro para tarjetas */
   --card-foreground: oklch(0.141 0.005 285.823);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.141 0.005 285.823);
 
-  /* Tu color amarillo/ámbar como color principal */
   --primary: oklch(0.763 0.177 89.173);
   --primary-foreground: oklch(0.141 0.005 285.823);
-  /* Texto negro sobre amarillo */
 
   --secondary: oklch(0.967 0.001 286.375);
-  /* Gris muy clarito */
   --secondary-foreground: oklch(0.21 0.006 285.885);
   --muted: oklch(0.967 0.001 286.375);
   --muted-foreground: oklch(0.552 0.016 285.938);
-  /* Gris para texto secundario */
   --accent: oklch(0.967 0.001 286.375);
   --accent-foreground: oklch(0.21 0.006 285.885);
   --destructive: oklch(0.577 0.245 27.325);
-  /* Rojo */
   --destructive-foreground: oklch(0.985 0 0);
   --border: oklch(0.92 0.004 286.32);
-  /* Bordes grises sutiles */
   --input: oklch(0.92 0.004 286.32);
   --ring: oklch(0.763 0.177 89.173);
-  /* Anillo amarillo al enfocar */
   --radius: 0.625rem;
 
   --sidebar: oklch(0.985 0 0);
@@ -97,45 +87,35 @@
   --sidebar-border: oklch(0.92 0.004 286.32);
   --sidebar-ring: oklch(0.763 0.177 89.173);
 
-  /* ── Tokens "Brasa" para el Login/Register (derivados del mismo hue del primary,
-     pensados para verse igual en claro y oscuro, ya que el panel izquierdo
-     siempre es oscuro/carbón sin importar el tema de la app) ── */
-  --ember: oklch(0.763 0.177 89.173);       /* = --primary, brasa encendida */
-  --ember-deep: oklch(0.55 0.16 48);        /* naranja-brasa, más rojizo y oscuro */
-  --char: oklch(0.16 0.018 50);             /* carbón cálido, no gris frío */
-  --char-deep: oklch(0.09 0.012 40);        /* carbón casi negro, para overlays */
+  /* Tokens "Brasa" para Login/Register (panel izq. siempre oscuro) */
+  --ember: oklch(0.763 0.177 89.173);       /* = --primary */
+  --ember-deep: oklch(0.55 0.16 48);
+  --char: oklch(0.16 0.018 50);
+  --char-deep: oklch(0.09 0.012 40);
   --ember-glow: oklch(0.763 0.177 89.173 / 0.35);
 }
 
 /* === MODO OSCURO === */
 .dark {
   --background: oklch(0.141 0.005 285.823);
-  /* Fondo oscuro (casi negro) */
   --foreground: oklch(0.985 0 0);
-  /* Texto blanco */
   --card: oklch(0.21 0.006 285.885);
-  /* Tarjetas gris oscuro */
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.21 0.006 285.885);
   --popover-foreground: oklch(0.985 0 0);
 
-  /* Tu color amarillo se mantiene brillante en modo oscuro */
   --primary: oklch(0.763 0.177 89.173);
   --primary-foreground: oklch(0.141 0.005 285.823);
-  /* Texto oscuro sobre el amarillo */
 
   --secondary: oklch(0.274 0.006 286.033);
-  /* Gris medio para botones secundarios */
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.274 0.006 286.033);
   --muted-foreground: oklch(0.705 0.015 286.067);
-  /* Texto sutil en oscuro */
   --accent: oklch(0.274 0.006 286.033);
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
   --destructive-foreground: oklch(0.985 0 0);
   --border: oklch(0.274 0.006 286.033);
-  /* Bordes oscuros */
   --input: oklch(0.274 0.006 286.033);
   --ring: oklch(0.763 0.177 89.173);
 
@@ -154,37 +134,24 @@
   --char-deep: oklch(0.09 0.012 40);
   --ember-glow: oklch(0.763 0.177 89.173 / 0.4);
 }
-
-
-/* ═══════════════════════════════════════════════════════════════
-   BASE LAYER
-═══════════════════════════════════════════════════════════════ */
+/* BASE LAYER */
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
-
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
   }
-
   html {
     @apply font-sans;
   }
 }
 
-/* =========================================
-   ESTILOS LEGACY REFACCIONADOS (BUENAS PRÁCTICAS)
-   Usamos @apply para que respeten el modo claro/oscuro
-   ========================================= */
+/* ESTILOS LEGACY (refactorizados con @apply para soportar claro/oscuro) */
 
-.admin-panel {
-  @apply max-w-[1220px] mx-auto pt-[42px] px-6 pb-[90px] text-foreground;
-}
+.admin-panel { @apply max-w-[1220px] mx-auto pt-[42px] px-6 pb-[90px] text-foreground; }
 
-.admin-header {
-  @apply flex justify-between items-center mb-[34px] flex-col md:flex-row md:items-center gap-3 md:gap-0;
-}
+.admin-header { @apply flex justify-between items-center mb-[34px] flex-col md:flex-row md:items-center gap-3 md:gap-0; }
 .admin-header h1 {
   @apply font-serif text-4xl font-extrabold text-foreground;
 }
@@ -192,60 +159,40 @@
   @apply text-muted-foreground text-base;
 }
 
-.admin-tabs {
-  @apply inline-flex flex-wrap gap-2 bg-secondary border border-border p-1.5 rounded-lg mb-7;
-}
+.admin-tabs { @apply inline-flex flex-wrap gap-2 bg-secondary border border-border p-1.5 rounded-lg mb-7; }
 .admin-tabs a {
   @apply text-muted-foreground no-underline py-2 px-3.5 rounded-md font-semibold transition-colors;
 }
 .admin-tabs a.active,
-.admin-tabs a:hover {
-  @apply bg-background text-foreground shadow-sm;
-}
+.admin-tabs a:hover { @apply bg-background text-foreground shadow-sm; }
 
-.stats-grid {
-  @apply grid grid-cols-1 md:grid-cols-4 gap-5 mb-8;
-}
+.stats-grid { @apply grid grid-cols-1 md:grid-cols-4 gap-5 mb-8; }
 
 .stat-card,
 .admin-card,
-.profile-card {
-  @apply bg-card text-card-foreground border border-border rounded-xl;
-}
+.profile-card { @apply bg-card text-card-foreground border border-border rounded-xl; }
 
-.stat-card {
-  @apply p-6 flex justify-between;
-}
-
+.stat-card { @apply p-6 flex justify-between; }
 .stat-card p {
   @apply text-muted-foreground mb-3;
 }
-
 .stat-card h2 {
   @apply text-3xl font-black text-foreground;
 }
-
 .stat-card span {
   @apply text-primary font-bold;
 }
 
-.admin-card {
-  @apply p-6 mt-7 overflow-x-auto;
-}
+.admin-card { @apply p-6 mt-7 overflow-x-auto; }
 
 .admin-card h2,
-.profile-card h2 {
-  @apply text-lg font-extrabold mb-7 text-foreground;
-}
+.profile-card h2 { @apply text-lg font-extrabold mb-7 text-foreground; }
 
-.card-head {
-  @apply flex justify-between items-center;
-}
+.card-head { @apply flex justify-between items-center; }
 
 table {
   @apply w-full border-collapse;
 }
-
 th {
   @apply text-muted-foreground text-left py-4 px-2 border-b border-border;
 }
@@ -257,63 +204,34 @@ td small {
 }
 
 .status,
-.filter {
-  @apply bg-secondary text-secondary-foreground border border-border py-2 px-4 rounded-md;
-}
-.available {
-  @apply bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 py-1.5 px-2.5 rounded-md text-sm;
-}
-.yellow-btn {
-  @apply bg-primary text-primary-foreground font-bold py-2.5 px-4 rounded-md border-none transition-opacity hover:opacity-90;
-}
+.filter { @apply bg-secondary text-secondary-foreground border border-border py-2 px-4 rounded-md; }
+.available { @apply bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 py-1.5 px-2.5 rounded-md text-sm; }
+.yellow-btn { @apply bg-primary text-primary-foreground font-bold py-2.5 px-4 rounded-md border-none transition-opacity hover:opacity-90; }
 
-.profile-card {
-  @apply mt-7 p-6 max-w-[430px];
-}
-
+.profile-card { @apply mt-7 p-6 max-w-[430px]; }
 .profile-card p {
   @apply text-muted-foreground mb-2;
 }
-
 .profile-card strong {
   @apply block text-lg mb-5 text-foreground;
 }
-
 .profile-card button {
   @apply w-full bg-destructive text-destructive-foreground py-3 rounded-md font-bold transition-opacity hover:opacity-90;
 }
 
-.tab-section {
-  @apply hidden;
-}
-
-.default-section {
-  @apply block;
-}
-
+.tab-section { @apply hidden; }
+.default-section { @apply block; }
 .admin-panel:has(#pedidos:target) .default-section,
 .admin-panel:has(#productos:target) .default-section,
 .admin-panel:has(#promociones:target) .default-section,
-.admin-panel:has(#perfil:target) .default-section {
-  @apply hidden;
-}
-
+.admin-panel:has(#perfil:target) .default-section { @apply hidden; }
 #resumen:target,
 #pedidos:target,
 #productos:target,
 #promociones:target,
-#perfil:target {
-  @apply block;
-}
+#perfil:target { @apply block; }
 
-
-/* ═══════════════════════════════════════════════════════════════
-   AUTH · LOGIN & REGISTER — "DE PARRAS & PITZ"
-   Grid de 2 columnas: izquierda = carrusel con marca + info discreta,
-   derecha = tarjeta de formulario (el protagonista). Todo deriva de
-   --ember / --char definidos en :root, nunca de hex sueltos.
-═══════════════════════════════════════════════════════════════ */
-
+/* AUTH · LOGIN & REGISTER — grid de 2 columnas (carrusel + form). Deriva de --ember / --char. */
 @keyframes lp-slide-zoom {
   from { transform: scale(1.06); }
   to { transform: scale(1); }
@@ -331,15 +249,11 @@ td small {
   font-family: var(--font-sans);
 }
 
-.lp-layout {
-  @apply grid min-h-screen w-full grid-cols-1 lg:grid-cols-2;
-}
+.lp-layout { @apply grid min-h-screen w-full grid-cols-1 lg:grid-cols-2; }
 
 /* ── Columna izquierda: carrusel + marca + info discreta ── */
 .lp-info {
   @apply relative isolate flex min-h-[40vh] flex-col justify-between gap-8 overflow-hidden px-8 py-10 text-[oklch(0.985_0_0)] sm:px-12 lg:min-h-screen lg:px-14 lg:py-14;
-  /* Fondo base siempre visible, no depende de que la foto cargue:
-     viñeta cálida + dos glows ámbar en las esquinas + grano sutil. */
   background-color: var(--char-deep);
   background-image:
     radial-gradient(circle at 12% 88%, color-mix(in oklch, var(--ember-deep) 30%, transparent) 0%, transparent 45%),
@@ -348,9 +262,7 @@ td small {
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.04 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-.lp-carousel {
-  @apply absolute inset-0 -z-10;
-}
+.lp-carousel { @apply absolute inset-0 -z-10; }
 .lp-slide {
   @apply absolute inset-0 bg-cover bg-center opacity-0;
   transition: opacity 1.1s ease-in-out;
@@ -367,59 +279,32 @@ td small {
     var(--char-deep) 100%);
 }
 
-/* Marca: jerarquía clara, sin competir con nada más */
-.lp-brand {
-  @apply flex items-center gap-3;
-}
+.lp-brand { @apply flex items-center gap-3; }
+.lp-brand-icon { @apply text-[var(--ember)]; }
 .lp-brand-name {
   font-family: var(--font-display);
   @apply text-[1.65rem] font-bold leading-tight tracking-tight sm:text-3xl;
 }
-.lp-brand-tagline {
-  @apply text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--ember)]/85;
-}
+.lp-brand-tagline { @apply text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--ember)]/85; }
 
-/* Frase del slide actual: una sola línea, peso medio, sin badge pesado */
-.lp-slide-label {
-  @apply flex items-center gap-2 self-start text-[13px] font-medium text-[oklch(0.985_0_0_/_0.7)];
-}
+.lp-slide-label { @apply flex items-center gap-2 self-start text-[13px] font-medium text-[oklch(0.985_0_0_/_0.7)]; }
 .lp-slide-label svg {
   @apply text-[var(--ember)]/80;
 }
 
-/* Info cards: ahora discretas — sin fondo propio, solo separadas por una
-   línea superior sutil, tipografía más pequeña y de menor peso */
-.lp-info-grid {
-  @apply grid grid-cols-1 gap-x-6 gap-y-4 border-t border-[oklch(0.985_0_0_/_0.12)] pt-6 sm:grid-cols-2;
-}
-.lp-info-card {
-  @apply flex items-start gap-2.5;
-}
-.lp-info-icon {
-  @apply mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center text-[var(--ember)]/75;
-}
-.lp-info-title {
-  @apply text-[12px] font-semibold uppercase tracking-wide text-[oklch(0.985_0_0_/_0.85)];
-}
-.lp-info-desc {
-  @apply mt-0.5 text-[12.5px] leading-snug text-[oklch(0.985_0_0_/_0.5)];
-}
+.lp-info-grid { @apply grid grid-cols-1 gap-x-6 gap-y-4 border-t border-[oklch(0.985_0_0_/_0.12)] pt-6 sm:grid-cols-2; }
+.lp-info-card { @apply flex items-start gap-2.5; }
+.lp-info-icon { @apply mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center text-[var(--ember)]/75; }
+.lp-info-title { @apply text-[12px] font-semibold uppercase tracking-wide text-[oklch(0.985_0_0_/_0.85)]; }
+.lp-info-desc { @apply mt-0.5 text-[12.5px] leading-snug text-[oklch(0.985_0_0_/_0.5)]; }
 
-.lp-dots {
-  @apply flex items-center gap-2;
-}
-.lp-dot {
-  @apply h-1 w-5 rounded-full bg-[oklch(0.985_0_0_/_0.2)] transition-all;
-}
-.lp-dot.active {
-  @apply w-8 bg-[var(--ember)];
-}
+.lp-dots { @apply flex items-center gap-2; }
+.lp-dot { @apply h-1 w-5 rounded-full bg-[oklch(0.985_0_0_/_0.2)] transition-all; }
+.lp-dot.active { @apply w-8 bg-[var(--ember)]; }
 
-/* ── Columna derecha: tarjeta de formulario, ahora con jerarquía clara ── */
+/* ── Columna derecha: tarjeta de formulario ── */
 .lf-card {
   @apply relative flex flex-col justify-center overflow-hidden px-6 py-14 sm:px-10 lg:px-16;
-  /* Tinte cálido casi imperceptible en vez de blanco puro, para que
-     conecte con la paleta brasa sin perder legibilidad. */
   background:
     radial-gradient(circle at 100% 0%, color-mix(in oklch, var(--ember) 6%, transparent) 0%, transparent 55%),
     color-mix(in oklch, var(--ember-deep) 2.5%, var(--card));
@@ -431,9 +316,7 @@ td small {
 .lf-card:hover .lf-spotlight {
   @apply opacity-100;
 }
-.lf-ring {
-  @apply pointer-events-none absolute rounded-full border border-[var(--ember)]/15;
-}
+.lf-ring { @apply pointer-events-none absolute rounded-full border border-[var(--ember)]/15; }
 .lf-ring-1 {
   @apply -right-20 -top-20 h-56 w-56;
   animation: lf-ring-pulse 6s ease-in-out infinite;
@@ -443,48 +326,27 @@ td small {
   animation: lf-ring-pulse 7s ease-in-out 1s infinite;
 }
 
-/* Header: el título manda, todo lo demás es secundario y compacto */
-.lf-header {
-  @apply relative z-10 mx-auto flex w-full max-w-sm flex-col items-start gap-3;
-}
-.lf-icon-bg {
-  @apply mb-1 flex h-12 w-12 items-center justify-center rounded-xl border border-[var(--ember)]/20 bg-[var(--ember)]/10;
-}
+.lf-header { @apply relative z-10 mx-auto flex w-full max-w-sm flex-col items-start gap-3; }
+.lf-icon-bg { @apply mb-1 flex h-12 w-12 items-center justify-center rounded-xl border border-[var(--ember)]/20 bg-[var(--ember)]/10; }
 .lf-orbit-dot,
-.lf-orbit-dot-2 {
+.lf-orbit-dot-2,
+.lf-divider {
   display: none;
 }
 .lf-title {
   font-family: var(--font-display);
   @apply text-[2rem] font-bold leading-[1.1] tracking-tight text-foreground;
 }
-.lf-subtitle {
-  @apply text-[14.5px] leading-snug text-muted-foreground;
-}
-/* El divider con punto ámbar ya no aporta jerarquía; se retira para
-   bajar el ruido visual entre header y formulario. */
-.lf-divider {
-  @apply hidden;
-}
+.lf-subtitle { @apply text-[14.5px] leading-snug text-muted-foreground; }
 
-.lf-body {
-  @apply relative z-10 mx-auto mt-9 flex w-full max-w-sm flex-col gap-5;
-}
-.lf-field {
-  @apply flex flex-col gap-1.5;
-}
-.lf-label {
-  @apply text-[13px] font-semibold text-foreground;
-}
+.lf-body { @apply relative z-10 mx-auto mt-9 flex w-full max-w-sm flex-col gap-5; }
+.lf-field { @apply flex flex-col gap-1.5; }
+.lf-label { @apply text-[13px] font-semibold text-foreground; }
 .lf-field.focused .lf-label {
   @apply text-[var(--ember-deep)];
 }
-.lf-input-wrap {
-  @apply relative flex items-center;
-}
-.lf-input-icon {
-  @apply pointer-events-none absolute left-3.5 text-muted-foreground;
-}
+.lf-input-wrap { @apply relative flex items-center; }
+.lf-input-icon { @apply pointer-events-none absolute left-3.5 text-muted-foreground; }
 .lf-field.focused .lf-input-icon {
   @apply text-[var(--ember)];
 }
@@ -498,31 +360,17 @@ td small {
   border-color: var(--ember);
   background: var(--card);
 }
-.lf-input-underline {
-  @apply pointer-events-none absolute bottom-0 left-1/2 h-[2px] w-0 -translate-x-1/2 bg-[var(--ember)] transition-all duration-300;
-}
+.lf-input-underline { @apply pointer-events-none absolute bottom-0 left-1/2 h-[2px] w-0 -translate-x-1/2 bg-[var(--ember)] transition-all duration-300; }
 .lf-field.focused .lf-input-underline {
   @apply w-full;
 }
-.lf-error {
-  @apply text-xs font-medium text-destructive;
-}
+.lf-error { @apply text-xs font-medium text-destructive; }
 
-.lf-submit {
-  @apply relative mt-2 flex h-12 w-full items-center justify-center overflow-hidden rounded-xl bg-[var(--ember)] text-[15px] font-semibold text-[var(--char-deep)] transition-transform active:scale-[0.985];
-}
-.lf-submit:hover:not(:disabled) {
-  @apply brightness-105;
-}
-.lf-submit:disabled {
-  @apply cursor-not-allowed opacity-70;
-}
-.lf-submit-content {
-  @apply relative z-10 flex items-center gap-2;
-}
-.lf-submit-arrow {
-  @apply inline-block transition-transform;
-}
+.lf-submit { @apply relative mt-2 flex h-12 w-full items-center justify-center overflow-hidden rounded-xl bg-[var(--ember)] text-[15px] font-semibold text-[var(--char-deep)] transition-transform active:scale-[0.985]; }
+.lf-submit:hover:not(:disabled) { @apply brightness-105; }
+.lf-submit:disabled { @apply cursor-not-allowed opacity-70; }
+.lf-submit-content { @apply relative z-10 flex items-center gap-2; }
+.lf-submit-arrow { @apply inline-block transition-transform; }
 .lf-submit:hover:not(:disabled) .lf-submit-arrow {
   transform: translateX(3px);
 }
@@ -531,26 +379,14 @@ td small {
   animation: lf-ripple 0.6s ease-out forwards;
 }
 
-.lf-footer {
-  @apply relative z-10 mx-auto mt-8 flex w-full max-w-sm flex-col items-start gap-3;
-}
-.lf-footer-text {
-  @apply text-sm text-muted-foreground;
-}
-.lf-footer-link {
-  @apply font-semibold text-[var(--ember-deep)] underline-offset-4 hover:underline;
-}
-.lf-security {
-  @apply flex items-center gap-1.5 text-xs text-muted-foreground/70;
-}
-.lf-security-dot {
-  @apply h-1.5 w-1.5 rounded-full bg-green-500;
-}
+.lf-footer { @apply relative z-10 mx-auto mt-8 flex w-full max-w-sm flex-col items-start gap-3; }
+.lf-footer-text { @apply text-sm text-muted-foreground; }
+.lf-footer-link { @apply font-semibold text-[var(--ember-deep)] underline-offset-4 hover:underline; }
+.lf-security { @apply flex items-center gap-1.5 text-xs text-muted-foreground/70; }
+.lf-security-dot { @apply h-1.5 w-1.5 rounded-full bg-green-500; }
 
 .lf-submit:focus-visible,
-.lf-footer-link:focus-visible {
-  @apply outline-2 outline-offset-2 outline-[var(--ember)];
-}
+.lf-footer-link:focus-visible { @apply outline-2 outline-offset-2 outline-[var(--ember)]; }
 
 @media (prefers-reduced-motion: reduce) {
   .lp-slide,
