@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { getProducts } from "@/modules/admin/productos/services/product.service";
-// 🔥 IMPORTAMOS createOrder AQUÍ TAMBIÉN
-import { createReservation, createOrder } from "@/modules/admin/pedidos/services/order.service";
+import { createReservation } from "@/modules/admin/pedidos/services/order.service"; // 🗑️ Quitamos createOrder
 import { useCartStore } from "@/modules/admin/promociones/store/cartStore";
 import type { Product } from "@/modules/user/interfaces/product.interface";
 
@@ -10,6 +9,11 @@ export const useReservationWizard = () => {
     const [currentStep, setCurrentStep] = useState<number>(1);
     const [products, setProducts] = useState<Product[]>([]);
     const [isLoadingProducts, setIsLoadingProducts] = useState<boolean>(true);
+    
+    // Solo necesitamos el estado de carga
+    const [isLoadingSubmit, setIsLoadingSubmit] = useState<boolean>(false);
+    
+    // 🗑️ Quitamos los estados de Culqi (pendingOrderId y isCulqiModalOpen) porque ya no se paga aquí.
 
     const cart = useCartStore((state) => state.cart);
     const clearCart = useCartStore((state) => state.clearCart);
@@ -63,8 +67,10 @@ export const useReservationWizard = () => {
             quantity: Number(item.quantity),
         }));
 
+        setIsLoadingSubmit(true);
+
         try {
-            // 1️⃣ PRIMERO: Armamos la reserva SIN 'phone' ni 'notes' para cumplir con el DTO del backend
+            // 1️⃣ Solo armamos y enviamos la reserva
             const reservationPayload = {
                 eventDate: formData.date,
                 serviceStartTime: formData.time || "12:00",
@@ -74,37 +80,25 @@ export const useReservationWizard = () => {
                 items: items,
             };
 
-            console.log("📦 PAYLOAD DE RESERVA LIMPÍO:", JSON.stringify(reservationPayload, null, 2));
-            const newReservation = await createReservation(reservationPayload);
+            await createReservation(reservationPayload);
 
-            // 2️⃣ SEGUNDO: Creamos la orden vinculándola al ID obtenido. 
-            // Aquí SÍ enviamos el teléfono y las notas incrustadas en la dirección.
-            const orderData = {
-                reservationId: newReservation.id, // Enlace de las dos tablas
-                shippingAddress: `${formData.address} | EVENTO: ${formData.date} a las ${formData.time} | Asistentes: ${formData.guests} | Tipo: ${formData.eventType} ${formData.notes ? `| Notas: ${formData.notes}` : ''}`,
-                city: formData.city || "Ciudad pendiente",
-                postalCode: "00000",
-                phone: formData.phone, // 🔥 El teléfono se guarda aquí de forma segura
-                paymentMethod: formData.paymentMethod,
-                items,
-            };
+            // 2️⃣ Éxito: Limpiamos y redirigimos
+            toast.success("¡Reserva creada con éxito! Esperando aprobación del administrador para proceder al pago.");
+            
+            clearCart(); 
 
-            console.log("📦 PAYLOAD DE ORDEN:", JSON.stringify(orderData, null, 2));
-            await createOrder(orderData);
-
-            // 3️⃣ Limpieza y redirección
-            clearCart();
-            toast.success("¡Reserva enviada exitosamente!");
-
+            // Redirigir al usuario (Ajusta la URL "/perfil/reservas" a la ruta real de tu proyecto)
             setTimeout(() => {
-                window.location.href = "/";
-            }, 1500);
+                window.location.href = "/"; 
+            }, 2500);
 
         } catch (error: any) {
             console.error("Error al procesar reserva:", error);
             const backendMessage = error.response?.data?.message;
             const alertMessage = Array.isArray(backendMessage) ? backendMessage.join(", ") : backendMessage;
             toast.error(alertMessage || "Error al enviar la reserva");
+        } finally {
+            setIsLoadingSubmit(false);
         }
     };
 
@@ -113,6 +107,7 @@ export const useReservationWizard = () => {
         formData,
         products,
         isLoadingProducts,
+        isLoadingSubmit,
         handleChange,
         setFormData,
         nextStep,

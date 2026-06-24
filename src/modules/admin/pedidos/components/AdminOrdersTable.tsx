@@ -117,7 +117,7 @@ export default function AdminOrdersTable() {
                   const clientEmail = order.email || order.customerEmail || userRel.email || "jeffeson123xd@gmail.com";
                   const rawPhone = order.phone || order.customerPhone || userRel.phone;
                   const clientPhone = rawPhone && rawPhone !== "No disponible" ? rawPhone : "123123123";
-                  
+
                   const hasAddressPipe = order.shippingAddress?.includes("|");
                   const cleanAddress = hasAddressPipe ? order.shippingAddress.split(" | ")[0] : (order.address || order.shippingAddress);
                   const parsedNotes = hasAddressPipe && order.shippingAddress.includes("Notas:")
@@ -129,7 +129,7 @@ export default function AdminOrdersTable() {
 
                   return (
                     <React.Fragment key={order.id}>
-                      <tr 
+                      <tr
                         className={`transition-colors cursor-pointer ${isExpanded ? "bg-muted/30" : "hover:bg-muted/50"}`}
                         onClick={() => toggleRow(order.id)}
                       >
@@ -160,14 +160,14 @@ export default function AdminOrdersTable() {
                         </td>
                         <td className="px-4 py-4 text-center" onClick={(e) => e.stopPropagation()}>
                           <select
-                            value={order.status || "Pendiente"}
+                            value={order.status?.toUpperCase() || "PENDIENTE"}
                             onChange={(e) => handleStatusChange(order.id, e.target.value)}
                             className={`border text-xs font-black rounded-md p-1.5 focus:ring-1 focus:ring-ring outline-none cursor-pointer transition-all hover:brightness-110 ${getStatusStyle(order.status)}`}
                           >
-                            <option value="Pendiente" className="bg-background text-amber-500">⏳ Pendiente</option>
-                            <option value="Confirmado" className="bg-background text-emerald-500">✅ Confirmado</option>
-                            <option value="Entregado" className="bg-background text-blue-500">🚚 Entregado</option>
-                            <option value="Cancelado" className="bg-background text-rose-500">❌ Cancelado</option>
+                            <option value="PENDIENTE" className="bg-background text-amber-500">Pendiente</option>
+                            <option value="APROBADA" className="bg-background text-blue-500">Aprobada (Lista para pago)</option>
+                            <option value="PAGADA" className="bg-background text-emerald-500">Pagada</option>
+                            <option value="CANCELADA" className="bg-background text-rose-500">Cancelada</option>
                           </select>
                         </td>
                       </tr>
@@ -194,7 +194,7 @@ export default function AdminOrdersTable() {
                                     <tbody className="text-xs text-foreground divide-y divide-border/50">
                                       {orderItems.map((item: any, index: number) => {
                                         const itemName = item.name || "Plato sin nombre";
-                                        const itemCategory = item.category || "Comida"; 
+                                        const itemCategory = item.category || "Comida";
                                         const itemQty = item.quantity || 1;
                                         const itemPrice = Number(item.price || 0);
                                         const itemSubtotal = Number(item.subtotal || (itemQty * itemPrice));

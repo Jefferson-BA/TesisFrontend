@@ -1,14 +1,16 @@
 ---
+// src/pages/checkout.astro
 import UserLayout from '@/layouts/UserLayout.astro';
 import CheckoutPage from '@/modules/user/components/CheckoutPage';
 import { Toaster } from 'sonner';
 
-// Obtenemos el ID de la orden desde la URL (Ej: /checkout?orderId=45&total=150)
 const url = new URL(Astro.request.url);
 const orderId = url.searchParams.get('orderId') || '0';
 const totalAmount = parseFloat(url.searchParams.get('total') || '0.00');
 
-// Si no hay datos válidos de orden, redirigimos preventivamente al menú
+// TODO: Obtén el email real del usuario autenticado desde tu authStore o cookies
+const userEmail = "cliente@correo.com"; 
+
 if (orderId === '0' || totalAmount === 0) {
   return Astro.redirect('/menu');
 }
@@ -17,14 +19,17 @@ if (orderId === '0' || totalAmount === 0) {
 <UserLayout title="Finalizar Pago | DeParraSpitz">
   <main class="min-h-screen bg-[#0b0806] pt-32 pb-12 px-4 flex items-center justify-center">
     <div class="w-full space-y-6">
-      
       <div class="text-center space-y-2">
-  <p class="text-xs uppercase...">Pasarela de Pago</p>
-  </div>
+        <p class="text-xs uppercase tracking-wider text-zinc-500">Pasarela de Pago</p>
+      </div>
 
-      {/* Cargamos nuestro componente React interactivo en el cliente */}
-      <CheckoutPage orderId={orderId} totalAmount={totalAmount} client:load />
-
+      {/* Solo llamamos a la isla. El Contexto de React Query ya vive adentro */}
+      <CheckoutPage 
+        orderId={orderId} 
+        totalAmount={totalAmount} 
+        userEmail={userEmail} 
+        client:load 
+      />
     </div>
   </main>
 

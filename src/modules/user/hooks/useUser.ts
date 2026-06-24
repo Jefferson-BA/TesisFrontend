@@ -15,7 +15,6 @@ export const useUser = () => {
   useEffect(() => {
     try {
       const savedUser = localStorage.getItem("user");
-
       if (savedUser) {
         setUserState(JSON.parse(savedUser));
       }
@@ -36,7 +35,6 @@ export const useUser = () => {
       ...user,
       ...newData,
     };
-
     localStorage.setItem("user", JSON.stringify(updatedUser));
     setUserState(updatedUser);
   };
