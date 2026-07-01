@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import type { ChatMessage } from "../reservas/chatbot/interfaces/chatbot.interface";
-import { askChatbot } from "../reservas/chatbot/services/chatbot.service";
+import type { ChatMessage } from "../interfaces/chatbot.interface";
+import { askChatbot } from "../services/chatbot.service";
 
 export const useChatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
