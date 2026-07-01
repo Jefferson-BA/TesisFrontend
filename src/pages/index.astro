@@ -1,30 +1,18 @@
 ---
-import '@/styles/globals.css';
-
-import { PublicNavbar } from '@/modules/user/shared/components/PublicNavbar';
-import { Hero } from '@/modules/user/Inicio/components/Hero';
-import { Servicios } from '@/modules/user/Inicio/components/Servicios';
-import { Testimonios } from '@/modules/user/Inicio/components/Testimonios';
-import { Contacto } from '@/modules/user/Inicio/components/Contacto';
-import PromoBanner from '@/modules/admin/promociones/components/PromoBanner';
+import UserLayout from "@/layouts/UserLayout.astro";
+import { Hero } from "@/modules/user/Inicio/components/Hero";
+import { Servicios } from "@/modules/user/Inicio/components/Servicios";
+import { Testimonios } from "@/modules/user/Inicio/components/Testimonios";
+import { Contacto } from "@/modules/user/Inicio/components/Contacto";
+import PromoBanner from "@/modules/admin/promociones/components/PromoBanner";
 ---
-<html lang="es">
-  <head>
-    <meta charset="utf-8" />
-    <title>DeParraSpitz | Catering & Eventos</title>
-  </head>
 
-  <body class="min-h-screen bg-[#0b0806] text-white font-sans">
-    
-    <PublicNavbar client:only="react" />
-
-    <main>
-      <Hero client:only="react" />
-      <Servicios client:only="react" />
-      <PromoBanner client:load />
-      <Testimonios client:only="react" />
-      <Contacto client:only="react" />
-    </main>
-
-  </body>
-</html>
+<UserLayout title="DeParraSpitz | Catering & Eventos">
+  <main>
+    <Hero client:load />
+    <Servicios client:load />
+    <PromoBanner client:load />
+    <Testimonios client:load />
+    <Contacto client:load />
+  </main>
+</UserLayout>

@@ -1,32 +1,23 @@
 ---
-// src/pages/reservas.astro
-import UserLayout from '@/layouts/UserLayout.astro'; 
-import ReservationWizard from '@/modules/user/reservas/components/ReservationWizard'; // Componente de usuario
-import { Toaster } from 'sonner';
+import UserLayout from "@/layouts/UserLayout.astro";
+import ReservationWizard from "@/modules/user/reservas/components/ReservationWizard";
 ---
 
 <UserLayout title="Reserva tu Mesa | DeParraSpitz">
-  {/* Usamos los colores oscuros/dorados que manejas en tu vista pública (PublicNavbar) */}
-  <main class="min-h-screen bg-[#0b0806] pt-32 pb-12 px-4 md:px-8">
-    <div class="max-w-4xl mx-auto space-y-8">
-      
-      <header class="text-center space-y-3">
-        <h1 class="text-4xl md:text-5xl font-black tracking-wider text-white uppercase font-serif">
-          Haz tu <span class="text-yellow-500">Reserva</span>
-        </h1>
-        <p class="text-zinc-400 text-sm md:text-base max-w-xl mx-auto">
-          Asegura tu lugar en DeParraSpitz. Completa el formulario a continuación y prepárate para una experiencia gastronómica inolvidable.
-        </p>
-      </header>
+  <main class="max-w-4xl mx-auto space-y-8">
+    
+    <header class="text-center space-y-3">
+      <h1 class="text-4xl md:text-5xl font-black tracking-wider uppercase font-display">
+        Haz tu <span class="text-ember">Reserva</span>
+      </h1>
+      <p class="text-muted-foreground text-sm md:text-base max-w-xl mx-auto">
+        Asegura tu lugar en DeParraSpitz y prepárate para una experiencia gastronómica inolvidable.
+      </p>
+    </header>
 
-      {/* Aquí cargamos el formulario paso a paso del usuario */}
-      <div class="bg-[#120d0a] border border-[#3d2c1f] rounded-2xl p-6 md:p-8 shadow-2xl shadow-yellow-500/5">
-        <ReservationWizard client:load />
-      </div>
-
+    <div class="bg-card border border-border rounded-2xl p-6 md:p-8 shadow-2xl">
+      <ReservationWizard client:load />
     </div>
 
   </main>
-
-  <Toaster richColors position="top-right" client:load />
 </UserLayout>

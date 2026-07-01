@@ -1,37 +1,8 @@
 ---
-// src/pages/checkout.astro
-import UserLayout from '@/layouts/UserLayout.astro';
-import CheckoutPage from '@/modules/user/checkout/components/CheckoutPage';
-import { Toaster } from 'sonner';
-
-const url = new URL(Astro.request.url);
-const orderId = url.searchParams.get('orderId') || '0';
-const totalAmount = parseFloat(url.searchParams.get('total') || '0.00');
-
-// TODO: Obtén el email real del usuario autenticado desde tu authStore o cookies
-const userEmail = "cliente@correo.com"; 
-
-if (orderId === '0' || totalAmount === 0) {
-  return Astro.redirect('/menu');
-}
+import UserLayout from "@/layouts/UserLayout.astro";
+import CheckoutPage from "@/modules/user/checkout/components/CheckoutPage";
 ---
 
-<UserLayout title="Finalizar Pago | DeParraSpitz">
-  <main class="min-h-screen bg-[#0b0806] pt-32 pb-12 px-4 flex items-center justify-center">
-    <div class="w-full space-y-6">
-      <div class="text-center space-y-2">
-        <p class="text-xs uppercase tracking-wider text-zinc-500">Pasarela de Pago</p>
-      </div>
-
-      {/* Solo llamamos a la isla. El Contexto de React Query ya vive adentro */}
-      <CheckoutPage 
-        orderId={orderId} 
-        totalAmount={totalAmount} 
-        userEmail={userEmail} 
-        client:load 
-      />
-    </div>
-  </main>
-
-  <Toaster richColors position="top-right" client:load />
+<UserLayout title="Checkout | DeParraSpitz">
+  <CheckoutPage client:load />
 </UserLayout>

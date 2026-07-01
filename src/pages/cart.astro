@@ -1,19 +1,8 @@
 ---
-import { Toaster } from "sonner";
-import "@/styles/globals.css";
-import { PublicNavbar } from "@/modules/user/shared/components/PublicNavbar";
+import UserLayout from "@/layouts/UserLayout.astro";
 import CartPage from "@/modules/user/carrito/components/CartPage";
 ---
 
-<html lang="es">
-  <head>
-    <meta charset="utf-8" />
-    <title>Carrito | DeParraSpitz</title>
-  </head>
-
-  <body class="min-h-screen bg-black text-white">
-    <PublicNavbar client:only="react" />
-    <CartPage client:load />
-      <Toaster richColors position="top-right" client:load />
-  </body>
-</html>
+<UserLayout title="Carrito | DeParraSpitz">
+  <CartPage client:load />
+</UserLayout>

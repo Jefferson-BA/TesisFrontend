@@ -1,73 +1,96 @@
-import { useState } from "react";
+"use client";
+
+import { useState, useEffect } from "react";
 import { CulqiPayment } from "@/modules/payments/components/CulqiPayment";
-import { CreditCard, ShieldCheck } from "lucide-react";
+import { useCartStore } from "@/modules/admin/promociones/store/cartStore";
+import { useUser } from "@/modules/user/hooks/useUser";
+import { CreditCard, ShieldCheck, ShoppingBag, ArrowLeft } from "lucide-react";
 
-// 1. Definimos las propiedades exactas que Astro le está enviando
-interface CheckoutPageProps {
-  orderId: string;
-  totalAmount: number;
-  userEmail: string;
-}
+export default function CheckoutPage() {
+  const cart = useCartStore((s) => s.cart);
+  const clearCart = useCartStore((s) => s.clearCart);
+  const { user } = useUser();
+  
+  const [isCulqiOpen, setIsCulqiOpen] = useState(false);
+  const [orderId, setOrderId] = useState("");
 
-// 2. Recibimos las props directamente en el componente
-export default function CheckoutPage({ orderId, totalAmount, userEmail }: CheckoutPageProps) {
-  const [isCulqiOpen, setIsCulqiOpen] = useState(false); // 🔥 ESTADO CLAVE
+  const totalAmount = cart.reduce((acc, item) => acc + Number(item.price) * Number(item.quantity), 0);
 
-  const handleSuccessRedirect = () => {
-    // Redirigimos al perfil después del éxito
+  useEffect(() => {
+    setOrderId(`ORD-${Date.now()}-${Math.random().toString(36).slice(2, 7).toUpperCase()}`);
+  }, []);
+
+  const handleSuccess = () => {
+    clearCart();
     window.location.href = "/user/profile";
   };
 
-  // Validación de seguridad por si falla la inyección de props
-  if (!orderId || totalAmount <= 0) {
+  if (cart.length === 0) {
     return (
-      <div className="min-h-[50vh] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#C9974A]"></div>
+      <div className="min-h-[60vh] flex flex-col items-center justify-center text-center space-y-6 px-4">
+        <div className="w-20 h-20 rounded-full bg-char flex items-center justify-center">
+          <ShoppingBag className="w-10 h-10 text-white/20" />
+        </div>
+        <div>
+          <h2 className="text-2xl font-display font-bold text-white">No hay productos en tu carrito</h2>
+          <p className="text-white/50 mt-2">Agrega productos desde el menú antes de hacer checkout</p>
+        </div>
+        <a href="/menu" className="inline-flex items-center gap-2 px-6 py-3 bg-ember hover:brightness-110 text-char-deep font-bold rounded-xl transition-all active:scale-[0.98]">
+          <ArrowLeft size={16} /> Ir al Menú
+        </a>
       </div>
     );
   }
 
   return (
-    <div className="max-w-2xl mx-auto py-12 px-6">
-      <div className="bg-white dark:bg-[#140d0b] border border-stone-200 dark:border-[#3d2c1f] rounded-2xl p-8 shadow-xl text-center">
-        <h1 className="text-3xl font-serif font-bold text-stone-900 dark:text-white mb-2">
-          Completar Pago
-        </h1>
-        <p className="text-stone-500 dark:text-zinc-400 mb-8">
-          Estás a un paso de confirmar tu evento.
-        </p>
-
-        <div className="bg-stone-50 dark:bg-[#0a0705] border border-stone-200 dark:border-[#3d2c1f] rounded-xl p-6 mb-8 text-left">
-          <p className="text-sm text-stone-500 uppercase tracking-wider font-bold mb-1">
-            Resumen de Orden #{orderId.toString().padStart(5, '0')}
-          </p>
-          <p className="text-4xl font-black text-amber-600 dark:text-yellow-500">
-            {/* Usamos el totalAmount que viene de las props */}
-            S/ {totalAmount.toFixed(2)}
-          </p>
+    <div className="max-w-2xl mx-auto py-12 px-4 sm:px-6">
+      <div className="bg-card border border-border rounded-2xl p-6 sm:p-8 shadow-xl">
+        
+        <div className="text-center space-y-2 mb-8">
+          <h1 className="text-3xl font-display font-bold text-foreground">Completar Pago</h1>
+          <p className="text-muted-foreground">Estás a un paso de confirmar tu evento</p>
         </div>
 
-        {/* 🔥 EL BOTÓN QUE ACTIVA EL MODAL */}
+        <div className="bg-char/40 border border-char rounded-xl p-5 mb-8 space-y-4">
+          <div>
+            <p className="text-[10px] text-white/40 uppercase tracking-widest font-bold">Orden #{orderId}</p>
+            <p className="text-4xl font-black text-ember font-mono mt-1">S/ {totalAmount.toFixed(2)}</p>
+          </div>
+          <div className="space-y-2 pt-3 border-t border-char">
+            {cart.map((item) => (
+              <div key={item.id} className="flex justify-between text-sm">
+                <span className="text-white/70 truncate flex-1">{item.quantity}x {item.name}</span>
+                <span className="text-white/50 ml-4 font-mono">S/ {(Number(item.price) * Number(item.quantity)).toFixed(2)}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="bg-char/20 border border-char rounded-xl p-4 mb-8">
+          <p className="text-[10px] text-white/40 uppercase tracking-widest font-bold mb-1">Confirmaremos tu pedido en</p>
+          <p className="text-white/80 text-sm font-medium">{user?.email || "email@ejemplo.com"}</p>
+        </div>
+
         <button
           onClick={() => setIsCulqiOpen(true)}
-          className="w-full flex items-center justify-center gap-2 bg-stone-900 hover:bg-stone-800 dark:bg-white dark:hover:bg-zinc-200 text-white dark:text-stone-900 font-bold py-4 rounded-xl transition-all shadow-lg"
+          className="w-full flex items-center justify-center gap-2 bg-ember hover:brightness-110 text-char-deep font-bold py-4 rounded-xl transition-all active:scale-[0.98] relative overflow-hidden group"
         >
-          <CreditCard className="w-5 h-5" />
-          Pagar de Forma Segura
+          <span className="absolute inset-0 bg-[linear-gradient(115deg,transparent_30%,color-mix(in_oklch,white_50%,transparent)_50%,transparent_70%)] animate-shimmer" />
+          <CreditCard className="w-5 h-5 relative z-10" />
+          <span className="relative z-10">Pagar de Forma Segura</span>
         </button>
 
-        <div className="mt-4 flex items-center justify-center gap-2 text-xs text-stone-400">
-          <ShieldCheck className="w-4 h-4 text-emerald-500" />
-          <span>Pagos encriptados y procesados de forma segura por Culqi.</span>
+        <div className="mt-4 flex items-center justify-center gap-2 text-[10px] text-white/30">
+          <ShieldCheck className="w-4 h-4 text-emerald-500/70" /> Pagos encriptados y procesados por Culqi
         </div>
 
         <CulqiPayment
           orderId={orderId}
           amount={totalAmount}
-          userEmail={userEmail} // Usamos el correo real que viene de Astro
+          userEmail={user?.email || ""}
           isOpen={isCulqiOpen}
           onClose={() => setIsCulqiOpen(false)}
-          onSuccessCallback={handleSuccessRedirect}
+          onSuccessCallback={handleSuccess}
         />
       </div>
     </div>

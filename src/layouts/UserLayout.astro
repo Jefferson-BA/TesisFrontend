@@ -1,32 +1,58 @@
 ---
 import { PublicNavbar } from "@/modules/user/shared/components/PublicNavbar";
 import ChatbotWidget from "@/modules/user/chatbot/components/ChatbotWidget";
+import { Toaster } from "sonner";
 import "@/styles/globals.css";
 
 interface Props {
   title?: string;
+  description?: string;
 }
 
-const { title = "Hojas de Parra Spitz - Catering & Eventos" } = Astro.props;
+const {
+  title = "DeParraSpitz - Catering & Eventos",
+  description = "Experiencias gastronómicas premium. Catering, eventos y parrillas.",
+} = Astro.props;
 ---
 
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
     <title>{title}</title>
+
+    <script is:inline>
+      (function() {
+        const t = localStorage.getItem("deparraspitz-theme");
+        const d = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        try {
+          const parsed = JSON.parse(t);
+          const theme = parsed?.state?.theme;
+          if (theme === "dark" || (!theme && d)) {
+            document.documentElement.classList.add("dark");
+            document.documentElement.style.colorScheme = "dark";
+          }
+        } catch {
+          if (d) {
+            document.documentElement.classList.add("dark");
+            document.documentElement.style.colorScheme = "dark";
+          }
+        }
+      })();
+    </script>
   </head>
 
   <body class="bg-background text-foreground antialiased min-h-screen flex flex-col transition-colors duration-300">
     
     <PublicNavbar client:load />
-
-    <div class="pt-[82px] flex-1">
+    
+    <div class="flex-1">
       <slot />
     </div>
 
     <ChatbotWidget client:load />
-
+    <Toaster richColors position="top-right" client:load />
   </body>
 </html>
