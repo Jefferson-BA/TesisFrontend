@@ -2,7 +2,7 @@ import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useReservationWizard } from "../hooks/useReservationWizard";
 import { useCartStore } from "@/modules/admin/promociones/store/cartStore";
-import type { Product } from "@/modules/user/interfaces/product.interface";
+import type { Product } from "@/modules/user/menu/interfaces/product.interface";
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";

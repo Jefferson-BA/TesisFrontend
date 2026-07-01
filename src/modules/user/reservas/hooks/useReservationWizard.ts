@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import { getProducts } from "@/modules/admin/productos/services/product.service";
 import { createReservation } from "@/modules/admin/pedidos/services/order.service"; // 🗑️ Quitamos createOrder
 import { useCartStore } from "@/modules/admin/promociones/store/cartStore";
-import type { Product } from "@/modules/user/interfaces/product.interface";
+import type { Product } from "@/modules/user/menu/interfaces/product.interface";
 
 export const useReservationWizard = () => {
     const [currentStep, setCurrentStep] = useState<number>(1);

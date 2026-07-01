@@ -12,7 +12,7 @@ import {
 import { useCartStore } from "@/modules/admin/promociones/store/cartStore";
 import { useUser } from "@/modules/user/hooks/useUser";
 // 1. IMPORTAMOS EL COMPONENTE SWITCH DEL THEME
-import ThemeToggle from "./Themetoggle";
+import ThemeToggle from "../components/Themetoggle";
 
 export function PublicNavbar() {
   const cart = useCartStore((state) => state.cart);
