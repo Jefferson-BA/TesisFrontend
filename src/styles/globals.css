@@ -55,7 +55,7 @@
   --color-ember-deep: var(--ember-deep);
   --color-char: var(--char);
   --color-char-deep: var(--char-deep);
-    --animate-fade-in: fade-in 0.6s ease-out both;
+  --animate-fade-in: fade-in 0.6s ease-out both;
   --animate-fade-in-up: fade-in-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
   --animate-fade-in-scale: fade-in-scale 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
   --animate-ken-burns: ken-burns linear both;
@@ -69,7 +69,7 @@
   --animate-bounce-soft: bounce-soft 2s ease-in-out infinite;
   --animate-wiggle: wiggle 2.5s ease-in-out infinite;
   --animate-progress: progress-fill linear forwards;
-
+  --animate-progress-bar: progress-bar 2s ease-in-out infinite;
 }
 
 /* === MODO CLARO === */
@@ -80,10 +80,8 @@
   --card-foreground: oklch(0.141 0.005 285.823);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.141 0.005 285.823);
-
   --primary: oklch(0.763 0.177 89.173);
   --primary-foreground: oklch(0.141 0.005 285.823);
-
   --secondary: oklch(0.967 0.001 286.375);
   --secondary-foreground: oklch(0.21 0.006 285.885);
   --muted: oklch(0.967 0.001 286.375);
@@ -96,7 +94,6 @@
   --input: oklch(0.92 0.004 286.32);
   --ring: oklch(0.763 0.177 89.173);
   --radius: 0.625rem;
-
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.141 0.005 285.823);
   --sidebar-primary: oklch(0.763 0.177 89.173);
@@ -105,10 +102,7 @@
   --sidebar-accent-foreground: oklch(0.21 0.006 285.885);
   --sidebar-border: oklch(0.92 0.004 286.32);
   --sidebar-ring: oklch(0.763 0.177 89.173);
-
-  /* Tokens "Brasa" para Login/Register (panel izq. siempre oscuro) */
   --ember: oklch(0.763 0.177 89.173);
-  /* = --primary */
   --ember-deep: oklch(0.55 0.16 48);
   --char: oklch(0.16 0.018 50);
   --char-deep: oklch(0.09 0.012 40);
@@ -123,10 +117,8 @@
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.21 0.006 285.885);
   --popover-foreground: oklch(0.985 0 0);
-
   --primary: oklch(0.763 0.177 89.173);
   --primary-foreground: oklch(0.141 0.005 285.823);
-
   --secondary: oklch(0.274 0.006 286.033);
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.274 0.006 286.033);
@@ -138,7 +130,6 @@
   --border: oklch(0.274 0.006 286.033);
   --input: oklch(0.274 0.006 286.033);
   --ring: oklch(0.763 0.177 89.173);
-
   --sidebar: oklch(0.141 0.005 285.823);
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.763 0.177 89.173);
@@ -147,7 +138,6 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(0.274 0.006 286.033);
   --sidebar-ring: oklch(0.763 0.177 89.173);
-
   --ember: oklch(0.763 0.177 89.173);
   --ember-deep: oklch(0.6 0.17 48);
   --char: oklch(0.16 0.018 50);
@@ -160,18 +150,90 @@
   * {
     @apply border-border outline-ring/50;
   }
-
   body {
     @apply bg-background text-foreground font-sans;
   }
-
   html {
     @apply font-sans;
   }
 }
 
-/* ESTILOS LEGACY (refactorizados con @apply para soportar claro/oscuro) */
+/* ── ANIMACIONES GLOBALES (solo una vez) ── */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
 
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(24px); filter: blur(6px); }
+  to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+@keyframes fade-in-scale {
+  from { opacity: 0; transform: scale(0.9) rotate(-8deg); }
+  to { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.95) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes ken-burns {
+  from { transform: scale(1); }
+  to { transform: scale(1.08); }
+}
+
+@keyframes crossfade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes ember-rise {
+  0% { opacity: 0; transform: translateY(0) translateX(0); }
+  10% { opacity: 0.8; }
+  90% { opacity: 0.3; }
+  100% { opacity: 0; transform: translateY(-560px) translateX(10px); }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-130%); }
+  55%, 100% { transform: translateX(130%); }
+}
+
+@keyframes pulse-ring {
+  0%, 100% { transform: scale(1); opacity: 0.6; }
+  50% { transform: scale(1.5); opacity: 0; }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 0px color-mix(in oklch, var(--ember) 0%, transparent); }
+  50% { box-shadow: 0 0 18px color-mix(in oklch, var(--ember) 40%, transparent); }
+}
+
+@keyframes bounce-soft {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(8px); }
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(15deg); }
+  75% { transform: rotate(-15deg); }
+}
+
+@keyframes progress-fill {
+  from { transform: scaleY(0); }
+  to { transform: scaleY(1); }
+}
+
+@keyframes progress-bar {
+  0% { width: 0%; }
+  50% { width: 70%; }
+  100% { width: 100%; }
+}
+
+/* ── ESTILOS LEGACY ── */
 .admin-panel {
   @apply max-w-[1220px] mx-auto pt-[42px] px-6 pb-[90px] text-foreground;
 }
@@ -307,104 +369,20 @@ td small {
 #perfil:target {
   @apply block;
 }
-@keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
- 
-@keyframes fade-in-up {
-  from { opacity: 0; transform: translateY(24px); filter: blur(6px); }
-  to { opacity: 1; transform: translateY(0); filter: blur(0); }
-}
- 
-@keyframes fade-in-scale {
-  from { opacity: 0; transform: scale(0.9) rotate(-8deg); }
-  to { opacity: 1; transform: scale(1) rotate(0deg); }
-}
- 
-@keyframes ken-burns {
-  from { transform: scale(1); }
-  to { transform: scale(1.08); }
-}
- 
-@keyframes crossfade {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
- 
-@keyframes ember-rise {
-  0% { opacity: 0; transform: translateY(0) translateX(0); }
-  10% { opacity: 0.8; }
-  90% { opacity: 0.3; }
-  100% { opacity: 0; transform: translateY(-560px) translateX(10px); }
-}
- 
-@keyframes shimmer {
-  0% { transform: translateX(-130%); }
-  55%, 100% { transform: translateX(130%); }
-}
- 
-@keyframes pulse-ring {
-  0%, 100% { transform: scale(1); opacity: 0.6; }
-  50% { transform: scale(1.5); opacity: 0; }
-}
- 
-@keyframes glow-pulse {
-  0%, 100% { box-shadow: 0 0 0px color-mix(in oklch, var(--ember) 0%, transparent); }
-  50% { box-shadow: 0 0 18px color-mix(in oklch, var(--ember) 40%, transparent); }
-}
- 
-@keyframes bounce-soft {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(8px); }
-}
- 
-@keyframes wiggle {
-  0%, 100% { transform: rotate(0deg); }
-  25% { transform: rotate(15deg); }
-  75% { transform: rotate(-15deg); }
-}
- 
-@keyframes progress-fill {
-  from { transform: scaleY(0); }
-  to { transform: scaleY(1); }
-}
- 
-@media (prefers-reduced-motion: reduce) {
-  [class*="animate-"] {
-    animation: none !important;
-  }
-}
-/* AUTH · LOGIN & REGISTER — grid de 2 columnas (carrusel + form). Deriva de --ember / --char. */
-@keyframes lp-slide-zoom {
-  from {
-    transform: scale(1.06);
-  }
 
-  to {
-    transform: scale(1);
-  }
+/* ── AUTH STYLES ── */
+@keyframes lp-slide-zoom {
+  from { transform: scale(1.06); }
+  to { transform: scale(1); }
 }
 
 @keyframes lf-ring-pulse {
-
-  0%,
-  100% {
-    transform: scale(1);
-    opacity: 0.45;
-  }
-
-  50% {
-    transform: scale(1.1);
-    opacity: 0.15;
-  }
+  0%, 100% { transform: scale(1); opacity: 0.45; }
+  50% { transform: scale(1.1); opacity: 0.15; }
 }
 
 @keyframes lf-ripple {
-  to {
-    transform: scale(22);
-    opacity: 0;
-  }
+  to { transform: scale(22); opacity: 0; }
 }
 
 .lp-root {
@@ -416,7 +394,6 @@ td small {
   @apply grid min-h-screen w-full grid-cols-1 lg:grid-cols-2;
 }
 
-/* ── Columna izquierda: carrusel + marca + info discreta ── */
 .lp-info {
   @apply relative isolate flex min-h-[40vh] flex-col justify-between gap-8 overflow-hidden px-8 py-10 text-[oklch(0.985_0_0)] sm:px-12 lg:min-h-screen lg:px-14 lg:py-14;
   background-color: var(--char-deep);
@@ -427,254 +404,103 @@ td small {
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.04 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-.lp-carousel {
-  @apply absolute inset-0 -z-10;
-}
+.lp-carousel { @apply absolute inset-0 -z-10; }
+.lp-slide { @apply absolute inset-0 bg-cover bg-center opacity-0; transition: opacity 1.1s ease-in-out; }
+.lp-slide.active { @apply opacity-100; animation: lp-slide-zoom 9s ease-out forwards; }
+.lp-overlay { @apply absolute inset-0; background: linear-gradient(180deg, color-mix(in oklch, var(--char-deep) 78%, transparent) 0%, color-mix(in oklch, var(--char-deep) 42%, transparent) 45%, var(--char-deep) 100%); }
+.lp-brand { @apply flex items-center gap-3; }
+.lp-brand-icon { @apply text-[var(--ember)]; }
+.lp-brand-name { font-family: var(--font-display); @apply text-[1.65rem] font-bold leading-tight tracking-tight sm:text-3xl; }
+.lp-brand-tagline { @apply text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--ember)]/85; }
+.lp-slide-label { @apply flex items-center gap-2 self-start text-[13px] font-medium text-[oklch(0.985_0_0_/_0.7)]; }
+.lp-slide-label svg { @apply text-[var(--ember)]/80; }
+.lp-info-grid { @apply grid grid-cols-1 gap-x-6 gap-y-4 border-t border-[oklch(0.985_0_0_/_0.12)] pt-6 sm:grid-cols-2; }
+.lp-info-card { @apply flex items-start gap-2.5; }
+.lp-info-icon { @apply mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center text-[var(--ember)]/75; }
+.lp-info-title { @apply text-[12px] font-semibold uppercase tracking-wide text-[oklch(0.985_0_0_/_0.85)]; }
+.lp-info-desc { @apply mt-0.5 text-[12.5px] leading-snug text-[oklch(0.985_0_0_/_0.5)]; }
+.lp-dots { @apply flex items-center gap-2; }
+.lp-dot { @apply h-1 w-5 rounded-full bg-[oklch(0.985_0_0_/_0.2)] transition-all; }
+.lp-dot.active { @apply w-8 bg-[var(--ember)]; }
 
-.lp-slide {
-  @apply absolute inset-0 bg-cover bg-center opacity-0;
-  transition: opacity 1.1s ease-in-out;
-}
-
-.lp-slide.active {
-  @apply opacity-100;
-  animation: lp-slide-zoom 9s ease-out forwards;
-}
-
-.lp-overlay {
-  @apply absolute inset-0;
-  background: linear-gradient(180deg,
-      color-mix(in oklch, var(--char-deep) 78%, transparent) 0%,
-      color-mix(in oklch, var(--char-deep) 42%, transparent) 45%,
-      var(--char-deep) 100%);
-}
-
-.lp-brand {
-  @apply flex items-center gap-3;
-}
-
-.lp-brand-icon {
-  @apply text-[var(--ember)];
-}
-
-.lp-brand-name {
-  font-family: var(--font-display);
-  @apply text-[1.65rem] font-bold leading-tight tracking-tight sm:text-3xl;
-}
-
-.lp-brand-tagline {
-  @apply text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--ember)]/85;
-}
-
-.lp-slide-label {
-  @apply flex items-center gap-2 self-start text-[13px] font-medium text-[oklch(0.985_0_0_/_0.7)];
-}
-
-.lp-slide-label svg {
-  @apply text-[var(--ember)]/80;
-}
-
-.lp-info-grid {
-  @apply grid grid-cols-1 gap-x-6 gap-y-4 border-t border-[oklch(0.985_0_0_/_0.12)] pt-6 sm:grid-cols-2;
-}
-
-.lp-info-card {
-  @apply flex items-start gap-2.5;
-}
-
-.lp-info-icon {
-  @apply mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center text-[var(--ember)]/75;
-}
-
-.lp-info-title {
-  @apply text-[12px] font-semibold uppercase tracking-wide text-[oklch(0.985_0_0_/_0.85)];
-}
-
-.lp-info-desc {
-  @apply mt-0.5 text-[12.5px] leading-snug text-[oklch(0.985_0_0_/_0.5)];
-}
-
-.lp-dots {
-  @apply flex items-center gap-2;
-}
-
-.lp-dot {
-  @apply h-1 w-5 rounded-full bg-[oklch(0.985_0_0_/_0.2)] transition-all;
-}
-
-.lp-dot.active {
-  @apply w-8 bg-[var(--ember)];
-}
-
-/* ── Columna derecha: tarjeta de formulario ── */
-.lf-card {
-  @apply relative flex flex-col justify-center overflow-hidden px-6 py-14 sm:px-10 lg:px-16;
-  background:
-    radial-gradient(circle at 100% 0%, color-mix(in oklch, var(--ember) 6%, transparent) 0%, transparent 55%),
-    color-mix(in oklch, var(--ember-deep) 2.5%, var(--card));
-}
-
-.lf-spotlight {
-  @apply pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300;
-  background: radial-gradient(420px circle at var(--mx) var(--my), var(--ember-glow), transparent 70%);
-}
-
-.lf-card:hover .lf-spotlight {
-  @apply opacity-100;
-}
-
-.lf-ring {
-  @apply pointer-events-none absolute rounded-full border border-[var(--ember)]/15;
-}
-
-.lf-ring-1 {
-  @apply -right-20 -top-20 h-56 w-56;
-  animation: lf-ring-pulse 6s ease-in-out infinite;
-}
-
-.lf-ring-2 {
-  @apply -bottom-28 -left-16 h-64 w-64;
-  animation: lf-ring-pulse 7s ease-in-out 1s infinite;
-}
-
-.lf-header {
-  @apply relative z-10 mx-auto flex w-full max-w-sm flex-col items-start gap-3;
-}
-
-.lf-icon-bg {
-  @apply mb-1 flex h-12 w-12 items-center justify-center rounded-xl border border-[var(--ember)]/20 bg-[var(--ember)]/10;
-}
-
-.lf-orbit-dot,
-.lf-orbit-dot-2,
-.lf-divider {
-  display: none;
-}
-
-.lf-title {
-  font-family: var(--font-display);
-  @apply text-[2rem] font-bold leading-[1.1] tracking-tight text-foreground;
-}
-
-.lf-subtitle {
-  @apply text-[14.5px] leading-snug text-muted-foreground;
-}
-
-.lf-body {
-  @apply relative z-10 mx-auto mt-9 flex w-full max-w-sm flex-col gap-5;
-}
-
-.lf-field {
-  @apply flex flex-col gap-1.5;
-}
-
-.lf-label {
-  @apply text-[13px] font-semibold text-foreground;
-}
-
-.lf-field.focused .lf-label {
-  @apply text-[var(--ember-deep)];
-}
-
-.lf-input-wrap {
-  @apply relative flex items-center;
-}
-
-.lf-input-icon {
-  @apply pointer-events-none absolute left-3.5 text-muted-foreground;
-}
-
-.lf-field.focused .lf-input-icon {
-  @apply text-[var(--ember)];
-}
-
-.lf-input {
-  @apply h-12 w-full rounded-xl pl-10 pr-3.5 text-[15px] text-foreground placeholder:text-muted-foreground/60 outline-none transition-colors;
-  border: 1px solid color-mix(in oklch, var(--ember-deep) 12%, var(--border));
-  background: color-mix(in oklch, var(--ember-deep) 4%, var(--card));
-}
-
-.lf-input:focus {
-  @apply ring-2 ring-[var(--ember)]/20;
-  border-color: var(--ember);
-  background: var(--card);
-}
-
-.lf-input-underline {
-  @apply pointer-events-none absolute bottom-0 left-1/2 h-[2px] w-0 -translate-x-1/2 bg-[var(--ember)] transition-all duration-300;
-}
-
-.lf-field.focused .lf-input-underline {
-  @apply w-full;
-}
-
-.lf-error {
-  @apply text-xs font-medium text-destructive;
-}
-
-.lf-submit {
-  @apply relative mt-2 flex h-12 w-full items-center justify-center overflow-hidden rounded-xl bg-[var(--ember)] text-[15px] font-semibold text-[var(--char-deep)] transition-transform active:scale-[0.985];
-}
-
-.lf-submit:hover:not(:disabled) {
-  @apply brightness-105;
-}
-
-.lf-submit:disabled {
-  @apply cursor-not-allowed opacity-70;
-}
-
-.lf-submit-content {
-  @apply relative z-10 flex items-center gap-2;
-}
-
-.lf-submit-arrow {
-  @apply inline-block transition-transform;
-}
-
-.lf-submit:hover:not(:disabled) .lf-submit-arrow {
-  transform: translateX(3px);
-}
-
-.lf-submit-ripple {
-  @apply pointer-events-none absolute h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[oklch(0_0_0_/_0.18)];
-  animation: lf-ripple 0.6s ease-out forwards;
-}
-
-.lf-footer {
-  @apply relative z-10 mx-auto mt-8 flex w-full max-w-sm flex-col items-start gap-3;
-}
-
-.lf-footer-text {
-  @apply text-sm text-muted-foreground;
-}
-
-.lf-footer-link {
-  @apply font-semibold text-[var(--ember-deep)] underline-offset-4 hover:underline;
-}
-
-.lf-security {
-  @apply flex items-center gap-1.5 text-xs text-muted-foreground/70;
-}
-
-.lf-security-dot {
-  @apply h-1.5 w-1.5 rounded-full bg-green-500;
-}
-
-.lf-submit:focus-visible,
-.lf-footer-link:focus-visible {
-  @apply outline-2 outline-offset-2 outline-[var(--ember)];
-}
+.lf-card { @apply relative flex flex-col justify-center overflow-hidden px-6 py-14 sm:px-10 lg:px-16; background: radial-gradient(circle at 100% 0%, color-mix(in oklch, var(--ember) 6%, transparent) 0%, transparent 55%), color-mix(in oklch, var(--ember-deep) 2.5%, var(--card)); }
+.lf-spotlight { @apply pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300; background: radial-gradient(420px circle at var(--mx) var(--my), var(--ember-glow), transparent 70%); }
+.lf-card:hover .lf-spotlight { @apply opacity-100; }
+.lf-ring { @apply pointer-events-none absolute rounded-full border border-[var(--ember)]/15; }
+.lf-ring-1 { @apply -right-20 -top-20 h-56 w-56; animation: lf-ring-pulse 6s ease-in-out infinite; }
+.lf-ring-2 { @apply -bottom-28 -left-16 h-64 w-64; animation: lf-ring-pulse 7s ease-in-out 1s infinite; }
+.lf-header { @apply relative z-10 mx-auto flex w-full max-w-sm flex-col items-start gap-3; }
+.lf-icon-bg { @apply mb-1 flex h-12 w-12 items-center justify-center rounded-xl border border-[var(--ember)]/20 bg-[var(--ember)]/10; }
+.lf-orbit-dot, .lf-orbit-dot-2, .lf-divider { display: none; }
+.lf-title { font-family: var(--font-display); @apply text-[2rem] font-bold leading-[1.1] tracking-tight text-foreground; }
+.lf-subtitle { @apply text-[14.5px] leading-snug text-muted-foreground; }
+.lf-body { @apply relative z-10 mx-auto mt-9 flex w-full max-w-sm flex-col gap-5; }
+.lf-field { @apply flex flex-col gap-1.5; }
+.lf-label { @apply text-[13px] font-semibold text-foreground; }
+.lf-field.focused .lf-label { @apply text-[var(--ember-deep)]; }
+.lf-input-wrap { @apply relative flex items-center; }
+.lf-input-icon { @apply pointer-events-none absolute left-3.5 text-muted-foreground; }
+.lf-field.focused .lf-input-icon { @apply text-[var(--ember)]; }
+.lf-input { @apply h-12 w-full rounded-xl pl-10 pr-3.5 text-[15px] text-foreground placeholder:text-muted-foreground/60 outline-none transition-colors; border: 1px solid color-mix(in oklch, var(--ember-deep) 12%, var(--border)); background: color-mix(in oklch, var(--ember-deep) 4%, var(--card)); }
+.lf-input:focus { @apply ring-2 ring-[var(--ember)]/20; border-color: var(--ember); background: var(--card); }
+.lf-input-underline { @apply pointer-events-none absolute bottom-0 left-1/2 h-[2px] w-0 -translate-x-1/2 bg-[var(--ember)] transition-all duration-300; }
+.lf-field.focused .lf-input-underline { @apply w-full; }
+.lf-error { @apply text-xs font-medium text-destructive; }
+.lf-submit { @apply relative mt-2 flex h-12 w-full items-center justify-center overflow-hidden rounded-xl bg-[var(--ember)] text-[15px] font-semibold text-[var(--char-deep)] transition-transform active:scale-[0.985]; }
+.lf-submit:hover:not(:disabled) { @apply brightness-105; }
+.lf-submit:disabled { @apply cursor-not-allowed opacity-70; }
+.lf-submit-content { @apply relative z-10 flex items-center gap-2; }
+.lf-submit-arrow { @apply inline-block transition-transform; }
+.lf-submit:hover:not(:disabled) .lf-submit-arrow { transform: translateX(3px); }
+.lf-submit-ripple { @apply pointer-events-none absolute h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[oklch(0_0_0_/_0.18)]; animation: lf-ripple 0.6s ease-out forwards; }
+.lf-footer { @apply relative z-10 mx-auto mt-8 flex w-full max-w-sm flex-col items-start gap-3; }
+.lf-footer-text { @apply text-sm text-muted-foreground; }
+.lf-footer-link { @apply font-semibold text-[var(--ember-deep)] underline-offset-4 hover:underline; }
+.lf-security { @apply flex items-center gap-1.5 text-xs text-muted-foreground/70; }
+.lf-security-dot { @apply h-1.5 w-1.5 rounded-full bg-green-500; }
+.lf-submit:focus-visible, .lf-footer-link:focus-visible { @apply outline-2 outline-offset-2 outline-[var(--ember)]; }
 
 @media (prefers-reduced-motion: reduce) {
+  .lp-slide, .lf-ring-1, .lf-ring-2 { animation: none !important; }
+  .lp-slide { transition: opacity 0.3s linear; }
+  [class*="animate-"] { animation: none !important; }
+}
 
-  .lp-slide,
-  .lf-ring-1,
-  .lf-ring-2 {
-    animation: none !important;
-  }
+.culqi-wrapper,
+[id^="culqi-container-"] {
+  overflow: visible !important;
+  height: auto !important;
+  max-height: none !important;
+  min-height: 0 !important;
+}
 
-  .lp-slide {
-    transition: opacity 0.3s linear;
-  }
+[id^="culqi-container-"] > * {
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+  flex: 1;
+}
+/* 🔥 CULQI - Forzar altura completa y adaptar tema */
+[id^="culqi-"] {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+  width: 100% !important;
+  overflow: auto !important;
+}
+
+[id^="culqi-"] > * {
+  flex: 1 !important;
+  height: auto !important;
+  min-height: 0 !important;
+}
+
+/* Fondo en modo claro */
+.light [id^="culqi-"] {
+  background: #fafaf9 !important;
+}
+
+body:has([id^="culqi-"]) {
+  overflow: hidden !important;
+  height: 100vh !important;
 }

@@ -1,0 +1,9 @@
+---
+// src/pages/user/pagar-reserva.astro
+import UserLayout from "@/layouts/UserLayout.astro";
+import PaymentReservationPage from "@/modules/user/checkout/components/PaymentReservationPage";
+---
+
+<UserLayout title="Pagar Reserva | DeParraSpitz">
+  <PaymentReservationPage client:load />
+</UserLayout>
