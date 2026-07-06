@@ -130,7 +130,7 @@ function PaymentReservationContent() {
       appearance: {
         theme: isDark ? "dark" : "default",
         hiddenCulqiLogo: true, menuType: "sidebar",
-        buttonCardPayText: `Pagar S/ ${amount.toFixed(2)}`,
+        buttonCardPayText: `Pagar`,
         defaultStyle: { bannerColor: "#C9974A", buttonBackground: "#C9974A", menuColor: "#C9974A", linksColor: "#C9974A", buttonTextColor: isDark ? "#FFF" : "#1a1a1a", priceColor: "#C9974A" },
       },
     });
