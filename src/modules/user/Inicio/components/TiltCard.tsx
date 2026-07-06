@@ -13,7 +13,13 @@ interface TiltCardProps {
   className?: string;
 }
 
-export function TiltCard({ children, delay = 0, inView, glowColor = "rgba(234,179,8,0.25)", className }: TiltCardProps) {
+export function TiltCard({
+  children,
+  delay = 0,
+  inView,
+  glowColor = "rgba(234,179,8,0.25)",
+  className,
+}: TiltCardProps) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
   const [hovered, setHovered] = useState(false);
@@ -37,7 +43,8 @@ export function TiltCard({ children, delay = 0, inView, glowColor = "rgba(234,17
   const handleMouseLeave = useCallback(() => {
     setHovered(false);
     if (innerRef.current) {
-      innerRef.current.style.transform = "perspective(900px) rotateX(0deg) rotateY(0deg) translateZ(0px)";
+      innerRef.current.style.transform =
+        "perspective(900px) rotateX(0deg) rotateY(0deg) translateZ(0px)";
     }
     const imgEl = wrapRef.current?.querySelector<HTMLElement>(".tilt-img");
     if (imgEl) imgEl.style.transform = "scale(1) translate(0, 0)";
@@ -46,13 +53,16 @@ export function TiltCard({ children, delay = 0, inView, glowColor = "rgba(234,17
   return (
     <div
       ref={wrapRef}
-      className={cn("relative", inView ? "animate-fade-in-up" : "opacity-0")}
+      className={cn(
+        "relative",
+        inView ? "animate-fade-in-up" : "opacity-0"
+      )}
       style={{ animationDelay: `${delay}s` }}
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={handleMouseLeave}
     >
-      {/* Ambient glow */}
+      {/* Ambient glow behind card */}
       <div
         className="absolute -inset-2 rounded-3xl pointer-events-none transition-opacity duration-400"
         style={{
@@ -67,9 +77,13 @@ export function TiltCard({ children, delay = 0, inView, glowColor = "rgba(234,17
         ref={innerRef}
         className={cn(
           "relative rounded-3xl overflow-hidden flex flex-col h-full transition-all duration-350",
-          "bg-card border border-border",
-          hovered && "border-ember/35 shadow-[0_30px_70px_rgba(0,0,0,0.6)]",
-          !hovered && "shadow-lg",
+          // Modo claro temático
+          "bg-[#fffdf9] border-[#e0d5c5]",
+          // Modo oscuro
+          "dark:bg-card dark:border-border",
+          hovered &&
+            "border-ember/35 shadow-[0_30px_70px_rgba(0,0,0,0.1)] dark:shadow-[0_30px_70px_rgba(0,0,0,0.6)]",
+          !hovered && "shadow-lg shadow-amber-900/5 dark:shadow-none",
           className
         )}
         style={{ transformStyle: "preserve-3d" }}

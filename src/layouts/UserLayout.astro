@@ -1,4 +1,5 @@
 ---
+// src/layouts/UserLayout.astro
 import { PublicNavbar } from "@/modules/user/shared/components/PublicNavbar";
 import ChatbotWidget from "@/modules/user/chatbot/components/ChatbotWidget";
 import { Toaster } from "sonner";
@@ -23,6 +24,9 @@ const {
     <meta name="description" content={description} />
     <title>{title}</title>
 
+    <!-- 🔥 View Transitions API nativa del navegador -->
+    <meta name="view-transition" content="same-origin" />
+
     <script is:inline>
       (function() {
         const t = localStorage.getItem("deparraspitz-theme");
@@ -42,15 +46,43 @@ const {
         }
       })();
     </script>
+
+    <!-- 🔥 Transiciones suaves entre páginas -->
+    <style is:global>
+      @keyframes page-fade-in {
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      @keyframes page-fade-out {
+        from { opacity: 1; }
+        to { opacity: 0; }
+      }
+
+      ::view-transition-old(root) {
+        animation: page-fade-out 0.15s ease-out forwards;
+      }
+
+      ::view-transition-new(root) {
+        animation: page-fade-in 0.3s ease-out forwards;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        ::view-transition-old(root),
+        ::view-transition-new(root) {
+          animation: none !important;
+        }
+      }
+    </style>
   </head>
 
   <body class="bg-background text-foreground antialiased min-h-screen flex flex-col transition-colors duration-300">
     
     <PublicNavbar client:load />
     
-<div class="w-full">
-  <slot />
-</div>
+    <div class="flex-1">
+      <slot />
+    </div>
 
     <ChatbotWidget client:load />
     <Toaster richColors position="top-right" client:load />

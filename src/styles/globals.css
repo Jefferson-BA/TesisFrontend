@@ -72,44 +72,48 @@
   --animate-progress-bar: progress-bar 2s ease-in-out infinite;
 }
 
-/* === MODO CLARO === */
+/* ═══════════════════════════════════════════
+   MODO CLARO TEMÁTICO (Cálido/Crema/Ámbar)
+   ═══════════════════════════════════════════ */
 :root {
-  --background: oklch(0.985 0 0);
-  --foreground: oklch(0.141 0.005 285.823);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.141 0.005 285.823);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.141 0.005 285.823);
+  --background: oklch(0.98 0.01 84);
+  --foreground: oklch(0.25 0.02 60);
+  --card: oklch(0.99 0.005 84);
+  --card-foreground: oklch(0.25 0.02 60);
+  --popover: oklch(0.99 0.005 84);
+  --popover-foreground: oklch(0.25 0.02 60);
   --primary: oklch(0.763 0.177 89.173);
   --primary-foreground: oklch(0.141 0.005 285.823);
-  --secondary: oklch(0.967 0.001 286.375);
-  --secondary-foreground: oklch(0.21 0.006 285.885);
-  --muted: oklch(0.967 0.001 286.375);
-  --muted-foreground: oklch(0.552 0.016 285.938);
-  --accent: oklch(0.967 0.001 286.375);
-  --accent-foreground: oklch(0.21 0.006 285.885);
+  --secondary: oklch(0.96 0.01 84);
+  --secondary-foreground: oklch(0.3 0.02 60);
+  --muted: oklch(0.95 0.015 84);
+  --muted-foreground: oklch(0.45 0.03 60);
+  --accent: oklch(0.94 0.02 84);
+  --accent-foreground: oklch(0.3 0.02 60);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(0.92 0.004 286.32);
-  --input: oklch(0.92 0.004 286.32);
+  --border: oklch(0.88 0.02 80);
+  --input: oklch(0.88 0.02 80);
   --ring: oklch(0.763 0.177 89.173);
   --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.141 0.005 285.823);
+  --sidebar: oklch(0.98 0.01 84);
+  --sidebar-foreground: oklch(0.25 0.02 60);
   --sidebar-primary: oklch(0.763 0.177 89.173);
   --sidebar-primary-foreground: oklch(0.141 0.005 285.823);
-  --sidebar-accent: oklch(0.967 0.001 286.375);
-  --sidebar-accent-foreground: oklch(0.21 0.006 285.885);
-  --sidebar-border: oklch(0.92 0.004 286.32);
+  --sidebar-accent: oklch(0.94 0.02 84);
+  --sidebar-accent-foreground: oklch(0.3 0.02 60);
+  --sidebar-border: oklch(0.88 0.02 80);
   --sidebar-ring: oklch(0.763 0.177 89.173);
   --ember: oklch(0.763 0.177 89.173);
   --ember-deep: oklch(0.55 0.16 48);
-  --char: oklch(0.16 0.018 50);
-  --char-deep: oklch(0.09 0.012 40);
-  --ember-glow: oklch(0.763 0.177 89.173 / 0.35);
+  --char: oklch(0.88 0.02 80);
+  --char-deep: oklch(0.95 0.015 84);
+  --ember-glow: oklch(0.763 0.177 89.173 / 0.25);
 }
 
-/* === MODO OSCURO === */
+/* ═══════════════════════════════════════════
+   MODO OSCURO
+   ═══════════════════════════════════════════ */
 .dark {
   --background: oklch(0.141 0.005 285.823);
   --foreground: oklch(0.985 0 0);
@@ -145,7 +149,9 @@
   --ember-glow: oklch(0.763 0.177 89.173 / 0.4);
 }
 
-/* BASE LAYER */
+/* ═══════════════════════════════════════════
+   BASE LAYER
+   ═══════════════════════════════════════════ */
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -158,7 +164,9 @@
   }
 }
 
-/* ── ANIMACIONES GLOBALES (solo una vez) ── */
+/* ═══════════════════════════════════════════
+   ANIMACIONES GLOBALES
+   ═══════════════════════════════════════════ */
 @keyframes fade-in {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -233,7 +241,9 @@
   100% { width: 100%; }
 }
 
-/* ── ESTILOS LEGACY ── */
+/* ═══════════════════════════════════════════
+   ESTILOS LEGACY (Admin, Auth, etc.)
+   ═══════════════════════════════════════════ */
 .admin-panel {
   @apply max-w-[1220px] mx-auto pt-[42px] px-6 pb-[90px] text-foreground;
 }
@@ -466,21 +476,9 @@ td small {
   [class*="animate-"] { animation: none !important; }
 }
 
-.culqi-wrapper,
-[id^="culqi-container-"] {
-  overflow: visible !important;
-  height: auto !important;
-  max-height: none !important;
-  min-height: 0 !important;
-}
-
-[id^="culqi-container-"] > * {
-  height: auto !important;
-  max-height: none !important;
-  overflow: visible !important;
-  flex: 1;
-}
-/* 🔥 CULQI - Forzar altura completa y adaptar tema */
+/* ═══════════════════════════════════════════
+   CULQI - Contenedor sin restricciones
+   ═══════════════════════════════════════════ */
 [id^="culqi-"] {
   display: flex !important;
   flex-direction: column !important;
@@ -495,12 +493,32 @@ td small {
   min-height: 0 !important;
 }
 
-/* Fondo en modo claro */
-.light [id^="culqi-"] {
-  background: #fafaf9 !important;
-}
-
 body:has([id^="culqi-"]) {
   overflow: hidden !important;
   height: 100vh !important;
+}
+
+@keyframes page-fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes page-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+::view-transition-old(root) {
+  animation: page-fade-out 0.15s ease-out forwards;
+}
+
+::view-transition-new(root) {
+  animation: page-fade-in 0.3s ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none !important;
+  }
 }
