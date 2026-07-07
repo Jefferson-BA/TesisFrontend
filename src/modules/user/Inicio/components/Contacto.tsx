@@ -219,42 +219,8 @@ export const Contacto = () => {
             </div>
           </div>
 
-          {/* Newsletter + Redes */}
-          <div>
-            <h3 className="text-sm font-bold uppercase tracking-wider text-foreground mb-6">
-              Mantente al tanto
-            </h3>
-            <p className="text-sm font-light text-muted-foreground mb-4 leading-relaxed">
-              Recibe novedades de nuestros menús de temporada y promociones
-              para eventos.
-            </p>
-            <form className="flex items-stretch gap-2 mb-5">
-              <input
-                type="email"
-                placeholder="tu@correo.com"
-                className="flex-1 min-w-0 bg-muted border border-border rounded-xl px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-ember/50 outline-none transition-colors"
-              />
-              <button
-                type="submit"
-                className="bg-ember hover:brightness-110 text-char-deep font-bold px-4 rounded-xl transition-colors shrink-0"
-              >
-                Unirme
-              </button>
-            </form>
-            <div className="flex gap-3">
-              {SOCIAL_LINKS.map((social, i) => (
-                <a
-                  key={i}
-                  href={social.href}
-                  aria-label={social.label}
-                  className="w-10 h-10 rounded-xl bg-muted border border-border hover:border-ember/40 text-muted-foreground hover:text-ember transition-all flex items-center justify-center shadow-md"
-                >
-                  <social.icon className="w-4 h-4" />
-                </a>
-              ))}
-            </div>
+        
           </div>
-        </div>
 
         {/* Copyright */}
         <div className="border-t border-border py-8">
