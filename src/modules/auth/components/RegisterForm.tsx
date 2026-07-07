@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { registerSchema, type RegisterFormData } from "../schemas/auth.schema";
 import { useSignup } from "../hooks/useSignup";
-import { Loader2, Mail, Lock, User, Phone, UserPlus, ChefHat, Flame, Star, Clock, MapPin } from "lucide-react";
+import { Loader2, Mail, Lock, User, Phone, UserPlus, ChefHat, Flame, Star, Clock, MapPin, Eye, EyeOff } from "lucide-react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useState, useRef, useEffect } from "react";
@@ -45,6 +45,8 @@ function RegisterFormInner() {
   const [focused, setFocused] = useState<string | null>(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -98,7 +100,7 @@ function RegisterFormInner() {
   };
 
   return (
-    <div className="lp-root">
+    <div className="lp-root dark">
       {/* ── Background Carousel ── */}
       <div className="lp-carousel" aria-hidden="true">
         {CAROUSEL_IMAGES.map((img, i) => (
@@ -182,11 +184,12 @@ function RegisterFormInner() {
 
               {/* Full Name */}
               <div className={`lf-field${focused === "name" ? " focused" : ""}`}>
-                <label className="lf-label">Nombre completo</label>
+                <label className="lf-label" htmlFor="name">Nombre completo</label>
                 <div className="lf-input-wrap">
                   <User size={17} className="lf-input-icon" />
                   <input
                     {...nameReg}
+                    id="name"
                     type="text"
                     placeholder="Tu nombre y apellido"
                     className="lf-input"
@@ -201,11 +204,12 @@ function RegisterFormInner() {
 
               {/* Phone / Celular */}
               <div className={`lf-field${focused === "phone" ? " focused" : ""}`}>
-                <label className="lf-label">Número de celular</label>
+                <label className="lf-label" htmlFor="phone">Número de celular</label>
                 <div className="lf-input-wrap">
                   <Phone size={17} className="lf-input-icon" />
                   <input
                     {...phoneReg}
+                    id="phone"
                     type="tel"
                     placeholder="Ej: 987654321"
                     className="lf-input"
@@ -220,11 +224,12 @@ function RegisterFormInner() {
 
               {/* Email */}
               <div className={`lf-field${focused === "email" ? " focused" : ""}`}>
-                <label className="lf-label">Correo electrónico</label>
+                <label className="lf-label" htmlFor="email">Correo electrónico</label>
                 <div className="lf-input-wrap">
                   <Mail size={17} className="lf-input-icon" />
                   <input
                     {...emailReg}
+                    id="email"
                     type="email"
                     placeholder="usuario@deparraspitz.com"
                     className="lf-input"
@@ -239,18 +244,27 @@ function RegisterFormInner() {
 
               {/* Password */}
               <div className={`lf-field${focused === "pass" ? " focused" : ""}`}>
-                <label className="lf-label">Contraseña</label>
+                <label className="lf-label" htmlFor="password">Contraseña</label>
                 <div className="lf-input-wrap">
                   <Lock size={17} className="lf-input-icon" />
                   <input
                     {...passReg}
-                    type="password"
+                    id="password"
+                    type={showPassword ? "text" : "password"}
                     placeholder="••••••••"
-                    className="lf-input"
+                    className="lf-input pr-10"
                     onFocus={() => setFocused("pass")}
                     onBlur={(e) => { passReg.onBlur(e); setFocused(null); }}
                     autoComplete="new-password"
                   />
+                  <button
+                    type="button"
+                    className="lf-toggle-password"
+                    onClick={() => setShowPassword((v) => !v)}
+                    aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                  >
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
                   <div className="lf-input-underline" />
                 </div>
                 {errors.password && <span className="lf-error">{errors.password.message}</span>}
@@ -258,18 +272,27 @@ function RegisterFormInner() {
 
               {/* Confirm Password */}
               <div className={`lf-field${focused === "confirmPass" ? " focused" : ""}`}>
-                <label className="lf-label">Confirmar contraseña</label>
+                <label className="lf-label" htmlFor="confirmPassword">Confirmar contraseña</label>
                 <div className="lf-input-wrap">
                   <Lock size={17} className="lf-input-icon" />
                   <input
                     {...confirmPassReg}
-                    type="password"
+                    id="confirmPassword"
+                    type={showConfirmPassword ? "text" : "password"}
                     placeholder="••••••••"
-                    className="lf-input"
+                    className="lf-input pr-10"
                     onFocus={() => setFocused("confirmPass")}
                     onBlur={(e) => { confirmPassReg.onBlur(e); setFocused(null); }}
                     autoComplete="new-password"
                   />
+                  <button
+                    type="button"
+                    className="lf-toggle-password"
+                    onClick={() => setShowConfirmPassword((v) => !v)}
+                    aria-label={showConfirmPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                  >
+                    {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
                   <div className="lf-input-underline" />
                 </div>
                 {errors.confirmPassword && <span className="lf-error">{errors.confirmPassword.message}</span>}
