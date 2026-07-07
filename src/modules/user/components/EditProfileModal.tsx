@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { updateOwnProfile } from "@/modules/user/services/user.service";
 import { useUser } from "@/modules/user/hooks/useUser";
-import { X, User, Mail, Save, Loader2, Phone, MapPin } from "lucide-react"; // 👈 Añadidos Phone y MapPin
+import { X, User, Mail, Save, Loader2, Phone, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface EditProfileModalProps {
@@ -13,41 +13,113 @@ interface EditProfileModalProps {
   onClose: () => void;
 }
 
+// Campos del perfil tipados explícitamente en vez de `as any`.
+type ProfileFields = {
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+};
+
+const EMPTY_FORM: ProfileFields = { name: "", email: "", phone: "", address: "" };
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const PHONE_REGEX = /^\d{9}$/;
+
+const FORM_FIELDS: Array<{
+  key: keyof ProfileFields;
+  label: string;
+  icon: typeof User;
+  type?: string;
+  placeholder?: string;
+  required?: boolean;
+}> = [
+  { key: "name", label: "Nombre", icon: User, required: true },
+  { key: "email", label: "Email", icon: Mail, type: "email", required: true },
+  { key: "phone", label: "Número de Celular", icon: Phone, placeholder: "Ej: 986218081" },
+  { key: "address", label: "Dirección", icon: MapPin, placeholder: "Tu dirección de entrega" },
+];
+
 export const EditProfileModal = ({ open, onClose }: EditProfileModalProps) => {
-  const { user: anyUser, updateLocalUser } = useUser();
-  const user = anyUser as any; // Forzamos tipado dinámico para leer propiedades dinámicas sin trabas de TS
+  const { user, updateLocalUser } = useUser();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  // 👈 Añadidos 'phone' y 'address' al estado inicial
-  const [form, setForm] = useState({ name: "", email: "", phone: "", address: "" });
+  const [form, setForm] = useState<ProfileFields>(EMPTY_FORM);
+
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const lastFocusedRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
-    if (user && open) {
-      setForm({ 
-        name: user.name || "", 
-        email: user.email || "",
-        phone: user.phone || "",    // 👈 Setea el teléfono actual si existe
-        address: user.address || "", // 👈 Setea la dirección actual si existe
-      });
-    }
+    if (!user || !open) return;
+    const profile = user as Partial<ProfileFields> & { id?: string | number };
+    setForm({
+      name: profile.name || "",
+      email: profile.email || "",
+      phone: profile.phone || "",
+      address: profile.address || "",
+    });
   }, [user, open]);
+
+  // Accesibilidad de modal: foco inicial, Escape para cerrar, scroll bloqueado, foco devuelto
+  useEffect(() => {
+    if (!open) return;
+
+    lastFocusedRef.current = document.activeElement as HTMLElement;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    closeButtonRef.current?.focus();
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", onKeyDown);
+      lastFocusedRef.current?.focus?.();
+    };
+  }, [open, onClose]);
+
+  const errors = useMemo(() => {
+    const e: Partial<Record<keyof ProfileFields, string>> = {};
+    if (!form.name.trim()) e.name = "El nombre es obligatorio";
+    if (!EMAIL_REGEX.test(form.email)) e.email = "Ingresa un correo válido";
+    if (form.phone && !PHONE_REGEX.test(form.phone)) e.phone = "Debe tener 9 dígitos";
+    return e;
+  }, [form]);
+
+  const isValid = Object.keys(errors).length === 0;
+
+  const handleFieldChange = (key: keyof ProfileFields, value: string) => {
+    setForm((prev) => ({ ...prev, [key]: value }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user?.id) { toast.error("Usuario no encontrado"); return; }
+
+    const userId = (user as { id?: string | number } | null)?.id;
+    if (!userId) {
+      toast.error("Usuario no encontrado");
+      return;
+    }
+    if (!isValid) {
+      toast.error("Revisa los campos marcados antes de guardar");
+      return;
+    }
 
     setIsSubmitting(true);
     try {
-      // 1. Envía el objeto form completo (name, email, phone, address) al backend
-// Reemplaza el viejo updateUser(user.id, form) por este:
-const updatedUser = await updateOwnProfile(form);      
-      // 2. Sincroniza el estado global de React con los nuevos datos devuelvos
+      const updatedUser = await updateOwnProfile(form);
       updateLocalUser({ ...user, ...updatedUser, ...form });
-      
+
       toast.success("Perfil actualizado correctamente");
       onClose();
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || "No se pudo actualizar");
+
+      // Sincronización visual: refresca Astro para reflejar los cambios del layout
+      setTimeout(() => window.location.reload(), 800);
+    } catch (error) {
+      const err = error as { response?: { data?: { message?: string } } };
+      toast.error(err.response?.data?.message || "No se pudo actualizar");
     } finally {
       setIsSubmitting(false);
     }
@@ -56,7 +128,12 @@ const updatedUser = await updateOwnProfile(form);
   return (
     <AnimatePresence>
       {open && (
-        <div className="fixed inset-0 z-[999] flex items-center justify-center p-4">
+        <div
+          className="fixed inset-0 z-[999] flex items-center justify-center p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="edit-profile-modal-titulo"
+        >
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -71,87 +148,66 @@ const updatedUser = await updateOwnProfile(form);
             transition={{ duration: 0.2 }}
             className={cn(
               "relative w-full max-w-md rounded-2xl border shadow-2xl p-8 z-10",
-              "bg-[#fffdf9] border-[#e0d5c5] dark:bg-char-deep dark:border-char"
+              "bg-[#fffdf9] border-[#e0d5c5] dark:bg-char-deep dark:border-char",
             )}
           >
             <button
+              ref={closeButtonRef}
               onClick={onClose}
-              className="absolute top-4 right-4 w-8 h-8 rounded-lg bg-muted border border-border flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+              aria-label="Cerrar edición de perfil"
+              className="absolute top-4 right-4 w-8 h-8 rounded-lg bg-muted border border-border flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60"
             >
               <X size={14} />
             </button>
 
-            <h2 className="text-xl font-bold font-serif text-foreground mb-6">Editar Perfil</h2>
+            <h2 id="edit-profile-modal-titulo" className="text-xl font-bold font-display text-foreground mb-6">
+              Editar Perfil
+            </h2>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {/* CAMPO: NOMBRE */}
-              <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Nombre</label>
-                <div className="relative">
-                  <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <input
-                    name="name"
-                    value={form.name}
-                    onChange={(e) => setForm({ ...form, name: e.target.value })}
-                    className="w-full pl-10 pr-4 h-11 rounded-xl bg-muted border border-border text-foreground text-sm focus:border-ember/50 outline-none transition-colors"
-                    required
-                  />
-                </div>
-              </div>
+            <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+              {FORM_FIELDS.map((field) => {
+                const Icon = field.icon;
+                const fieldError = errors[field.key];
+                const inputId = `modal-profile-${field.key}`;
+                return (
+                  <div key={field.key} className="space-y-2">
+                    <label
+                      htmlFor={inputId}
+                      className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground"
+                    >
+                      {field.label}
+                    </label>
+                    <div className="relative">
+                      <Icon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      <input
+                        id={inputId}
+                        name={field.key}
+                        type={field.type || "text"}
+                        placeholder={field.placeholder}
+                        value={form[field.key]}
+                        onChange={(e) => handleFieldChange(field.key, e.target.value)}
+                        aria-invalid={Boolean(fieldError)}
+                        aria-describedby={fieldError ? `${inputId}-error` : undefined}
+                        className={cn(
+                          "w-full pl-10 pr-4 h-11 rounded-xl bg-muted border text-foreground text-sm outline-none transition-colors",
+                          fieldError ? "border-rose-500/60 focus:border-rose-500/60" : "border-border focus:border-ember/50",
+                        )}
+                        required={field.required}
+                      />
+                    </div>
+                    {fieldError && (
+                      <p id={`${inputId}-error`} className="text-[11px] text-rose-400">
+                        {fieldError}
+                      </p>
+                    )}
+                  </div>
+                );
+              })}
 
-              {/* CAMPO: EMAIL */}
-              <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Email</label>
-                <div className="relative">
-                  <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <input
-                    name="email"
-                    type="email"
-                    value={form.email}
-                    onChange={(e) => setForm({ ...form, email: e.target.value })}
-                    className="w-full pl-10 pr-4 h-11 rounded-xl bg-muted border border-border text-foreground text-sm focus:border-ember/50 outline-none transition-colors"
-                    required
-                  />
-                </div>
-              </div>
-
-              {/* 👇 NUEVO CAMPO: TELÉFONO */}
-              <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Número de Celular</label>
-                <div className="relative">
-                  <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <input
-                    name="phone"
-                    type="text"
-                    placeholder="Ej: 986218081"
-                    value={form.phone}
-                    onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                    className="w-full pl-10 pr-4 h-11 rounded-xl bg-muted border border-border text-foreground text-sm focus:border-ember/50 outline-none transition-colors"
-                  />
-                </div>
-              </div>
-
-              {/* 👇 NUEVO CAMPO: DIRECCIÓN */}
-              <div className="space-y-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Dirección</label>
-                <div className="relative">
-                  <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <input
-                    name="address"
-                    type="text"
-                    placeholder="Tu dirección de entrega"
-                    value={form.address}
-                    onChange={(e) => setForm({ ...form, address: e.target.value })}
-                    className="w-full pl-10 pr-4 h-11 rounded-xl bg-muted border border-border text-foreground text-sm focus:border-ember/50 outline-none transition-colors"
-                  />
-                </div>
-              </div>
-
-              {/* BOTÓN SUBMIT */}
               <button
                 type="submit"
-                disabled={isSubmitting}
-                className="w-full h-11 bg-ember hover:brightness-110 text-char-deep font-bold rounded-xl text-sm flex items-center justify-center gap-2 transition-all disabled:opacity-70"
+                disabled={isSubmitting || !isValid}
+                className="w-full h-11 bg-ember hover:brightness-110 text-char-deep font-bold rounded-xl text-sm flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                 Guardar cambios
