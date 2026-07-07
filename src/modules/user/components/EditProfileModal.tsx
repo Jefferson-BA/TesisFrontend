@@ -1,13 +1,11 @@
-// src/modules/admin/usuarios/components/EditProfileModal.tsx
-
 "use client";
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
-import { updateUser } from "@/modules/user/services/user.service";
+import { updateOwnProfile } from "@/modules/user/services/user.service";
 import { useUser } from "@/modules/user/hooks/useUser";
-import { X, User, Mail, Save, Loader2 } from "lucide-react";
+import { X, User, Mail, Save, Loader2, Phone, MapPin } from "lucide-react"; // 👈 Añadidos Phone y MapPin
 import { cn } from "@/lib/utils";
 
 interface EditProfileModalProps {
@@ -16,13 +14,21 @@ interface EditProfileModalProps {
 }
 
 export const EditProfileModal = ({ open, onClose }: EditProfileModalProps) => {
-  const { user, updateLocalUser } = useUser();
+  const { user: anyUser, updateLocalUser } = useUser();
+  const user = anyUser as any; // Forzamos tipado dinámico para leer propiedades dinámicas sin trabas de TS
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [form, setForm] = useState({ name: "", email: "" });
+  
+  // 👈 Añadidos 'phone' y 'address' al estado inicial
+  const [form, setForm] = useState({ name: "", email: "", phone: "", address: "" });
 
   useEffect(() => {
     if (user && open) {
-      setForm({ name: user.name || "", email: user.email || "" });
+      setForm({ 
+        name: user.name || "", 
+        email: user.email || "",
+        phone: user.phone || "",    // 👈 Setea el teléfono actual si existe
+        address: user.address || "", // 👈 Setea la dirección actual si existe
+      });
     }
   }, [user, open]);
 
@@ -32,8 +38,12 @@ export const EditProfileModal = ({ open, onClose }: EditProfileModalProps) => {
 
     setIsSubmitting(true);
     try {
-      const updatedUser = await updateUser(user.id, form);
+      // 1. Envía el objeto form completo (name, email, phone, address) al backend
+// Reemplaza el viejo updateUser(user.id, form) por este:
+const updatedUser = await updateOwnProfile(form);      
+      // 2. Sincroniza el estado global de React con los nuevos datos devuelvos
       updateLocalUser({ ...user, ...updatedUser, ...form });
+      
       toast.success("Perfil actualizado correctamente");
       onClose();
     } catch (error: any) {
@@ -74,6 +84,7 @@ export const EditProfileModal = ({ open, onClose }: EditProfileModalProps) => {
             <h2 className="text-xl font-bold font-serif text-foreground mb-6">Editar Perfil</h2>
 
             <form onSubmit={handleSubmit} className="space-y-4">
+              {/* CAMPO: NOMBRE */}
               <div className="space-y-2">
                 <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Nombre</label>
                 <div className="relative">
@@ -88,6 +99,7 @@ export const EditProfileModal = ({ open, onClose }: EditProfileModalProps) => {
                 </div>
               </div>
 
+              {/* CAMPO: EMAIL */}
               <div className="space-y-2">
                 <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Email</label>
                 <div className="relative">
@@ -103,6 +115,39 @@ export const EditProfileModal = ({ open, onClose }: EditProfileModalProps) => {
                 </div>
               </div>
 
+              {/* 👇 NUEVO CAMPO: TELÉFONO */}
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Número de Celular</label>
+                <div className="relative">
+                  <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <input
+                    name="phone"
+                    type="text"
+                    placeholder="Ej: 986218081"
+                    value={form.phone}
+                    onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                    className="w-full pl-10 pr-4 h-11 rounded-xl bg-muted border border-border text-foreground text-sm focus:border-ember/50 outline-none transition-colors"
+                  />
+                </div>
+              </div>
+
+              {/* 👇 NUEVO CAMPO: DIRECCIÓN */}
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Dirección</label>
+                <div className="relative">
+                  <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <input
+                    name="address"
+                    type="text"
+                    placeholder="Tu dirección de entrega"
+                    value={form.address}
+                    onChange={(e) => setForm({ ...form, address: e.target.value })}
+                    className="w-full pl-10 pr-4 h-11 rounded-xl bg-muted border border-border text-foreground text-sm focus:border-ember/50 outline-none transition-colors"
+                  />
+                </div>
+              </div>
+
+              {/* BOTÓN SUBMIT */}
               <button
                 type="submit"
                 disabled={isSubmitting}

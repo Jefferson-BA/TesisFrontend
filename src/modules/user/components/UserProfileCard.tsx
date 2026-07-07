@@ -1,5 +1,3 @@
-// src/modules/admin/usuarios/components/UserProfileCard.tsx
-
 "use client";
 
 import { useState } from "react";
@@ -9,7 +7,8 @@ import { cn } from "@/lib/utils";
 import { EditProfileModal } from "../components/EditProfileModal";
 
 export default function UserProfileCard() {
-  const { user, logout } = useUser();
+  const { user: anyUser, logout } = useUser();
+  const user = anyUser as any; // 👈 Evita los errores de TypeScript en las propiedades nuevas
   const [showEditModal, setShowEditModal] = useState(false);
 
   if (!user) {
@@ -51,13 +50,31 @@ export default function UserProfileCard() {
             </div>
           </div>
 
-          {/* Datos */}
+          {/* Datos Dinámicos vinculados al backend */}
           <div className="space-y-3">
-            <InfoRow icon={Mail} label="Correo Electrónico" value={user.email || "No registrado"} />
-            {/* FALTA EXTRAER DEL BACKEND: phone, address, memberSince */}
-            <InfoRow icon={Phone} label="Teléfono" value="No registrado" muted />
-            <InfoRow icon={MapPin} label="Dirección" value="No registrada" muted />
-            <InfoRow icon={Calendar} label="Miembro desde" value="2024" muted />
+            <InfoRow 
+              icon={Mail} 
+              label="Correo Electrónico" 
+              value={user.email || "No registrado"} 
+            />
+            <InfoRow 
+              icon={Phone} 
+              label="Teléfono" 
+              value={user.phone || "No registrado"} 
+              muted={!user.phone} 
+            />
+            <InfoRow 
+              icon={MapPin} 
+              label="Dirección" 
+              value={user.address || "No registrada"} 
+              muted={!user.address} 
+            />
+            <InfoRow 
+              icon={Calendar} 
+              label="Miembro desde" 
+              value={user.memberSince ? new Date(user.memberSince).getFullYear().toString() : "2024"} 
+              muted={!user.memberSince} 
+            />
           </div>
         </div>
 

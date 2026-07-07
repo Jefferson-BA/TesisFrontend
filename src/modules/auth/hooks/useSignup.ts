@@ -1,24 +1,25 @@
 import { useMutation } from "@tanstack/react-query";
 import { authService } from "../services/auth.service";
 import { toast } from "sonner"; 
+import type { RegisterFormData } from "../schemas/auth.schema";
 
 export const useSignup = () => {
   return useMutation({
-    mutationFn: (data: any) => {
+    mutationFn: (data: RegisterFormData) => {
+      // 🟢 CORREGIDO: Ahora incluimos 'phone' en el payload para que viaje al backend
       const payload = {
         name: data.name,
         email: data.email,
         password: data.password,
+        phone: (data as any).phone, // 👈 ¡Súper importante para que viaje por la API!
       };
       return authService.signup(payload);
     },
     onSuccess: () => {
-      // 👇 Adiós alert, hola toast.success
       toast.success("¡Cuenta creada con éxito!", {
         description: "Redirigiendo al inicio de sesión..."
       });
       
-      // Le damos 1.5 segundos al usuario para leer el mensaje antes de cambiar de página
       setTimeout(() => {
         window.location.href = "/login";
       }, 1500);

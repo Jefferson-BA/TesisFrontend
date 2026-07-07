@@ -76,6 +76,7 @@ function RegisterFormInner() {
   const confirmPassReg = register("confirmPassword");
 
   const onSubmit = (data: RegisterFormData) => {
+    // 🟢 'data' ya contiene la propiedad 'phone' limpia gracias a react-hook-form y zod
     signup(data, {
       onSuccess: () =>
         toast.success("¡Cuenta creada con éxito! 🎉", {

@@ -19,3 +19,8 @@ export const deleteUser = async (
   const res = await api.delete(`/users/${id}`);
   return res.data;
 };
+
+export const updateOwnProfile = async (data: { name: string; email: string; phone?: string; address?: string }) => {
+  const response = await api.patch("/users/profile", data); 
+  return response.data;
+};

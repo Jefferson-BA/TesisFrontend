@@ -4,7 +4,7 @@ export const prerender = false;
 
 import UserLayout from "@/layouts/UserLayout.astro";
 import UserOrders from "@/modules/user/components/UserOrders";
-import UserProfileCard from "../../modules/admin/usuarios/components/UserProfileCard";
+import UserProfileCard from "@/modules/user/components/UserProfileCard";
 ---
 
 <UserLayout 
@@ -18,12 +18,10 @@ import UserProfileCard from "../../modules/admin/usuarios/components/UserProfile
     </div>
 
     <section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-      <!-- Tarjeta de perfil (1/3) -->
       <div class="lg:col-span-1">
         <UserProfileCard client:visible />
       </div>
 
-      <!-- Reservas (2/3) -->
       <div class="lg:col-span-2">
         <UserOrders client:visible />
       </div>

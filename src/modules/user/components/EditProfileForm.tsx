@@ -1,28 +1,35 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { updateUser } from "../../../user/services/user.service";
+import { updateOwnProfile } from "@/modules/user/services/user.service";
 import { useUser } from "@/modules/user/hooks/useUser";
 
 // Importaciones de tus componentes UI premium unificados
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { User, Mail, Save, Trash2, Loader2 } from "lucide-react";
+import { User, Mail, Phone, MapPin, Save, Trash2, Loader2 } from "lucide-react";
 
 export default function EditProfileForm() {
+  // 🟢 CORRECCIÓN SEGURA: Obtenemos el usuario de forma directa y limpia
   const { user, updateLocalUser } = useUser();
+  
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [form, setForm] = useState({
     name: "",
     email: "",
+    phone: "",
+    address: "",
   });
 
+  // 🔄 Sincroniza los valores del formulario cuando el usuario termina de cargar desde el backend
   useEffect(() => {
     if (user) {
       setForm({
-        name: user.name || "",
-        email: user.email || "",
+        name: (user as any).name || "",
+        email: (user as any).email || "",
+        phone: (user as any).phone || "",    // 🟢 Extrae correctamente el teléfono de la base de datos
+        address: (user as any).address || "", // 🟢 Extrae correctamente la dirección de la base de datos
       });
     }
   }, [user]);
@@ -55,15 +62,11 @@ export default function EditProfileForm() {
       return;
     }
 
-    if (!user.id) {
-      toast.error("ID de usuario inválido");
-      return;
-    }
-
     setIsSubmitting(true);
 
     try {
-      const updatedUser = await updateUser(user.id, form);
+      // Llamada al servicio seguro de perfil propio
+      const updatedUser = await updateOwnProfile(form);
 
       updateLocalUser({
         ...user,
@@ -78,6 +81,12 @@ export default function EditProfileForm() {
           border: '1px solid #4a3824',
         }
       });
+
+      // 🔄 Sincronización visual: Refresca Astro para renderizar los nuevos datos desde el servidor
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+
     } catch (error: any) {
       console.error(error.response?.data || error);
 
@@ -106,7 +115,7 @@ export default function EditProfileForm() {
           Editar Perfil
         </h2>
         <p className="text-xs text-zinc-400 mt-1">
-          Actualiza tu información personal de cuenta administrativa.
+          Actualiza tu información personal de cuenta.
         </p>
       </div>
 
@@ -144,6 +153,42 @@ export default function EditProfileForm() {
               placeholder="usuario@deparraspitz.com"
               className="pl-12 bg-[#14100d] border border-[#3d2c1f]/60 h-12 text-zinc-100 rounded-xl text-sm focus-visible:ring-1 focus-visible:ring-yellow-500/50 focus-visible:border-yellow-500/50 transition-all placeholder:text-zinc-600"
               required
+            />
+          </div>
+        </div>
+
+        {/* INPUT: NÚMERO DE CELULAR */}
+        <div className="space-y-2">
+          <Label className="text-[10px] font-bold uppercase tracking-[0.25em] text-zinc-500 ml-1">
+            Número de Celular
+          </Label>
+          <div className="relative group">
+            <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 group-focus-within:text-yellow-500 transition-colors z-10" />
+            <Input
+              name="phone"
+              type="text"
+              value={form.phone}
+              onChange={handleChange}
+              placeholder="Ej: 986218081"
+              className="pl-12 bg-[#14100d] border border-[#3d2c1f]/60 h-12 text-zinc-100 rounded-xl text-sm focus-visible:ring-1 focus-visible:ring-yellow-500/50 focus-visible:border-yellow-500/50 transition-all placeholder:text-zinc-600"
+            />
+          </div>
+        </div>
+
+        {/* INPUT: DIRECCIÓN */}
+        <div className="space-y-2">
+          <Label className="text-[10px] font-bold uppercase tracking-[0.25em] text-zinc-500 ml-1">
+            Dirección de Entrega
+          </Label>
+          <div className="relative group">
+            <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 group-focus-within:text-yellow-500 transition-colors z-10" />
+            <Input
+              name="address"
+              type="text"
+              value={form.address}
+              onChange={handleChange}
+              placeholder="Tu dirección completa de domicilio"
+              className="pl-12 bg-[#14100d] border border-[#3d2c1f]/60 h-12 text-zinc-100 rounded-xl text-sm focus-visible:ring-1 focus-visible:ring-yellow-500/50 focus-visible:border-yellow-500/50 transition-all placeholder:text-zinc-600"
             />
           </div>
         </div>
