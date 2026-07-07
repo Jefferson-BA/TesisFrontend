@@ -1,19 +1,19 @@
 /* ══════════════════════════════════════════════════════════
-   1. IMPORTACIONES ABSOLUTAS
+   1. IMPORTACIONES ABSOLUTAS (SIEMPRE PRIMERO)
    ══════════════════════════════════════════════════════════ */
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/geist";
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Manrope:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Manrope:wght@300;400;500;600;700;800&display=swap');
 
 @custom-variant dark (&:is(.dark *));
 
 /* ══════════════════════════════════════════════════════════
-   2. MAPEO DE TEMA TAILWIND (SaaS Premium Profile)
+   2. MAPEO DE TEMA TAILWIND (colores, radios, animaciones)
    ══════════════════════════════════════════════════════════ */
 @theme inline {
-  --font-heading: 'Geist Variable', sans-serif;
+  --font-heading: var(--font-sans);
   --font-sans: 'Geist Variable', sans-serif;
   --font-display: 'Fraunces', 'Playfair Display', serif;
 
@@ -54,126 +54,134 @@
   --color-char: var(--char);
   --color-char-deep: var(--char-deep);
 
-  --radius-sm: calc(var(--radius) * 0.7);
-  --radius-md: calc(var(--radius) * 0.85);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.3);
-  --radius-2xl: calc(var(--radius) * 1.6);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
 
-  --animate-fade-in: fade-in 0.5s var(--ease-out-expo) both;
-  --animate-fade-in-up: fade-in-up 0.6s var(--ease-out-expo) both;
-  --animate-fade-in-scale: fade-in-scale 0.5s var(--ease-out-expo) both;
+  --animate-fade-in: fade-in 0.6s var(--ease-out-expo) both;
+  --animate-fade-in-up: fade-in-up 0.7s var(--ease-out-expo) both;
+  --animate-fade-in-scale: fade-in-scale 0.6s var(--ease-out-expo) both;
   --animate-ken-burns: ken-burns linear both;
-  --animate-crossfade: crossfade 1.5s ease-in-out both;
+  --animate-crossfade: crossfade 2s ease-in-out both;
   --animate-ember-rise: ember-rise ease-out infinite;
-  --animate-shimmer: shimmer 2.2s ease-in-out infinite;
+  --animate-shimmer: shimmer 2.4s ease-in-out infinite;
+  --animate-shimmer-delay: shimmer 2.4s ease-in-out 1.6s infinite;
+  --animate-pulse-ring: pulse-ring 2.4s ease-in-out infinite;
   --animate-glow-pulse: glow-pulse 3s ease-in-out infinite;
-  --animate-spin-slow: spin 30s linear infinite;
-  --animate-bounce-soft: bounce-soft 2.5s ease-in-out infinite;
+  --animate-spin-slow: spin 20s linear infinite;
+  --animate-bounce-soft: bounce-soft 2s ease-in-out infinite;
+  --animate-wiggle: wiggle 2.5s ease-in-out infinite;
+  --animate-progress: progress-fill linear forwards;
+  --animate-progress-bar: progress-bar 2s ease-in-out infinite;
 }
 
 /* ══════════════════════════════════════════════════════════
-   3. TOKENS DE TEMA — MODO CLARO (Elegante, limpio y corporativo)
+   3. TOKENS DE TEMA — MODO CLARO (cálido / crema / ámbar)
    ══════════════════════════════════════════════════════════ */
 :root {
-  /* Fondos más limpios (menos amarillentos) para mejorar confianza */
-  --background: oklch(0.99 0.004 80);
-  --foreground: oklch(0.21 0.015 75);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.21 0.015 75);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.21 0.015 75);
-  
-  /* Ámbar Corporativo (Menos estridente, más oro/marca de lujo) */
-  --primary: oklch(0.72 0.14 78);
-  --primary-foreground: oklch(0.12 0.015 75);
-  
-  --secondary: oklch(0.965 0.005 80);
-  --secondary-foreground: oklch(0.25 0.015 75);
-  --muted: oklch(0.95 0.005 80);
-  --muted-foreground: oklch(0.48 0.015 75);
-  --accent: oklch(0.945 0.01 78);
-  --accent-foreground: oklch(0.25 0.015 75);
-  
-  --destructive: oklch(0.55 0.18 28);
-  --destructive-foreground: oklch(0.99 0 0);
-  --border: oklch(0.91 0.005 80);
-  --input: oklch(0.91 0.005 80);
-  --ring: oklch(0.72 0.14 78);
-  --radius: 0.5rem; /* Bordes ligeramente más finos = apariencia más moderna/pro */
+  --background: oklch(0.98 0.01 84);
+  --foreground: oklch(0.25 0.02 60);
+  --card: oklch(0.99 0.005 84);
+  --card-foreground: oklch(0.25 0.02 60);
+  --popover: oklch(0.99 0.005 84);
+  --popover-foreground: oklch(0.25 0.02 60);
+  --primary: oklch(0.763 0.177 89.173);
+  --primary-foreground: oklch(0.141 0.005 285.823);
+  --secondary: oklch(0.96 0.01 84);
+  --secondary-foreground: oklch(0.3 0.02 60);
+  --muted: oklch(0.95 0.015 84);
+  --muted-foreground: oklch(0.45 0.03 60);
+  --accent: oklch(0.94 0.02 84);
+  --accent-foreground: oklch(0.3 0.02 60);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(0.88 0.02 80);
+  --input: oklch(0.88 0.02 80);
+  --ring: oklch(0.763 0.177 89.173);
+  --radius: 0.625rem;
 
-  --sidebar: oklch(0.985 0.004 80);
-  --sidebar-foreground: oklch(0.21 0.015 75);
-  --sidebar-primary: oklch(0.72 0.14 78);
-  --sidebar-primary-foreground: oklch(0.12 0.015 75);
-  --sidebar-accent: oklch(0.945 0.01 78);
-  --sidebar-accent-foreground: oklch(0.25 0.015 75);
-  --sidebar-border: oklch(0.91 0.005 80);
-  --sidebar-ring: oklch(0.72 0.14 78);
+  --sidebar: oklch(0.98 0.01 84);
+  --sidebar-foreground: oklch(0.25 0.02 60);
+  --sidebar-primary: oklch(0.763 0.177 89.173);
+  --sidebar-primary-foreground: oklch(0.141 0.005 285.823);
+  --sidebar-accent: oklch(0.94 0.02 84);
+  --sidebar-accent-foreground: oklch(0.3 0.02 60);
+  --sidebar-border: oklch(0.88 0.02 80);
+  --sidebar-ring: oklch(0.763 0.177 89.173);
 
-  --ember: oklch(0.72 0.14 78);
-  --ember-deep: oklch(0.52 0.13 65);
-  --char: oklch(0.88 0.01 80);
-  --char-deep: oklch(0.94 0.005 80);
-  --ember-glow: oklch(0.72 0.14 78 / 0.15);
+  --ember: oklch(0.763 0.177 89.173);
+  --ember-deep: oklch(0.55 0.16 48);
+  --char: oklch(0.88 0.02 80);
+  --char-deep: oklch(0.95 0.015 84);
+  --ember-glow: oklch(0.763 0.177 89.173 / 0.25);
 
-  --on-dark: oklch(0.99 0 0);
+  /* Color de texto sobre fondos oscuros (hero, login) — un solo origen,
+     todas las variantes de opacidad se derivan con color-mix() */
+  --on-dark: oklch(0.985 0 0);
 
-  /* Sombras suavizadas y difuminadas (Efecto profundidad real) */
-  --shadow-sm: 0 1px 2px oklch(0 0 0 / 0.03), 0 1px 1px oklch(0 0 0 / 0.02);
-  --shadow-md: 0 4px 20px -2px oklch(0.2 0.02 75 / 0.06), 0 2px 6px -1px oklch(0.2 0.02 75 / 0.04);
-  --shadow-lift: 0 20px 40px -12px oklch(0.12 0.015 75 / 0.12);
+  /* Elevación reutilizable */
+  --shadow-color: 30 20 0;
+  --shadow-sm: 0 1px 2px oklch(0 0 0 / 0.06);
+  --shadow-md: 0 4px 16px oklch(0 0 0 / 0.08);
+  --shadow-lift: 0 10px 30px -8px color-mix(in oklch, var(--ember-deep) 35%, transparent);
 
+  /* Curvas de easing consistentes en toda la app */
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-  --card-perspective: 1200px;
-  --rx: 0deg; --ry: 0deg; --mx: 50%; --my: 50%;
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Tilt 3D de cards — --rx/--ry los actualiza JS en mousemove (ver nota al final) */
+  --card-perspective: 900px;
+  --rx: 0deg;
+  --ry: 0deg;
+  --mx: 50%;
+  --my: 50%;
 }
 
 /* ══════════════════════════════════════════════════════════
-   4. TOKENS DE TEMA — MODO OSCURO (Slate/Grafito profundo de confianza)
+   4. TOKENS DE TEMA — MODO OSCURO
    ══════════════════════════════════════════════════════════ */
 .dark {
-  --background: oklch(0.12 0.01 240); /* Cambiado a base neutra fría, mucho más madura */
-  --foreground: oklch(0.98 0.005 240);
-  --card: oklch(0.16 0.012 240);
-  --card-foreground: oklch(0.98 0.005 240);
-  --popover: oklch(0.16 0.012 240);
-  --popover-foreground: oklch(0.98 0.005 240);
-  
-  --primary: oklch(0.74 0.13 78);
-  --primary-foreground: oklch(0.12 0.01 240);
-  
-  --secondary: oklch(0.20 0.01 240);
-  --secondary-foreground: oklch(0.98 0.005 240);
-  --muted: oklch(0.19 0.01 240);
-  --muted-foreground: oklch(0.65 0.01 240);
-  --accent: oklch(0.22 0.01 240);
-  --accent-foreground: oklch(0.98 0.005 240);
-  
-  --destructive: oklch(0.48 0.16 28);
-  --destructive-foreground: oklch(0.99 0 0);
-  --border: oklch(0.22 0.01 240);
-  --input: oklch(0.22 0.01 240);
-  --ring: oklch(0.74 0.13 78);
+  --background: oklch(0.141 0.005 285.823);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.21 0.006 285.885);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.21 0.006 285.885);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.763 0.177 89.173);
+  --primary-foreground: oklch(0.141 0.005 285.823);
+  --secondary: oklch(0.274 0.006 286.033);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.274 0.006 286.033);
+  --muted-foreground: oklch(0.705 0.015 286.067);
+  --accent: oklch(0.274 0.006 286.033);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(0.274 0.006 286.033);
+  --input: oklch(0.274 0.006 286.033);
+  --ring: oklch(0.763 0.177 89.173);
 
-  --sidebar: oklch(0.12 0.01 240);
-  --sidebar-foreground: oklch(0.98 0.005 240);
-  --sidebar-primary: oklch(0.74 0.13 78);
-  --sidebar-primary-foreground: oklch(0.12 0.01 240);
-  --sidebar-accent: oklch(0.20 0.01 240);
-  --sidebar-accent-foreground: oklch(0.98 0.005 240);
-  --sidebar-border: oklch(0.20 0.01 240);
-  --sidebar-ring: oklch(0.74 0.13 78);
+  --sidebar: oklch(0.141 0.005 285.823);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.763 0.177 89.173);
+  --sidebar-primary-foreground: oklch(0.141 0.005 285.823);
+  --sidebar-accent: oklch(0.274 0.006 286.033);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(0.274 0.006 286.033);
+  --sidebar-ring: oklch(0.763 0.177 89.173);
 
-  --ember: oklch(0.74 0.13 78);
-  --ember-deep: oklch(0.55 0.12 70);
-  --char: oklch(0.22 0.01 240);
-  --char-deep: oklch(0.08 0.008 240);
-  --ember-glow: oklch(0.74 0.13 78 / 0.12);
-  
-  --shadow-sm: 0 1px 2px oklch(0 0 0 / 0.4);
-  --shadow-md: 0 8px 30px oklch(0 0 0 / 0.5);
+  --ember: oklch(0.763 0.177 89.173);
+  --ember-deep: oklch(0.6 0.17 48);
+  --char: oklch(0.16 0.018 50);
+  --char-deep: oklch(0.09 0.012 40);
+  --ember-glow: oklch(0.763 0.177 89.173 / 0.4);
+  --on-dark: oklch(0.985 0 0);
+  --shadow-sm: 0 1px 2px oklch(0 0 0 / 0.3);
+  --shadow-md: 0 4px 16px oklch(0 0 0 / 0.35);
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -181,28 +189,45 @@
    ══════════════════════════════════════════════════════════ */
 @layer base {
   * {
-    @apply border-border/80 outline-ring/40;
+    @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground font-sans antialiased tracking-normal;
+    @apply bg-background text-foreground font-sans antialiased;
   }
   html {
     @apply font-sans scroll-smooth;
   }
   ::selection {
-    background: color-mix(in oklch, var(--ember) 25%, transparent);
+    background: color-mix(in oklch, var(--ember) 30%, transparent);
   }
 }
 
 /* ══════════════════════════════════════════════════════════
-   6. LIBRERÍA DE ANIMACIONES REFINADAS
+   6. LIBRERÍA DE ANIMACIONES (solo las que se usan)
    ══════════════════════════════════════════════════════════ */
 @keyframes fade-in        { from { opacity: 0; } to { opacity: 1; } }
-@keyframes fade-in-up     { from { opacity: 0; transform: translateY(16px); filter: blur(4px); } to { opacity: 1; transform: translateY(0); filter: blur(0); } }
-@keyframes fade-in-scale  { from { opacity: 0; transform: scale(0.96) rotate(-2deg); } to { opacity: 1; transform: scale(1) rotate(0deg); } }
-@keyframes ken-burns      { from { transform: scale(1); } to { transform: scale(1.04); } }
+@keyframes fade-in-up     { from { opacity: 0; transform: translateY(24px); filter: blur(6px); } to { opacity: 1; transform: translateY(0); filter: blur(0); } }
+@keyframes fade-in-scale  { from { opacity: 0; transform: scale(0.9) rotate(-8deg); } to { opacity: 1; transform: scale(1) rotate(0deg); } }
+@keyframes ken-burns      { from { transform: scale(1); } to { transform: scale(1.08); } }
 @keyframes crossfade      { from { opacity: 0; } to { opacity: 1; } }
-@keyframes shimmer        { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+@keyframes shimmer        { 0% { transform: translateX(-130%); } 55%, 100% { transform: translateX(130%); } }
+@keyframes pulse-ring     { 0%, 100% { transform: scale(1); opacity: 0.6; } 50% { transform: scale(1.5); opacity: 0; } }
+@keyframes bounce-soft    { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(8px); } }
+@keyframes wiggle         { 0%, 100% { transform: rotate(0deg); } 25% { transform: rotate(15deg); } 75% { transform: rotate(-15deg); } }
+@keyframes progress-fill  { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+@keyframes progress-bar   { 0% { width: 0%; } 50% { width: 70%; } 100% { width: 100%; } }
+
+@keyframes ember-rise {
+  0%   { opacity: 0;   transform: translate(0, 0); }
+  10%  { opacity: 0.8; }
+  90%  { opacity: 0.3; }
+  100% { opacity: 0;   transform: translate(10px, -560px); }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 0 color-mix(in oklch, var(--ember) 0%, transparent); }
+  50%      { box-shadow: 0 0 18px color-mix(in oklch, var(--ember) 40%, transparent); }
+}
 
 @media (prefers-reduced-motion: reduce) {
   *, ::before, ::after {
@@ -213,183 +238,235 @@
 }
 
 /* ══════════════════════════════════════════════════════════
-   7. PANEL DE ADMINISTRACIÓN (Enterprise Look)
+   7. PANEL DE ADMINISTRACIÓN
    ══════════════════════════════════════════════════════════ */
-.admin-panel  { @apply max-w-[1280px] mx-auto pt-12 px-6 pb-24 text-foreground; }
-.admin-header { @apply flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10 pb-6 border-b border-border/60; }
-.admin-header h1 { @apply font-sans text-3xl font-bold tracking-tight text-foreground; }
-.admin-header p  { @apply text-muted-foreground text-sm mt-1; }
+.admin-panel  { @apply max-w-[1220px] mx-auto pt-10 px-6 pb-24 text-foreground; }
+.admin-header { @apply flex flex-col md:flex-row justify-between items-start md:items-center gap-3 mb-8; }
+.admin-header h1 { @apply font-serif text-4xl font-extrabold text-foreground; }
+.admin-header p  { @apply text-muted-foreground text-base; }
 
-.admin-tabs   { @apply inline-flex flex-wrap gap-1 bg-muted p-1 rounded-lg mb-8 border border-border/40; }
-.admin-tabs a { @apply text-muted-foreground no-underline py-1.5 px-4 rounded-md text-sm font-medium transition-all duration-200; }
+.admin-tabs   { @apply inline-flex flex-wrap gap-2 bg-secondary border border-border p-1.5 rounded-lg mb-7; }
+.admin-tabs a { @apply text-muted-foreground no-underline py-2 px-3.5 rounded-md font-semibold transition-colors duration-200; }
 .admin-tabs a.active,
-.admin-tabs a:hover { @apply bg-card text-foreground shadow-sm font-semibold; }
+.admin-tabs a:hover { @apply bg-background text-foreground shadow-sm; }
 
-.stats-grid { @apply grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-10; }
+.stats-grid { @apply grid grid-cols-1 md:grid-cols-4 gap-5 mb-8; }
 
-.stats-grid, .admin-card, .profile-card { perspective: var(--card-perspective); }
+.stats-grid,
+.admin-card,
+.profile-card { perspective: var(--card-perspective); }
 
-.stat-card, .admin-card, .profile-card {
-  @apply relative bg-card text-card-foreground border border-border rounded-xl transition-all duration-300;
+.stat-card,
+.admin-card,
+.profile-card {
+  @apply relative bg-card text-card-foreground border border-border rounded-xl;
   box-shadow: var(--shadow-sm);
   transform-style: preserve-3d;
-  will-change: transform, box-shadow;
+  transform: perspective(var(--card-perspective)) rotateX(var(--ry)) rotateY(var(--rx));
+  transition: transform 0.5s var(--ease-out-expo), box-shadow 0.5s ease;
+  will-change: transform;
 }
 
-.stat-card:hover, .admin-card:hover, .profile-card:hover {
-  box-shadow: var(--shadow-md);
-  border-color: color-mix(in oklch, var(--primary) 30%, var(--border));
+.stat-card:hover,
+.admin-card:hover,
+.profile-card:hover {
+  box-shadow: var(--shadow-md), var(--shadow-lift);
 }
 
-.stat-card::before, .admin-card::before, .profile-card::before {
+/* Brillo de cristal que sigue el cursor, apoyado sobre el tilt */
+.stat-card::before,
+.admin-card::before,
+.profile-card::before {
   content: "";
-  @apply pointer-events-none absolute inset-0 rounded-xl opacity-0 transition-opacity duration-500;
-  background: radial-gradient(300px circle at var(--mx) var(--my), color-mix(in oklch, var(--ember) 8%, transparent), transparent 80%);
+  @apply pointer-events-none absolute inset-0 rounded-xl opacity-0 transition-opacity duration-300;
+  background: radial-gradient(240px circle at var(--mx) var(--my),
+    color-mix(in oklch, var(--ember) 12%, transparent), transparent 70%);
 }
-.stat-card:hover::before, .admin-card:hover::before, .profile-card:hover::before { opacity: 1; }
+.stat-card:hover::before,
+.admin-card:hover::before,
+.profile-card:hover::before { opacity: 1; }
 
-.stat-card   { @apply p-6 flex flex-col justify-between gap-2; }
-.stat-card p { @apply text-muted-foreground text-xs uppercase tracking-wider font-semibold mb-1; }
-.stat-card h2 { @apply text-3xl font-bold tracking-tight text-foreground; }
-.stat-card span { @apply text-xs font-medium px-2 py-0.5 rounded-full bg-primary/10 text-primary self-start mt-2; }
+/* Sin JS o con "prefers-reduced-motion", el tilt no debe activarse */
+@media (prefers-reduced-motion: reduce) {
+  .stat-card, .admin-card, .profile-card { transform: none !important; }
+}
 
-.admin-card { @apply p-6 mt-6 overflow-hidden backdrop-blur-md; }
-.admin-card h2, .profile-card h2 { @apply text-lg font-bold mb-6 tracking-tight text-foreground; }
-.card-head { @apply flex justify-between items-center mb-4; }
+.stat-card   { @apply p-6 flex justify-between; }
+.stat-card p { @apply text-muted-foreground mb-3; }
+.stat-card h2 { @apply text-3xl font-black text-foreground; }
+.stat-card span { @apply text-primary font-bold; }
 
-/* Tablas Modernas y Limpias */
-table { @apply w-full border-collapse text-sm; }
-th { @apply text-muted-foreground font-semibold text-left py-3.5 px-3 border-b border-border text-xs uppercase tracking-wider bg-muted/40; }
-td { @apply py-4 px-3 border-b border-border font-medium text-foreground transition-colors; }
-tr:hover td { @apply bg-muted/20; }
-td small { @apply block text-muted-foreground mt-0.5 font-normal text-xs; }
+.admin-card { @apply p-6 mt-7 overflow-x-auto; }
+.admin-card h2,
+.profile-card h2 { @apply text-lg font-extrabold mb-7 text-foreground; }
+.card-head { @apply flex justify-between items-center; }
 
-.status, .filter { @apply bg-card text-foreground border border-border py-1.5 px-3 rounded-md text-sm font-medium shadow-sm outline-none transition-all; }
-.status:focus, .filter:focus { @apply border-primary ring-2 ring-primary/20; }
+table { @apply w-full border-collapse; }
+th { @apply text-muted-foreground text-left py-4 px-2 border-b border-border; }
+td { @apply py-4 px-2 border-b border-border font-bold text-foreground; }
+td small { @apply block text-muted-foreground mt-1 font-normal text-sm; }
+
+.status,
+.filter { @apply bg-secondary text-secondary-foreground border border-border py-2 px-4 rounded-md; }
 
 .available {
-  @apply bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 py-1 px-2.5 rounded-md text-xs font-semibold tracking-wide inline-flex items-center;
+  @apply bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 py-1.5 px-2.5 rounded-md text-sm;
 }
 
-/* Botones con Microinteracciones Premium */
 .yellow-btn {
-  @apply bg-primary text-primary-foreground font-semibold py-2 px-4 rounded-md text-sm border-none transition-all duration-200 cursor-pointer shadow-sm;
+  @apply bg-primary text-primary-foreground font-bold py-2.5 px-4 rounded-md border-none transition-all duration-200;
 }
 .yellow-btn:hover {
-  @apply shadow-md;
-  filter: brightness(1.02);
-  transform: translateY(-0.5px);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lift);
+  filter: brightness(1.03);
 }
 .yellow-btn:active { transform: translateY(0); }
 
-.profile-card { @apply mt-6 p-6 max-w-[440px]; }
-.profile-card p { @apply text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-1; }
-.profile-card strong { @apply block text-base font-semibold mb-5 text-foreground; }
+.profile-card { @apply mt-7 p-6 max-w-[430px]; }
+.profile-card p { @apply text-muted-foreground mb-2; }
+.profile-card strong { @apply block text-lg mb-5 text-foreground; }
 .profile-card button {
-  @apply w-full bg-destructive text-destructive-foreground py-2.5 rounded-md text-sm font-semibold transition-all duration-200 shadow-sm cursor-pointer;
+  @apply w-full bg-destructive text-destructive-foreground py-3 rounded-md font-bold transition-opacity duration-200;
 }
-.profile-card button:hover { @apply filter brightness-105 shadow-md; }
+.profile-card button:hover { @apply opacity-90; }
 
-/* Sistema de Pestañas nativo CSS sin saltos bruscos */
-.tab-section { @apply hidden opacity-0 transition-opacity duration-300; }
-.default-section { @apply block opacity-100; }
+/* Navegación por anclas (#tab:target) */
+.tab-section { @apply hidden; }
+.default-section { @apply block; }
 .admin-panel:has(#pedidos:target) .default-section,
 .admin-panel:has(#productos:target) .default-section,
 .admin-panel:has(#promociones:target) .default-section,
 .admin-panel:has(#perfil:target) .default-section { @apply hidden; }
 #resumen:target, #pedidos:target, #productos:target,
-#promociones:target, #perfil:target { @apply block opacity-100; animation: fade-in 0.4s ease; }
+#promociones:target, #perfil:target { @apply block; }
 
 /* ══════════════════════════════════════════════════════════
-   8. AUTENTICACIÓN (Diseño de pantalla dividida inmersiva)
+   8. AUTENTICACIÓN (login split-screen)
    ══════════════════════════════════════════════════════════ */
-.lp-root   { @apply min-h-screen w-full bg-background font-sans antialiased; }
+@keyframes lp-slide-zoom { from { transform: scale(1.06); } to { transform: scale(1); } }
+@keyframes lf-ring-pulse { 0%, 100% { transform: scale(1); opacity: 0.45; } 50% { transform: scale(1.1); opacity: 0.15; } }
+@keyframes lf-ripple     { to { transform: scale(22); opacity: 0; } }
+
+.lp-root   { @apply min-h-screen w-full bg-[var(--char-deep)] font-sans; }
 .lp-layout { @apply grid min-h-screen w-full grid-cols-1 lg:grid-cols-2; }
 
 .lp-info {
-  @apply relative isolate flex min-h-[45vh] flex-col justify-between gap-8 overflow-hidden
-         px-10 py-12 sm:px-14 lg:min-h-screen lg:px-16 lg:py-16;
+  @apply relative isolate flex min-h-[40vh] flex-col justify-between gap-8 overflow-hidden
+         px-8 py-10 sm:px-12 lg:min-h-screen lg:px-14 lg:py-14;
   color: var(--on-dark);
   background-color: var(--char-deep);
   background-image:
-    radial-gradient(circle at 15% 85%, color-mix(in oklch, var(--ember-deep) 25%, transparent) 0%, transparent 50%),
-    radial-gradient(circle at 85% 15%, color-mix(in oklch, var(--ember) 15%, transparent) 0%, transparent 45%);
+    radial-gradient(circle at 12% 88%, color-mix(in oklch, var(--ember-deep) 30%, transparent) 0%, transparent 45%),
+    radial-gradient(circle at 88% 8%, color-mix(in oklch, var(--ember) 18%, transparent) 0%, transparent 40%),
+    radial-gradient(ellipse at center, var(--char) 0%, var(--char-deep) 100%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.04 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-.lp-carousel { @apply absolute inset-0 -z-10 bg-[var(--char-deep)]; }
+.lp-carousel { @apply absolute inset-0 -z-10; }
 .lp-slide {
-  @apply absolute inset-0 bg-cover bg-center opacity-0 filter brightness-[0.65] contrast-[1.05];
-  transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+  @apply absolute inset-0 bg-cover bg-center opacity-0;
+  transition: opacity 1.1s ease-in-out;
 }
-.lp-slide.active { @apply opacity-100; }
+.lp-slide.active { @apply opacity-100; animation: lp-slide-zoom 9s ease-out forwards; }
 .lp-overlay {
   @apply absolute inset-0;
-  background: linear-gradient(180deg, 
-    oklch(0.08 0.008 240 / 0.7) 0%, 
-    oklch(0.08 0.008 240 / 0.4) 50%, 
-    oklch(0.08 0.008 240 / 0.95) 100%);
+  background: linear-gradient(180deg,
+    color-mix(in oklch, var(--char-deep) 78%, transparent) 0%,
+    color-mix(in oklch, var(--char-deep) 42%, transparent) 45%,
+    var(--char-deep) 100%);
 }
 
-.lp-brand      { @apply flex items-center gap-3.5; }
-.lp-brand-icon { @apply text-[var(--ember)] filter drop-shadow-sm; }
-.lp-brand-name { font-family: var(--font-heading); @apply text-2xl font-bold tracking-tight sm:text-3xl; }
-.lp-brand-tagline { @apply text-[10px] font-bold uppercase tracking-[0.25em]; color: color-mix(in oklch, var(--ember) 90%, transparent); }
+.lp-brand      { @apply flex items-center gap-3; }
+.lp-brand-icon { @apply text-[var(--ember)]; }
+.lp-brand-name { font-family: var(--font-display); @apply text-[1.65rem] font-bold leading-tight tracking-tight sm:text-3xl; }
+.lp-brand-tagline { @apply text-[11px] font-semibold uppercase tracking-[0.22em]; color: color-mix(in oklch, var(--ember) 85%, transparent); }
 
-.lp-info-grid { @apply grid grid-cols-1 gap-x-8 gap-y-5 pt-8 sm:grid-cols-2; border-top: 1px solid oklch(1 0 0 / 0.1); }
-.lp-info-card { @apply flex items-start gap-3; }
-.lp-info-icon { @apply mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center text-primary; }
-.lp-info-title { @apply text-xs font-bold uppercase tracking-wider text-foreground; }
-.lp-info-desc  { @apply mt-1 text-sm leading-relaxed; color: color-mix(in oklch, var(--on-dark) 65%, transparent); }
+.lp-slide-label { @apply flex items-center gap-2 self-start text-[13px] font-medium; color: color-mix(in oklch, var(--on-dark) 70%, transparent); }
+.lp-slide-label svg { color: color-mix(in oklch, var(--ember) 80%, transparent); }
 
-.lp-dots { @apply flex items-center gap-2.5; }
-.lp-dot  { @apply h-1 w-6 rounded-full transition-all duration-300; background: oklch(1 0 0 / 0.2); }
-.lp-dot.active { @apply w-10 bg-primary; }
+.lp-info-grid { @apply grid grid-cols-1 gap-x-6 gap-y-4 pt-6 sm:grid-cols-2; border-top: 1px solid color-mix(in oklch, var(--on-dark) 12%, transparent); }
+.lp-info-card { @apply flex items-start gap-2.5; }
+.lp-info-icon { @apply mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center; color: color-mix(in oklch, var(--ember) 75%, transparent); }
+.lp-info-title { @apply text-[12px] font-semibold uppercase tracking-wide; color: color-mix(in oklch, var(--on-dark) 85%, transparent); }
+.lp-info-desc  { @apply mt-0.5 text-[12.5px] leading-snug; color: color-mix(in oklch, var(--on-dark) 50%, transparent); }
 
-/* Formulario Limpio y Corporativo (Alta Conversión) */
+.lp-dots { @apply flex items-center gap-2; }
+.lp-dot  { @apply h-1 w-5 rounded-full transition-all duration-300; background: color-mix(in oklch, var(--on-dark) 20%, transparent); }
+.lp-dot.active { @apply w-8; background: var(--ember); }
+
+/* ── Formulario ── */
 .lf-card {
-  @apply relative flex flex-col justify-center px-8 py-16 sm:px-16 lg:px-20 bg-card;
+  @apply relative flex flex-col justify-center overflow-hidden px-6 py-14 sm:px-10 lg:px-16;
+  background: radial-gradient(circle at 100% 0%, color-mix(in oklch, var(--ember) 6%, transparent) 0%, transparent 55%),
+              color-mix(in oklch, var(--ember-deep) 2.5%, var(--card));
 }
+.lf-spotlight {
+  @apply pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300;
+  background: radial-gradient(420px circle at var(--mx) var(--my), var(--ember-glow), transparent 70%);
+}
+.lf-card:hover .lf-spotlight { @apply opacity-100; }
 
-.lf-header    { @apply relative z-10 mx-auto flex w-full max-w-sm flex-col items-start gap-2.5; }
-.lf-icon-bg   { @apply mb-2 flex h-11 w-11 items-center justify-center rounded-lg border border-border bg-muted; }
-.lf-title     { font-family: var(--font-heading); @apply text-3xl font-bold tracking-tight text-foreground; }
-.lf-subtitle  { @apply text-sm leading-relaxed text-muted-foreground; }
+.lf-ring   { @apply pointer-events-none absolute rounded-full; border: 1px solid color-mix(in oklch, var(--ember) 15%, transparent); }
+.lf-ring-1 { @apply -right-20 -top-20 h-56 w-56; animation: lf-ring-pulse 6s ease-in-out infinite; }
+.lf-ring-2 { @apply -bottom-28 -left-16 h-64 w-64; animation: lf-ring-pulse 7s ease-in-out 1s infinite; }
 
-.lf-body  { @apply relative z-10 mx-auto mt-8 flex w-full max-w-sm flex-col gap-5; }
+.lf-header    { @apply relative z-10 mx-auto flex w-full max-w-sm flex-col items-start gap-3; }
+.lf-icon-bg   { @apply mb-1 flex h-12 w-12 items-center justify-center rounded-xl; border: 1px solid color-mix(in oklch, var(--ember) 20%, transparent); background: color-mix(in oklch, var(--ember) 10%, transparent); }
+.lf-title     { font-family: var(--font-display); @apply text-[2rem] font-bold leading-[1.1] tracking-tight text-foreground; }
+.lf-subtitle  { @apply text-[14.5px] leading-snug text-muted-foreground; }
+
+.lf-body  { @apply relative z-10 mx-auto mt-9 flex w-full max-w-sm flex-col gap-5; }
 .lf-field { @apply flex flex-col gap-1.5; }
-.lf-label { @apply text-xs font-semibold text-muted-foreground uppercase tracking-wider; }
+.lf-label { @apply text-[13px] font-semibold text-foreground; }
+.lf-field.focused .lf-label { color: var(--ember-deep); }
 
 .lf-input-wrap  { @apply relative flex items-center; }
-.lf-input-icon  { @apply pointer-events-none absolute left-3.5 text-muted-foreground/70 transition-colors duration-200; }
+.lf-input-icon  { @apply pointer-events-none absolute left-3.5 text-muted-foreground transition-colors duration-200; }
+.lf-field.focused .lf-input-icon { color: var(--ember); }
 .lf-input {
-  @apply h-11 w-full rounded-lg pl-10 pr-3.5 text-sm text-foreground placeholder:text-muted-foreground/50 outline-none transition-all duration-200 bg-background/50;
-  border: 1px solid var(--border);
+  @apply h-12 w-full rounded-xl pl-10 pr-3.5 text-[15px] text-foreground placeholder:text-muted-foreground/60 outline-none transition-colors duration-200;
+  border: 1px solid color-mix(in oklch, var(--ember-deep) 12%, var(--border));
+  background: color-mix(in oklch, var(--ember-deep) 4%, var(--card));
 }
-.lf-input:focus { 
-  @apply bg-card;
-  border-color: var(--primary); 
-  box-shadow: 0 0 0 3px color-mix(in oklch, var(--primary) 15%, transparent);
-}
-
-.lf-error { @apply text-xs font-medium text-destructive mt-1; }
+.lf-input:focus { @apply ring-2 ring-[var(--ember)]/20; border-color: var(--ember); background: var(--card); }
+.lf-input-underline { @apply pointer-events-none absolute bottom-0 left-1/2 h-[2px] w-0 -translate-x-1/2 transition-all duration-300; background: var(--ember); }
+.lf-field.focused .lf-input-underline { @apply w-full; }
+.lf-error { @apply text-xs font-medium text-destructive; }
 
 .lf-submit {
-  @apply relative mt-3 flex h-11 w-full items-center justify-center overflow-hidden rounded-lg text-sm font-semibold transition-all duration-150 shadow-sm cursor-pointer;
-  background: var(--primary);
-  color: var(--primary-foreground);
+  @apply relative mt-2 flex h-12 w-full items-center justify-center overflow-hidden rounded-xl text-[15px] font-semibold transition-transform duration-150;
+  background: var(--ember);
+  color: var(--char-deep);
 }
-.lf-submit:hover:not(:disabled) { @apply shadow-md; filter: brightness(1.03); }
-.lf-submit:active:not(:disabled) { transform: scale(0.99); }
-.lf-submit:disabled { @apply cursor-not-allowed opacity-50 shadow-none; }
+.lf-submit:hover:not(:disabled) { filter: brightness(1.05); box-shadow: var(--shadow-lift); }
+.lf-submit:active:not(:disabled) { transform: scale(0.985); }
+.lf-submit:disabled { @apply cursor-not-allowed opacity-70; }
+.lf-submit-content { @apply relative z-10 flex items-center gap-2; }
+.lf-submit-arrow { @apply inline-block transition-transform duration-200; }
+.lf-submit:hover:not(:disabled) .lf-submit-arrow { transform: translateX(3px); }
+.lf-submit-ripple {
+  @apply pointer-events-none absolute h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full;
+  background: oklch(0 0 0 / 0.18);
+  animation: lf-ripple 0.6s ease-out forwards;
+}
 
-.lf-footer      { @apply relative z-10 mx-auto mt-8 flex w-full max-w-sm flex-col items-center gap-4 text-center; }
+.lf-footer      { @apply relative z-10 mx-auto mt-8 flex w-full max-w-sm flex-col items-start gap-3; }
 .lf-footer-text { @apply text-sm text-muted-foreground; }
-.lf-footer-link { @apply font-semibold text-primary no-underline hover:underline underline-offset-4; }
-.lf-security    { @apply flex items-center gap-2 text-xs font-medium text-muted-foreground/60 bg-muted/50 px-3 py-1 rounded-full border border-border/40; }
-.lf-security-dot{ @apply h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse; }
+.lf-footer-link { @apply font-semibold underline-offset-4 hover:underline; color: var(--ember-deep); }
+.lf-security    { @apply flex items-center gap-1.5 text-xs text-muted-foreground/70; }
+.lf-security-dot{ @apply h-1.5 w-1.5 rounded-full bg-green-500; }
+
+.lf-submit:focus-visible,
+.lf-footer-link:focus-visible { @apply outline-2 outline-offset-2; outline-color: var(--ember); }
+
+@media (prefers-reduced-motion: reduce) {
+  .lp-slide, .lf-ring-1, .lf-ring-2 { animation: none !important; }
+  .lp-slide { transition: opacity 0.3s linear; }
+}
 
 /* ══════════════════════════════════════════════════════════
-   9. CULQI O FACTURACIÓN SEGURO (Ajustes de Integridad)
+   9. CULQI — Contenedor de pago sin restricciones de layout
    ══════════════════════════════════════════════════════════ */
 [id^="culqi-"] {
   display: flex !important;
@@ -397,14 +474,209 @@ td small { @apply block text-muted-foreground mt-0.5 font-normal text-xs; }
   height: 100% !important;
   width: 100% !important;
   overflow: auto !important;
-  border-radius: var(--radius);
+}
+[id^="culqi-"] > * {
+  flex: 1 !important;
+  height: auto !important;
+  min-height: 0 !important;
+}
+body:has([id^="culqi-"]) {
+  overflow: hidden !important;
+  height: 100vh !important;
 }
 
 /* ══════════════════════════════════════════════════════════
-   10. VIEW TRANSITIONS API (Navegación Fluida)
+   10. TRANSICIONES DE PÁGINA (View Transitions API)
    ══════════════════════════════════════════════════════════ */
-@keyframes page-fade-in  { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes page-fade-in  { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes page-fade-out { from { opacity: 1; } to { opacity: 0; } }
 
-::view-transition-old(root) { animation: page-fade-out 0.12s var(--ease-out-expo) forwards; }
-::view-transition-new(root) { animation: page-fade-in 0.24s var(--ease-out-expo) forwards; }
+::view-transition-old(root) { animation: page-fade-out 0.15s ease-out forwards; }
+::view-transition-new(root) { animation: page-fade-in 0.3s ease-out forwards; }
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) { animation: none !important; }
+}
+/* ══════════════════════════════════════════════════════════
+   2. RE-MAPEO DE ANIMACIONES PREMIUM (Físicas Naturales)
+   ══════════════════════════════════════════════════════════ */
+@theme inline {
+  /* ... tus fuentes y colores se mantienen ... */
+
+  /* Curvas de aceleración cinéticas (Físicas fluidas de UI) */
+  --ease-premium-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-premium-in-out: cubic-bezier(0.76, 0, 0.24, 1);
+  --ease-elastic: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Animaciones coreografiadas de entrada */
+  --animate-fade-in: UI-fade-in 0.4s var(--ease-premium-out) both;
+  --animate-fade-in-up: UI-fade-in-up 0.6s var(--ease-premium-out) both;
+  --animate-fade-in-scale: UI-fade-in-scale 0.55s var(--ease-premium-out) both;
+  
+  /* Micro-interacciones continuas */
+  --animate-shimmer: UI-shimmer 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  --animate-glow-pulse: UI-glow-pulse 3s ease-in-out infinite;
+  --animate-float: UI-float 4s ease-in-out infinite;
+  --animate-pulse-subtle: UI-pulse-subtle 2s ease-in-out infinite;
+}
+
+/* ══════════════════════════════════════════════════════════
+   6. LIBRERÍA DE ANIMACIONES PROFESIONALES (Efectos Cinemáticos)
+   ══════════════════════════════════════════════════════════ */
+
+/* Entrada limpia con ligero desenfoque gaesiano */
+@keyframes UI-fade-in {
+  from { opacity: 0; filter: blur(4px); }
+  to { opacity: 1; filter: blur(0); }
+}
+
+/* Desplazamiento orgánico ascendente con desaceleración */
+@keyframes UI-fade-in-up {
+  from { 
+    opacity: 0; 
+    transform: translateY(20px); 
+    filter: blur(6px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+    filter: blur(0); 
+  }
+}
+
+/* Escala tridimensional sutil para modales y ventanas de login */
+@keyframes UI-fade-in-scale {
+  from { 
+    opacity: 0; 
+    transform: scale(0.96) translateY(8px); 
+    filter: blur(4px);
+  }
+  to { 
+    opacity: 1; 
+    transform: scale(1) translateY(0); 
+    filter: blur(0);
+  }
+}
+
+/* Efecto esqueleto (Skeleton Loader) premium para tablas y tarjetas */
+@keyframes UI-shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Efecto respiración para elementos de alta prioridad (ej. Indicador Seguro) */
+@keyframes UI-pulse-subtle {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(0.96); }
+}
+
+/* Brillo perimetral dinámico para estados enfocados o interactivos */
+@keyframes UI-glow-pulse {
+  0%, 100% { 
+    box-shadow: 0 0 0 0 color-mix(in oklch, var(--primary) 0%, transparent);
+    border-color: var(--border);
+  }
+  50% { 
+    box-shadow: 0 0 20px 0 color-mix(in oklch, var(--primary) 20%, transparent);
+    border-color: var(--primary);
+  }
+}
+
+/* Flotación sutil para el branding e isotipos en la pantalla de carga o login */
+@keyframes UI-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+/* Linea de carga progresiva infinita (para simular peticiones asíncronas) */
+@keyframes UI-progress-loop {
+  0% { left: -30%; width: 30%; }
+  50% { left: 100%; width: 30%; }
+  100% { left: 100%; width: 30%; }
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   7. INYECCIÓN DE ANIMACIONES EN COMPONENTES CLAVE
+   ══════════════════════════════════════════════════════════ */
+
+/* Aplicar entradas escalonadas nativas en el Panel de Administración */
+.admin-header { animation: UI-fade-in-up 0.5s var(--ease-premium-out) both; }
+.admin-tabs { animation: UI-fade-in 0.6s var(--ease-premium-out) both; animation-delay: 0.1s; }
+
+/* Efecto de orquestación en la cuadrícula de reportes */
+.stats-grid .stat-card:nth-child(1) { animation: UI-fade-in-up 0.6s var(--ease-premium-out) both; animation-delay: 0.05s; }
+.stats-grid .stat-card:nth-child(2) { animation: UI-fade-in-up 0.6s var(--ease-premium-out) both; animation-delay: 0.10s; }
+.stats-grid .stat-card:nth-child(3) { animation: UI-fade-in-up 0.6s var(--ease-premium-out) both; animation-delay: 0.15s; }
+.stats-grid .stat-card:nth-child(4) { animation: UI-fade-in-up 0.6s var(--ease-premium-out) both; animation-delay: 0.20s; }
+
+/* Tarjetas con Hover Tridimensional reactivo y sombras volumétricas */
+.stat-card, .admin-card, .profile-card {
+  transition: 
+    transform 0.4s var(--ease-premium-out), 
+    box-shadow 0.4s var(--ease-premium-out), 
+    border-color 0.3s ease;
+}
+
+.stat-card:hover, .admin-card:hover, .profile-card:hover {
+  transform: perspective(var(--card-perspective)) rotateX(var(--ry)) rotateY(var(--rx)) translateY(-4px);
+  box-shadow: 
+    0 12px 30px -10px color-mix(in oklch, var(--foreground) 8%, transparent),
+    0 30px 60px -15px color-mix(in oklch, var(--primary) 12%, transparent);
+}
+
+/* Transición cinemática de filas de tablas al pasar el cursor */
+table tbody tr {
+  transition: background-color 0.2s ease, transform 0.2s var(--ease-premium-out);
+}
+table tbody tr:hover td {
+  background-color: color-mix(in oklch, var(--primary) 4%, var(--card));
+  color: var(--primary-foreground);
+}
+
+/* Animación de Inputs en focus: El borde y la sombra se expanden elásticamente */
+.lf-input {
+  transition: border-color 0.25s ease, box-shadow 0.35s var(--ease-elastic), background-color 0.2s ease;
+}
+.lf-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px color-mix(in oklch, var(--primary) 18%, transparent);
+  transform: scale(1.005);
+}
+
+/* Botones Premium con Feedback Táctil Virtual */
+.yellow-btn, .lf-submit {
+  transition: 
+    transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), 
+    filter 0.2s ease, 
+    box-shadow 0.2s ease;
+}
+.yellow-btn:hover, .lf-submit:hover:not(:disabled) {
+  filter: brightness(1.05) contrast(1.02);
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 8px 20px -6px color-mix(in oklch, var(--primary) 40%, transparent);
+}
+.yellow-btn:active, .lf-submit:active:not(:disabled) {
+  transform: translateY(1px) scale(0.985);
+  box-shadow: 0 2px 5px -2px color-mix(in oklch, var(--primary) 20%, transparent);
+}
+
+/* El isotipo/logo flotará suavemente en la pantalla de Login */
+.lp-brand-icon {
+  animation: UI-float 5s ease-in-out infinite;
+}
+
+/* Línea de carga sutil para indicar procesos en formularios (.loading-bar) */
+.loading-bar {
+  position: relative;
+  overflow: hidden;
+}
+.loading-bar::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  height: 2px;
+  background: var(--primary);
+  animation: UI-progress-loop 1.8s ease-in-out infinite;
+}
