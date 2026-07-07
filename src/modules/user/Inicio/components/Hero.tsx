@@ -113,29 +113,24 @@ export const Hero = () => {
             ))}
           </span>
         </h1>
-        <motion.p
-          className="mt-6 text-muted-foreground text-base sm:text-lg md:text-xl max-w-2xl mx-auto font-light leading-relaxed"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.55 }}
-        >
-          Transformamos tus celebraciones en momentos inolvidables. Buffets
-          exclusivos, carnes premium y una atención impecable diseñada a tu
-          medida.
-        </motion.p>
         <motion.div
           className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.7 }}
         >
-          <HeroButton variant="primary">
-            Ver Menú{" "}
-            <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-          </HeroButton>
-          <HeroButton variant="secondary">
-            <Calendar className="w-4 h-4 text-ember" /> Cotizar ahora
-          </HeroButton>
+          <a href="/menu" className="w-full sm:w-auto">
+            <HeroButton variant="primary" className="w-full">
+              Ver Menú{" "}
+              <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+            </HeroButton>
+          </a>
+
+          <a href="/reservas" className="w-full sm:w-auto">
+            <HeroButton variant="secondary" className="w-full">
+              <Calendar className="w-4 h-4 text-ember" /> Cotizar ahora
+            </HeroButton>
+          </a>
         </motion.div>
         {/* Stats */}
         <motion.div
