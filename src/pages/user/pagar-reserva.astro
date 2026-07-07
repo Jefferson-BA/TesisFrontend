@@ -1,9 +1,15 @@
 ---
 // src/pages/user/pagar-reserva.astro
+export const prerender = false;
+
 import UserLayout from "@/layouts/UserLayout.astro";
 import PaymentReservationPage from "@/modules/user/checkout/components/PaymentReservationPage";
 ---
 
-<UserLayout title="Pagar Reserva | DeParraSpitz">
+<UserLayout 
+  title="Pagar Reserva | DeParraSpitz"
+  description="Completa el pago de tu reserva de forma segura."
+>
+  <!-- Payment necesita JS → load (Culqi debe estar listo) -->
   <PaymentReservationPage client:load />
 </UserLayout>

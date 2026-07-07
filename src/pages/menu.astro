@@ -1,8 +1,14 @@
 ---
+// src/pages/menu.astro
+export const prerender = true;
 import UserLayout from "@/layouts/UserLayout.astro";
 import { MenuProducts } from "@/modules/user/menu/components/MenuProducts";
 ---
 
-<UserLayout title="Menú | DeParraSpitz">
-  <MenuProducts client:load />
+<UserLayout 
+  title="Menú | DeParraSpitz"
+  description="Explora nuestro menú de catering: buffets parrilleros, árabes y criollos. Carnes premium, comida peruana e internacional."
+>
+  <!-- MenuProducts necesita JS → visible (carga al hacer scroll) -->
+  <MenuProducts client:visible />
 </UserLayout>

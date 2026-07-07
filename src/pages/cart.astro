@@ -1,8 +1,14 @@
 ---
+// src/pages/cart.astro
+export const prerender = true;
 import UserLayout from "@/layouts/UserLayout.astro";
 import CartPage from "@/modules/user/carrito/components/CartPage";
 ---
 
-<UserLayout title="Carrito | DeParraSpitz">
-  <CartPage client:load />
+<UserLayout 
+  title="Carrito | DeParraSpitz"
+  description="Revisa los productos en tu carrito antes de confirmar tu pedido de catering."
+>
+  <!-- CartPage necesita JS → visible -->
+  <CartPage client:visible />
 </UserLayout>

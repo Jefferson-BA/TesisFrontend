@@ -8,11 +8,9 @@ import { fileURLToPath } from 'url';
 export default defineConfig({
   output: "server",
   
-  integrations: [
-    react(),
-  ],
+  integrations: [react()],
 
-  // 🔥 Prefetch para carga instantánea al hacer hover
+  // 🔥 Prefetch inteligente
   prefetch: {
     defaultStrategy: 'hover',
     prefetchAll: false,
@@ -23,7 +21,6 @@ export default defineConfig({
     inlineStylesheets: 'auto',
   },
 
-  // 🔥 Server optimizado
   server: {
     port: 4321,
     host: true,

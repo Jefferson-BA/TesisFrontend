@@ -1,71 +1,32 @@
 ---
-import "@/styles/globals.css";
+// src/pages/user/profile.astro
+export const prerender = false;
 
-// Este usa export const (va con llaves)
-import { PublicNavbar } from "@/modules/user/shared/components/PublicNavbar";
-
-// Estos usan export default (van SIN llaves)
-import EditProfileForm from "@/modules/admin/usuarios/components/EditProfileForm";
+import UserLayout from "@/layouts/UserLayout.astro";
 import UserOrders from "@/modules/user/components/UserOrders";
-
-// Este lo importamos sin llaves asumiendo que lo arreglaremos en el Paso 2
 import UserProfileCard from "../../modules/admin/usuarios/components/UserProfileCard";
-
-import { Toaster } from "sonner";
 ---
 
-<html lang="es">
-  <head>
-    <meta charset="utf-8" />
-    <title>Mi Perfil | DeParraSpitz</title>
-    <script is:inline>
-      (function () {
-        const stored = localStorage.getItem("theme");
-        const prefersLight = window.matchMedia("(prefers-color-scheme: light)").matches;
-        const theme = stored === "dark" || stored === "light" ? stored : (prefersLight ? "light" : "dark");
-        document.documentElement.classList.add(theme);
-      })();
-    </script>
-  </head>
+<UserLayout 
+  title="Mi Perfil | DeParraSpitz"
+  description="Gestiona tu perfil y revisa tu historial de reservas."
+>
+  <main class="max-w-7xl mx-auto px-6 pb-20">
+    <div class="mb-10">
+      <h1 class="text-5xl font-serif font-bold text-foreground">Mi Perfil</h1>
+      <p class="text-muted-foreground mt-3">Gestiona tu información personal y revisa el historial de tus reservas.</p>
+    </div>
 
-  <body class="min-h-screen bg-stone-50 dark:bg-[#0b0806] text-stone-900 dark:text-white transition-colors duration-500">
-
-    <PublicNavbar client:only="react" />
-
-    <main class="pt-[120px] max-w-7xl mx-auto px-6 pb-20">
-
-      <div class="mb-10 flex items-start justify-between gap-6">
-        <div>
-          <h1 class="text-5xl font-serif font-bold">
-            Mi Perfil
-          </h1>
-
-          <p class="text-amber-700 dark:text-[#f1d8b5] mt-3">
-            Revisa tus datos personales y tu historial de pedidos.
-          </p>
-        </div>
-
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Tarjeta de perfil (1/3) -->
+      <div class="lg:col-span-1">
+        <UserProfileCard client:visible />
       </div>
 
-      <section class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-
-        <UserProfileCard client:only="react" />
-
-        <EditProfileForm client:only="react" />
-
-        <div class="lg:col-span-2">
-          <UserOrders client:only="react" />
-        </div>
-
-      </section>
-
-    </main>
-
-    <Toaster
-      richColors
-      position="top-right"
-      client:only="react"
-    />
-
-  </body>
-</html>
+      <!-- Reservas (2/3) -->
+      <div class="lg:col-span-2">
+        <UserOrders client:visible />
+      </div>
+    </section>
+  </main>
+</UserLayout>

@@ -1,18 +1,33 @@
 ---
+// src/pages/index.astro
+export const prerender = true;
+
 import UserLayout from "@/layouts/UserLayout.astro";
 import { Hero } from "@/modules/user/Inicio/components/Hero";
 import { Servicios } from "@/modules/user/Inicio/components/Servicios";
 import { Testimonios } from "@/modules/user/Inicio/components/Testimonios";
 import { Contacto } from "@/modules/user/Inicio/components/Contacto";
 import PromoBanner from "@/modules/admin/promociones/components/PromoBanner";
----
 
-<UserLayout title="DeParraSpitz | Catering & Eventos">
+---
+<UserLayout 
+  title="DeParraSpitz | Catering & Eventos Premium"
+  description="Servicio de catering premium. Buffets exclusivos, carnes premium y atención impecable para eventos especiales en Lima, Perú."
+>
   <main>
-    <Hero client:load />
-    <Servicios client:load />
-    <PromoBanner client:load />
-    <Testimonios client:load />
-    <Contacto client:load />
+    <!-- Hero: Necesita JS para carrusel → visible -->
+    <Hero client:visible />
+    
+    <!-- Servicios: Necesita JS para tilt → visible -->
+    <Servicios client:visible />
+    
+    <!-- PromoBanner: Si solo es visual → estático. Si tiene JS → visible -->
+    <PromoBanner client:visible />
+    
+    <!-- Testimonios: Animaciones con framer-motion → visible -->
+    <Testimonios client:visible />
+    
+    <!-- Contacto: HTML estático puro → sin hidratación -->
+    <Contacto />
   </main>
 </UserLayout>
