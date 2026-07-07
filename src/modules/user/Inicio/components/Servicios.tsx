@@ -3,8 +3,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
-import { Flame, Utensils, ChefHat, ArrowRight } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Flame, Utensils, ChefHat, ArrowRight, X } from "lucide-react";
 import { TiltCard } from "./TiltCard";
 
 const SERVICIOS = [
@@ -15,7 +15,7 @@ const SERVICIOS = [
     descripcion:
       "Carnes selectas a la parrilla, anticuchos, chorizo parrillero y guarniciones tradicionales.",
     imagen:
-      "https://www.aboutespanol.com/thmb/bS7Z_z5CCAZmf3lYEjmZbuRqyCg=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/el-rincon-gaucho--597b93665f9b58928bd96024.png",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT1dpMgV13LLejk4TtO7GPFAweKMwmBvLYRNgcgPReheueo0_RhLvzDtw8&s=10",
     icono: Flame,
     accentColor: "#eab308",
     glow: "rgba(234,179,8,0.28)",
@@ -46,7 +46,8 @@ const SERVICIOS = [
   },
 ] as const;
 
-// Hook reutilizable de intersección
+type ServicioType = typeof SERVICIOS[number];
+
 function useInView<T extends HTMLElement>(threshold = 0.12) {
   const ref = useRef<T>(null);
   const [inView, setInView] = useState(false);
@@ -71,6 +72,9 @@ function useInView<T extends HTMLElement>(threshold = 0.12) {
 export const Servicios = () => {
   const [headerIn, setHeaderIn] = useState(false);
   const headerRef = useRef<HTMLDivElement>(null);
+  
+  // Estado para capturar el servicio seleccionado y abrir la imagen
+  const [servicioSeleccionado, setServicioSeleccionado] = useState<ServicioType | null>(null);
 
   useEffect(() => {
     const el = headerRef.current;
@@ -152,15 +156,16 @@ export const Servicios = () => {
                   inView={inView}
                   glowColor={servicio.glow}
                 >
-                  {/* Imagen */}
+                  {/* Contenedor de la Imagen interactiva con cursor pointer */}
                   <div
-                    className="relative h-64 overflow-hidden"
+                    className="relative h-64 overflow-hidden cursor-pointer group"
                     style={{ transformStyle: "preserve-3d" }}
+                    onClick={() => setServicioSeleccionado(servicio)}
                   >
                     <img
                       src={servicio.imagen}
                       alt={servicio.titulo}
-                      className="tilt-img w-full h-full object-cover transition-transform duration-500"
+                      className="tilt-img w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-card via-card/15 to-transparent" />
                     <div
@@ -210,6 +215,7 @@ export const Servicios = () => {
                     </div>
                     <div className="mt-6 pt-5 border-t border-border">
                       <button
+                        onClick={() => setServicioSeleccionado(servicio)}
                         className="inline-flex items-center gap-2 text-sm font-semibold transition-all duration-300 group/btn"
                         style={{ color: servicio.accentColor }}
                       >
@@ -245,6 +251,89 @@ export const Servicios = () => {
           </p>
         </motion.div>
       </div>
+
+      {/* ── MODAL DETALLE DE SERVICIO ABIERTO ── */}
+      <AnimatePresence>
+        {servicioSeleccionado && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
+            {/* Fondo opaco oscuro con blur */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setServicioSeleccionado(null)}
+              className="absolute inset-0 bg-[#000000]/80 backdrop-blur-md"
+            />
+
+            {/* Contenedor del Modal */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ type: "spring", duration: 0.5 }}
+              className="relative w-full max-w-4xl bg-card text-card-foreground rounded-3xl overflow-hidden shadow-2xl border border-border flex flex-col md:flex-row z-10 max-h-[90vh] md:max-h-none overflow-y-auto md:overflow-visible"
+            >
+              {/* Botón de cerrar */}
+              <button
+                onClick={() => setServicioSeleccionado(null)}
+                className="absolute top-4 right-4 z-20 w-10 h-10 rounded-full flex items-center justify-center bg-black/50 text-white md:bg-card/80 md:text-foreground backdrop-blur-md border border-border hover:scale-105 transition-transform"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              {/* Área de la Imagen Ampliada */}
+              <div className="w-full md:w-1/2 h-64 md:h-[450px] relative">
+                <img
+                  src={servicioSeleccionado.imagen}
+                  alt={servicioSeleccionado.titulo}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-transparent to-card via-transparent md:via-transparent" />
+              </div>
+
+              {/* Área de Textos e Información */}
+              <div className="w-full md:w-1/2 p-6 sm:p-10 flex flex-col justify-center">
+                <span 
+                  className="text-[10px] font-bold uppercase tracking-[0.2em] mb-3 inline-block self-start px-3 py-1 rounded-full bg-secondary border border-border"
+                  style={{ color: servicioSeleccionado.accentColor }}
+                >
+                  {servicioSeleccionado.etiqueta}
+                </span>
+
+                <h3 className="text-3xl sm:text-4xl font-bold font-display tracking-tight text-foreground mb-2">
+                  {servicioSeleccionado.titulo}
+                </h3>
+
+                <p 
+                  className="text-xs font-semibold uppercase tracking-wider mb-6"
+                  style={{ color: servicioSeleccionado.accentColor }}
+                >
+                  {servicioSeleccionado.idealPara}
+                </p>
+
+                <p className="text-base font-light text-muted-foreground leading-relaxed mb-8">
+                  {servicioSeleccionado.descripcion}
+                </p>
+
+                <div className="flex gap-4">
+                  <button
+                    onClick={() => setServicioSeleccionado(null)}
+                    className="flex-1 py-3 px-5 rounded-xl text-sm font-semibold border border-border bg-secondary hover:bg-accent transition-colors"
+                  >
+                    Cerrar vista
+                  </button>
+                  <a
+                    href="/menu"
+                    className="flex-1 py-3 px-5 rounded-xl text-sm font-semibold text-center text-char-deep bg-gradient-to-r from-ember to-amber-500 shadow-md transition-transform active:scale-[0.98]"
+                  >
+                    Cotizar servicio
+                  </a>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </section>
   );
 };
