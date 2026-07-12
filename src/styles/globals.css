@@ -12,7 +12,7 @@
   --font-heading: var(--font-sans);
   --font-sans: 'Geist Variable', sans-serif;
   --font-display: 'Fraunces', 'Playfair Display', serif;
-  --color-sidebar-ring: var(--sidebar-ring); --color-sidebar-border: var(--sidebar-border); --color-sidebar-accent-foreground: var(--sidebar-accent-foreground); --color-sidebar-accent: var(--sidebar-accent); --color-sidebar-primary-foreground: var(--sidebar-primary-foreground); --color-sidebar-primary: var(--sidebar-primary); --color-sidebar-foreground: var(--sidebar-foreground); --color-sidebar: var(--sidebar); --color-chart-5: var(--chart-5); --color-chart-4: var(--chart-4); --color-chart-3: var(--chart-3); --color-chart-2: var(--chart-2); --color-chart-1: var(--chart-1); --color-ring: var(--ring); --color-input: var(--input); --color-border: var(--border); --color-destructive: var(--destructive); --color-destructive-foreground: var(--destructive-foreground); --color-accent-foreground: var(--accent-foreground); --color-accent: var(--accent); --color-muted-foreground: var(--muted-foreground); --color-muted: var(--muted); --color-secondary-foreground: var(--secondary-foreground); --color-secondary: var(--secondary); --color-primary-foreground: var(--primary-foreground); --color-primary: var(--primary); --color-popover-foreground: var(--popover-foreground); --color-popover: var(--popover); --color-card-foreground: var(--card-foreground); --color-card: var(--card); --color-foreground: var(--foreground); --color-background: var(--background); --color-ember: var(--ember); --color-ember-deep: var(--ember-deep); --color-char: var(--char); --color-char-deep: var(--char-deep);
+  --color-sidebar-ring: var(--sidebar-ring); --color-sidebar-border: var(--sidebar-border); --color-sidebar-accent-foreground: var(--sidebar-accent-foreground); --color-sidebar-accent: var(--sidebar-accent); --color-sidebar-primary-foreground: var(--sidebar-primary-foreground); --color-sidebar-primary: var(--sidebar-primary); --color-sidebar-foreground: var(--sidebar-foreground); --color-sidebar: var(--sidebar); --color-chart-5: var(--chart-5); --color-chart-4: var(--chart-4); --color-chart-3: var(--chart-3); --color-chart-2: var(--chart-2); --color-chart-1: var(--chart-1); --color-ring: var(--ring); --color-input: var(--input); --color-border: var(--border); --color-destructive: var(--destructive); --color-destructive-foreground: var(--destructive-foreground); --color-accent-foreground: var(--accent-foreground); --color-accent: var(--accent); --color-muted-foreground: var(--muted-foreground); --color-muted: var(--muted); --color-secondary-foreground: var(--secondary-foreground); --color-secondary: var(--secondary); --color-primary-foreground: var(--primary-foreground); --color-primary: var(--primary); --color-popover-foreground: var(--popover-foreground); --color-popover: var(--popover); --color-card-foreground: var(--card-foreground); --color-card: var(--card); --color-foreground: var(--foreground); --color-background: var(--background); --color-ember: var(--ember); --color-ember-deep: var(--ember-deep); --color-char: var(--char); --color-char-deep: var(--char-deep); --color-oro: var(--oro); --color-oro-deep: var(--oro-deep); --color-llama: var(--llama); --color-llama-deep: var(--llama-deep);
   --radius-sm: calc(var(--radius) * 0.6); --radius-md: calc(var(--radius) * 0.8); --radius-lg: var(--radius); --radius-xl: calc(var(--radius) * 1.4); --radius-2xl: calc(var(--radius) * 1.8); --radius-3xl: calc(var(--radius) * 2.2); --radius-4xl: calc(var(--radius) * 2.6);
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1); --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1); --ease-in-out: cubic-bezier(0.76, 0, 0.24, 1);
   --animate-fade-in: fade-in 0.4s var(--ease-out-expo) both; --animate-fade-in-up: fade-in-up 0.6s var(--ease-out-expo) both; --animate-fade-in-scale: fade-in-scale 0.55s var(--ease-out-expo) both; --animate-ken-burns: ken-burns linear both; --animate-crossfade: crossfade 2s ease-in-out both; --animate-ember-rise: ember-rise ease-out infinite; --animate-shimmer: shimmer 2.4s ease-in-out infinite; --animate-shimmer-delay: shimmer 2.4s ease-in-out 1.6s infinite; --animate-pulse-ring: pulse-ring 2.4s ease-in-out infinite; --animate-glow-pulse: glow-pulse 3s ease-in-out infinite; --animate-pulse-subtle: pulse-subtle 2s ease-in-out infinite; --animate-float: float 4s ease-in-out infinite; --animate-spin-slow: spin 20s linear infinite; --animate-bounce-soft: bounce-soft 2s ease-in-out infinite; --animate-wiggle: wiggle 2.5s ease-in-out infinite; --animate-progress: progress-fill linear forwards; --animate-progress-bar: progress-bar 2s ease-in-out infinite;
@@ -69,6 +69,7 @@
   .lp-slide { transition: opacity 0.3s linear; }
   ::view-transition-old(root), ::view-transition-new(root) { animation: none !important; }
 }
+
 
 /* 6. Admin Panel & 3D Cards */
 .admin-panel { @apply max-w-[1220px] mx-auto pt-10 px-6 pb-24 text-foreground; }
@@ -273,104 +274,73 @@ body:has([id^="culqi-"]) { overflow: hidden !important; height: 100vh !important
 }
 @media (prefers-reduced-motion: reduce) { .hero-stack-card, .hero-media-frame { transition: none !important; transform: none !important; } }
 
-/* 10. Navbar */
+/* ==========================================================
+   10. NAVBAR — cápsula flotante glassmorphism (única versión)
+   Todo derivado de los design tokens del tema (--ember, --char,
+   --card, --foreground, etc.) para que dark mode funcione solo.
+   ========================================================== */
 @layer components {
-  .navbar-wrapper { @apply fixed inset-x-0 top-0 z-50 flex justify-center px-4 py-4 transition-all duration-500 ease-out; }
-  .navbar-wrapper.scrolled { @apply py-2; }
-  .logo-icon-box { @apply w-9 h-9 rounded-full border flex items-center justify-center transition-all duration-300 bg-amber-50/60 border-amber-200/70 shadow-[0_4px_12px_rgba(201,151,74,0.1)] dark:bg-char dark:border-char/80 dark:shadow-[0_4px_12px_rgba(0,0,0,0.3)] group-hover:border-ember/40 group-hover:bg-amber-50; }
-  .cart-badge { @apply absolute -top-0.5 -right-0.5 bg-ember text-char-deep text-[9px] font-black w-4.5 h-4.5 rounded-full flex items-center justify-center shadow-[0_3px_8px_color-mix(in_oklch,var(--ember)_50%,transparent)]; }
-  .navbar-mobile-wrapper { @apply fixed inset-x-0 top-20 z-40 flex justify-center px-4 md:hidden; }
-  .mobile-login-btn { @apply block text-xs text-char-deep bg-ember font-bold py-3 px-4 rounded-xl text-center shadow-lg transition-transform active:scale-[0.98] mt-2; }
-}
+  /* padding/shadow-only transitions (no blur/backdrop changes) => GPU-cheap, no jank on scroll */
+  .navbar-wrapper { @apply fixed inset-x-0 top-0 z-50 flex justify-center px-4 py-5; transition: padding 0.35s var(--ease-out-expo); will-change: padding; }
+  .navbar-wrapper.scrolled { @apply py-3; }
 
-/* Navbar — variante Glass (minimal, usada actualmente) */
-.bg-liquid-specular { display: none; }
-@layer components {
-  .navbar-capsule-glass { @apply relative flex w-full max-w-6xl items-center justify-between rounded-full px-5 py-2.5 transition-all duration-500 ease-out; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); background: color-mix(in oklch, var(--card) 72%, transparent); border: 1px solid color-mix(in oklch, var(--foreground) 8%, transparent); box-shadow: 0 8px 24px -16px rgba(0, 0, 0, 0.12); }
-  .dark .navbar-capsule-glass { background: color-mix(in oklch, var(--char-deep) 78%, transparent); border-color: color-mix(in oklch, white 8%, transparent); box-shadow: 0 12px 30px -18px rgba(0, 0, 0, 0.5); }
-  .navbar-wrapper.scrolled .navbar-capsule-glass { @apply px-5 py-2; background: color-mix(in oklch, var(--card) 90%, transparent); box-shadow: 0 10px 28px -16px rgba(0, 0, 0, 0.16); }
-  .dark .navbar-wrapper.scrolled .navbar-capsule-glass { background: color-mix(in oklch, var(--char-deep) 92%, transparent); box-shadow: 0 14px 32px -18px rgba(0, 0, 0, 0.55); }
-  .logo-icon-box-glass { @apply relative w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300; background: color-mix(in oklch, var(--ember) 10%, transparent); }
-  .group:hover .logo-icon-box-glass { background: color-mix(in oklch, var(--ember) 16%, transparent); }
-  .nav-links-pill-glass { @apply hidden md:flex items-center gap-0.5 rounded-full; }
-  .nav-link-item-glass { @apply relative px-4 py-1.5 rounded-full text-xs font-semibold tracking-wide transition-colors duration-300 select-none overflow-hidden; color: var(--muted-foreground); }
-  .nav-link-item-glass:hover { color: var(--foreground); }
-  .user-dropdown-btn-glass { @apply flex items-center gap-2 px-3.5 py-1.5 rounded-full transition-colors duration-300 cursor-pointer max-w-[180px] select-none; color: var(--muted-foreground); }
-  .user-dropdown-btn-glass:hover { color: var(--foreground); background: color-mix(in oklch, var(--foreground) 5%, transparent); }
-  .dropdown-menu-glass { @apply absolute right-0 mt-3 w-52 rounded-2xl py-1.5 z-50 origin-top-right overflow-hidden; backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); background: color-mix(in oklch, var(--card) 96%, transparent); border: 1px solid color-mix(in oklch, var(--foreground) 8%, transparent); box-shadow: 0 16px 40px -20px rgba(0, 0, 0, 0.2); }
-  .dark .dropdown-menu-glass { background: color-mix(in oklch, var(--char-deep) 96%, transparent); border-color: color-mix(in oklch, white 8%, transparent); box-shadow: 0 16px 40px -18px rgba(0, 0, 0, 0.6); }
-  .dropdown-link-glass { @apply flex items-center gap-2.5 px-4 py-2 text-xs text-muted-foreground transition-colors font-semibold w-full; }
-  .dropdown-link-glass:hover { color: var(--foreground); background: color-mix(in oklch, var(--foreground) 5%, transparent); }
-  .login-nav-btn-glass { @apply hidden md:inline-flex items-center px-4 py-1.5 rounded-full text-xs font-bold transition-colors; color: var(--muted-foreground); }
-  .login-nav-btn-glass:hover { color: var(--foreground); background: color-mix(in oklch, var(--foreground) 5%, transparent); }
-  .cart-nav-icon-glass { @apply relative p-2.5 rounded-full text-muted-foreground transition-colors duration-300; }
-  .cart-nav-icon-glass:hover { color: var(--foreground); background: color-mix(in oklch, var(--foreground) 5%, transparent); }
-  .cart-badge-glass { @apply absolute top-0.5 right-0.5 text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center; background: var(--ember-deep); color: var(--on-dark); }
-  .navbar-mobile-panel-glass { @apply relative w-full max-w-lg rounded-3xl overflow-hidden; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); background: color-mix(in oklch, var(--card) 94%, transparent); border: 1px solid color-mix(in oklch, var(--foreground) 8%, transparent); box-shadow: 0 20px 45px -20px rgba(0, 0, 0, 0.2); }
+  .navbar-capsule-glass {
+    @apply relative flex w-full max-w-6xl items-center justify-between rounded-full px-5 py-2.5;
+    backdrop-filter: blur(14px) saturate(160%);
+    -webkit-backdrop-filter: blur(14px) saturate(160%);
+    background: color-mix(in oklch, var(--card) 55%, transparent);
+    border: 1px solid color-mix(in oklch, var(--foreground) 8%, transparent);
+    box-shadow: 0 4px 30px oklch(0 0 0 / 0.04), inset 0 1px 1px color-mix(in oklch, white 40%, transparent), 0 1px 3px oklch(0 0 0 / 0.02);
+    transition: background-color 0.35s ease, box-shadow 0.35s ease, padding 0.35s var(--ease-out-expo);
+  }
+  .dark .navbar-capsule-glass { background: color-mix(in oklch, var(--char-deep) 58%, transparent); border-color: color-mix(in oklch, white 8%, transparent); box-shadow: 0 12px 30px -18px oklch(0 0 0 / 0.5); }
+  .navbar-wrapper.scrolled .navbar-capsule-glass { @apply px-5 py-2; background: color-mix(in oklch, var(--card) 90%, transparent); box-shadow: 0 10px 28px -16px oklch(0 0 0 / 0.16); }
+  .dark .navbar-wrapper.scrolled .navbar-capsule-glass { background: color-mix(in oklch, var(--char-deep) 92%, transparent); box-shadow: 0 14px 32px -18px oklch(0 0 0 / 0.55); }
+
+  .logo-icon-box-glass { @apply relative flex h-8 w-8 items-center justify-center rounded-full transition-colors duration-300; background: color-mix(in oklch, var(--ember) 10%, transparent); }
+  .group:hover .logo-icon-box-glass { background: color-mix(in oklch, var(--ember) 18%, transparent); box-shadow: 0 0 0 4px color-mix(in oklch, var(--ember) 8%, transparent); }
+
+  .navbar-divider-glass { @apply mx-1 h-4 w-px; background: color-mix(in oklch, var(--on-dark) 14%, transparent); }
+
+  .nav-links-pill-glass { @apply hidden items-center gap-1 md:flex; }
+  .nav-link-item-glass { @apply relative select-none overflow-hidden rounded-full px-4 py-1.5 text-[13px] font-medium transition-colors duration-200; color: color-mix(in oklch, var(--on-dark) 58%, transparent); }
+  .nav-link-item-glass:hover { color: var(--on-dark); }
+  .nav-pill-active { @apply absolute inset-0 -z-0 rounded-full; background: var(--ember); box-shadow: 0 4px 12px color-mix(in oklch, var(--ember) 35%, transparent); }
+
+
+  .user-dropdown-btn-glass { @apply flex max-w-[180px] cursor-pointer select-none items-center gap-2 rounded-full px-3.5 py-1.5 transition-all duration-300; color: var(--muted-foreground); }
+  .user-dropdown-btn-glass:hover { color: var(--foreground); background: color-mix(in oklch, var(--foreground) 5%, transparent); transform: translateY(-1px); }
+
+  .dropdown-menu-glass { @apply absolute right-0 z-50 mt-3 w-52 origin-top-right overflow-hidden rounded-2xl py-1.5; backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); background: color-mix(in oklch, var(--card) 96%, transparent); border: 1px solid color-mix(in oklch, var(--foreground) 8%, transparent); box-shadow: 0 16px 40px -20px oklch(0 0 0 / 0.2); }
+  .dark .dropdown-menu-glass { background: color-mix(in oklch, var(--char-deep) 96%, transparent); border-color: color-mix(in oklch, white 8%, transparent); box-shadow: 0 16px 40px -18px oklch(0 0 0 / 0.6); }
+  .dropdown-link-glass { @apply flex w-full items-center gap-2.5 px-4 py-2 text-xs font-semibold text-muted-foreground transition-all duration-200; }
+  .dropdown-link-glass:hover { color: var(--foreground); background: color-mix(in oklch, var(--foreground) 5%, transparent); padding-left: 1.15rem; }
+
+  .login-nav-btn-glass { @apply hidden items-center rounded-full px-4 py-1.5 text-xs font-bold transition-all duration-300 md:inline-flex; background: var(--foreground); color: var(--background); }
+  .login-nav-btn-glass:hover { transform: scale(1.03); box-shadow: 0 6px 16px color-mix(in oklch, var(--foreground) 25%, transparent); }
+
+  .cart-nav-icon-glass { @apply relative flex h-9 w-9 items-center justify-center rounded-full text-foreground transition-colors duration-300; }
+  .cart-nav-icon-glass:hover { background: color-mix(in oklch, var(--foreground) 5%, transparent); }
+  .cart-badge-glass { @apply absolute right-0.5 top-0.5 flex h-4.5 w-4.5 items-center justify-center rounded-full text-[9px] font-bold; background: var(--ember-deep); color: var(--on-dark); border: 2px solid var(--card); }
+
+  .navbar-mobile-wrapper { @apply fixed inset-x-0 top-20 z-40 flex justify-center px-4 md:hidden; }
+  .navbar-mobile-panel-glass { @apply relative w-full max-w-lg overflow-hidden rounded-3xl; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); background: color-mix(in oklch, var(--card) 94%, transparent); border: 1px solid color-mix(in oklch, var(--foreground) 8%, transparent); box-shadow: 0 20px 45px -20px oklch(0 0 0 / 0.2); }
   .dark .navbar-mobile-panel-glass { background: color-mix(in oklch, var(--char-deep) 96%, transparent); border-color: color-mix(in oklch, white 8%, transparent); }
-  .mobile-link-glass-item { @apply block font-semibold text-sm py-3 px-4 rounded-xl transition-colors duration-200; }
+  .mobile-link-glass-item { @apply block rounded-xl px-4 py-3 text-sm font-semibold transition-colors duration-200; }
   .mobile-link-glass-item:not(.bg-ember):hover { background: color-mix(in oklch, var(--foreground) 5%, transparent); }
-  .mobile-sublink-glass { @apply block text-xs font-semibold py-2.5 px-4 rounded-lg text-muted-foreground transition-colors; }
+  .mobile-sublink-glass { @apply block rounded-lg px-4 py-2.5 text-xs font-semibold text-muted-foreground transition-colors; }
   .mobile-sublink-glass:hover { background: color-mix(in oklch, var(--foreground) 5%, transparent); color: var(--foreground); }
-  .mobile-login-glass-btn { @apply block text-xs font-bold py-3 px-4 rounded-xl text-center transition-transform active:scale-[0.98] mt-2; background: var(--foreground); color: var(--background); }
+  .mobile-login-glass-btn { @apply mt-2 block rounded-xl py-3 text-center text-xs font-bold transition-transform active:scale-[0.98]; background: var(--ember); color: var(--char-deep); box-shadow: var(--shadow-lift); }
 }
 
 /* 11. Comanda de cocina — utilidades reusables (Servicios y afines) */
 @layer components {
-  /* Grano de fondo — reemplaza el data-uri inline duplicado en componentes */
   .grain-overlay { @apply absolute inset-0 opacity-[0.035] mix-blend-overlay pointer-events-none; background-image: var(--grain-svg); }
-
-  /* Perforación tipo comanda entre imagen y contenido de una card */
   .ticket-perforation { @apply relative h-3 bg-card; background-image: radial-gradient(circle, var(--background) 3px, transparent 3.3px); background-size: 18px 100%; background-repeat: repeat-x; background-position: center; }
-
-  /* Sello circular tipo "wax seal" para íconos de card */
   .ticket-seal { @apply w-11 h-11 rounded-full flex items-center justify-center border-2 shadow-lg; background: radial-gradient(circle at 32% 28%, rgba(255,255,255,0.12), rgba(0,0,0,0.55)); }
-
-  /* Número grande de pedido sobre la imagen */
   .ticket-number { @apply absolute bottom-3 left-4 font-display italic text-6xl font-light select-none pointer-events-none; text-shadow: 0 2px 12px rgba(0,0,0,0.4); }
-
-  /* Card con sombra profunda + degradado de marca superior */
   .ticket-card { @apply relative h-full flex flex-col rounded-[1.75rem] overflow-hidden border border-border/80 shadow-[0_24px_70px_-20px_rgba(0,0,0,0.7)] transition-shadow duration-500; }
   .ticket-card:hover { @apply shadow-[0_32px_90px_-18px_rgba(0,0,0,0.8)]; }
   .ticket-card-top-accent { @apply absolute top-0 left-0 right-0 h-[3px] z-20; }
-
-  /* Brasa individual — usa el keyframe ember-rise ya definido en el tema */
   .ember-particle { @apply absolute bottom-0 rounded-full bg-ember pointer-events-none; animation: var(--animate-ember-rise); box-shadow: 0 0 8px 2px color-mix(in oklch, var(--ember) 60%, transparent); }
-}
-/* 13. Wizard — contenedor, stepper y footer (refinamiento) */
-@layer components {
-  /* Contenedor grande del wizard con atmósfera + borde sutil */
-  .wizard-shell {
-    @apply relative max-w-3xl mx-auto rounded-[2rem] overflow-hidden border;
-    border-color: color-mix(in oklch, var(--ember) 15%, transparent);
-    background: radial-gradient(ellipse 70% 50% at 100% 0%, color-mix(in oklch, var(--ember) 6%, transparent), transparent 60%), var(--card);
-    box-shadow: 0 30px 80px -30px rgba(0,0,0,0.6);
-  }
-  .wizard-shell-header { @apply px-8 sm:px-10 pt-9 pb-7 border-b; border-color: color-mix(in oklch, var(--foreground) 8%, transparent); }
-  .wizard-shell-eyebrow { @apply inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] mb-3; color: var(--ember); }
-  .wizard-shell-title { @apply font-display text-3xl font-bold text-foreground; }
-  .wizard-shell-sub { @apply mt-2 text-sm text-muted-foreground; }
-
-  /* Stepper: línea continua real detrás de los círculos */
-  .wizard-stepper-row { @apply relative flex items-center justify-between px-8 sm:px-10 py-8; }
-  .wizard-stepper-track { @apply absolute left-[8%] right-[8%] top-1/2 h-[2px] -translate-y-1/2 -z-0; background: color-mix(in oklch, var(--foreground) 10%, transparent); }
-  .wizard-stepper-track-fill { @apply absolute left-0 top-0 h-full transition-all duration-500 ease-out; background: var(--ember); }
-  .wizard-stepper-node { @apply relative z-10 flex flex-col items-center gap-2; background: var(--card); }
-
-  /* Cuerpo del paso actual — más aire */
-  .wizard-step-body { @apply px-8 sm:px-10 py-9; }
-
-  /* Footer con botones */
-  .wizard-shell-footer { @apply flex items-center justify-between px-8 sm:px-10 py-6 border-t; border-color: color-mix(in oklch, var(--foreground) 8%, transparent); background: color-mix(in oklch, var(--foreground) 2%, transparent); }
-  .wizard-btn-back { @apply px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors duration-200; color: var(--muted-foreground); background: color-mix(in oklch, var(--foreground) 5%, transparent); }
-  .wizard-btn-back:hover { color: var(--foreground); background: color-mix(in oklch, var(--foreground) 8%, transparent); }
-  .wizard-btn-next { @apply px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-200; background: var(--ember); color: var(--char-deep); box-shadow: 0 8px 20px -8px color-mix(in oklch, var(--ember) 50%, transparent); }
-  .wizard-btn-next:hover { filter: brightness(1.06); transform: translateY(-1px); }
-  .wizard-btn-next:disabled { @apply opacity-50 cursor-not-allowed; transform: none; }
-}
-/* 14. Stepper — línea continua con relleno progresivo */
-@layer components {
-  .wizard-stepper-continuous { @apply relative flex items-start justify-center px-6 md:px-10 pt-7 pb-3; }
-  .wizard-stepper-continuous-track { @apply absolute top-[38px] left-[calc(12.5%)] right-[calc(12.5%)] h-[2px] rounded-full -z-0; background: color-mix(in oklch, var(--foreground) 10%, transparent); }
-  .wizard-stepper-continuous-fill { @apply absolute top-0 left-0 h-full rounded-full transition-all duration-500 ease-out; background: var(--ember); }
 }

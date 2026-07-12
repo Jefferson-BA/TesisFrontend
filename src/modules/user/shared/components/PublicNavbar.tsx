@@ -14,6 +14,8 @@ const NAV_LINKS = [
   { href: "/reservas", label: "Reservas" },
 ] as const;
 
+const EASE = [0.16, 1, 0.3, 1] as const;
+
 export function PublicNavbar() {
   const cart = useCartStore((s) => s.cart);
   const { user, logout, isAdmin } = useUser();
@@ -26,53 +28,53 @@ export function PublicNavbar() {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const cartTotal = cart.reduce((acc, item) => acc + item.quantity, 0);
+  const isActive = (href: string) => (href === "/" ? path === "/" : path.startsWith(href));
 
+  // Mount + scroll state
   useEffect(() => {
     setMounted(true);
     setPath(window.location.pathname);
-
     const onScroll = () => setScrolled(window.scrollY > 15);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // Close user dropdown on outside click
   useEffect(() => {
     if (!dropdown) return;
     const close = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setDropdown(false);
-      }
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) setDropdown(false);
     };
     document.addEventListener("mousedown", close);
     return () => document.removeEventListener("mousedown", close);
   }, [dropdown]);
 
-  const isActive = (href: string) => (href === "/" ? path === "/" : path.startsWith(href));
-
   return (
     <>
-      {/* Contenedor Flotante Principal */}
-      <div className={cn("navbar-wrapper", scrolled && "scrolled")}>
+      <motion.div
+        className={cn("navbar-wrapper", scrolled && "scrolled")}
+        initial={{ y: -80, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.7, ease: EASE }}
+      >
         <nav className="navbar-capsule-glass">
-          <div className="absolute inset-0 bg-liquid-specular pointer-events-none rounded-full opacity-60 dark:opacity-40" />
-          
-          {/* ─── Logo con Animación Fluida ─── */}
-          <a href="/" className="flex items-center gap-2.5 group shrink-0 select-none relative z-10">
+          {/* Logo */}
+          <a href="/" className="relative z-10 flex shrink-0 select-none items-center gap-2.5 group">
             <div className="logo-icon-box-glass">
-              <ChefHat className="text-ember w-5 h-5 transition-transform duration-600 ease-[0.34,1.56,0.64,1] group-hover:rotate-[-15deg] group-hover:scale-115" />
+              <ChefHat className="text-ember w-[17px] h-[17px] transition-transform duration-500 ease-out group-hover:-rotate-6 group-hover:scale-110" />
             </div>
-            <div className="hidden sm:block">
-              <h1 className="font-display text-sm md:text-base font-black leading-none tracking-wide text-foreground">
+            <div className="hidden sm:block leading-none">
+              <h1 className="font-display text-[15px] md:text-base font-semibold tracking-tight text-foreground">
                 DeParraSpitz
               </h1>
-              <p className="text-ember text-[8px] font-black tracking-[0.25em] mt-1 uppercase opacity-90">
-                Catering & Eventos
+              <p className="text-ember text-[8px] font-bold tracking-[0.22em] mt-1 uppercase opacity-90">
+                Catering &amp; Eventos
               </p>
             </div>
           </a>
 
-          {/* ─── Links Desktop (Efecto Píldora Líquida) ─── */}
+          {/* Links desktop */}
           <div className="nav-links-pill-glass">
             {NAV_LINKS.map((link) => {
               const active = isActive(link.href);
@@ -80,18 +82,15 @@ export function PublicNavbar() {
                 <a
                   key={link.href}
                   href={link.href}
-                  className={cn(
-                    "nav-link-item-glass", 
-                    active ? "text-char-deep font-extrabold mix-blend-normal" : "text-muted-foreground/90"
-                  )}
+                  className={cn("nav-link-item-glass", active && "font-bold")}
+                  style={active ? { color: "var(--char-deep)" } : undefined}
                 >
                   <span className="relative z-20">{link.label}</span>
                   {active && (
                     <motion.div
-                      layoutId="liquidActivePill"
-                      className="absolute inset-0 bg-ember rounded-full shadow-[0_4px_16px_color-mix(in_oklch,var(--ember)_50%,transparent)] border border-white/20"
-                      /* Configuración elástica/líquida de la píldora activa */
-                      transition={{ type: "spring", stiffness: 320, damping: 22, mass: 0.8 }}
+                      layoutId="activePill"
+                      className="nav-pill-active"
+                      transition={{ type: "spring", stiffness: 420, damping: 34, mass: 0.6 }}
                     />
                   )}
                 </a>
@@ -99,42 +98,35 @@ export function PublicNavbar() {
             })}
           </div>
 
-          {/* ─── Acciones de la Derecha ─── */}
-          <div className="flex items-center gap-2 relative z-10">
+          {/* Acciones derecha */}
+          <div className="relative z-10 flex items-center gap-2">
             <ThemeToggle />
+            <span className="navbar-divider-glass" />
 
-            {/* Usuario Desktop */}
             {!mounted ? (
               <div className="hidden md:block w-24 h-8 bg-muted/40 animate-pulse rounded-full" />
             ) : user ? (
               <div className="relative hidden md:block" ref={dropdownRef}>
                 <button onClick={() => setDropdown(!dropdown)} className="user-dropdown-btn-glass">
                   <User size={14} className="text-ember shrink-0" />
-                  <span className="truncate text-xs font-bold">
-                    {user.name || user.email || "Mi Cuenta"}
-                  </span>
-                  <ChevronDown
-                    size={12}
-                    className={cn("text-muted-foreground transition-transform duration-500 ease-out", dropdown && "rotate-180")}
-                  />
+                  <span className="truncate text-xs font-bold">{user.name || user.email || "Mi Cuenta"}</span>
+                  <ChevronDown size={12} className={cn("transition-transform duration-300 ease-out", dropdown && "rotate-180")} />
                 </button>
 
                 <AnimatePresence>
                   {dropdown && (
                     <motion.div
-                      initial={{ opacity: 0, y: 12, scale: 0.94 }}
+                      initial={{ opacity: 0, y: 6, scale: 0.96 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 12, scale: 0.94 }}
-                      transition={{ duration: 0.25, ease: [0.34, 1.56, 0.64, 1] }}
+                      exit={{ opacity: 0, y: 6, scale: 0.96 }}
+                      transition={{ duration: 0.18, ease: EASE }}
                       className="dropdown-menu-glass"
                     >
-                      <div className="px-4 py-2.5 border-b dark:border-white/5 border-stone-200/50">
-                        <p className="text-[9px] text-muted-foreground uppercase tracking-widest font-black">
+                      <div className="px-4 py-2.5 border-b border-border">
+                        <p className="text-[9px] text-muted-foreground uppercase tracking-widest font-bold opacity-80">
                           Sesión activa
                         </p>
-                        <p className="text-xs font-bold text-foreground truncate mt-0.5">
-                          {user.name || "Usuario"}
-                        </p>
+                        <p className="text-xs font-bold text-foreground truncate mt-0.5">{user.name || "Usuario"}</p>
                       </div>
 
                       <a href="/user/profile" onClick={() => setDropdown(false)} className="dropdown-link-glass">
@@ -147,11 +139,11 @@ export function PublicNavbar() {
                         </a>
                       )}
 
-                      <div className="h-[1px] bg-stone-200/50 dark:bg-white/5 my-1" />
+                      <div className="h-[1px] bg-border my-1" />
 
                       <button
                         onClick={() => { logout(); setDropdown(false); }}
-                        className="dropdown-link-glass text-red-500 dark:text-red-400 hover:bg-red-500/10"
+                        className="dropdown-link-glass text-red-500 dark:text-red-400 hover:!bg-red-500/10 hover:!text-red-500"
                       >
                         <LogOut size={14} /> Cerrar Sesión
                       </button>
@@ -160,70 +152,89 @@ export function PublicNavbar() {
                 </AnimatePresence>
               </div>
             ) : (
-              <a href="/login" className="login-nav-btn-glass">
-                Ingresar
-              </a>
+              <a href="/login" className="login-nav-btn-glass">Ingresar</a>
             )}
 
-            {/* Carrito de Compras */}
+            {/* Carrito */}
             <a href="/cart" className="cart-nav-icon-glass group">
-              <ShoppingCart className="w-5 h-5 transition-all duration-500 ease-out group-hover:scale-115 group-hover:rotate-[-6deg]" />
-              {mounted && cartTotal > 0 && (
-                <span className="cart-badge-glass">
-                  {cartTotal}
-                </span>
-              )}
+              <ShoppingCart className="w-[17px] h-[17px] transition-transform duration-300 ease-out group-hover:scale-110" />
+              <AnimatePresence>
+                {mounted && cartTotal > 0 && (
+                  <motion.span
+                    key={cartTotal}
+                    initial={{ scale: 0.4, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.4, opacity: 0 }}
+                    transition={{ type: "spring", stiffness: 500, damping: 20 }}
+                    className="cart-badge-glass"
+                  >
+                    {cartTotal}
+                  </motion.span>
+                )}
+              </AnimatePresence>
             </a>
 
-            {/* Menú Hamburguesa Mobile */}
+            {/* Hamburguesa mobile */}
             <button
               onClick={() => setMobile(!mobile)}
-              className="md:hidden p-2 text-muted-foreground hover:text-ember transition-colors"
+              className="md:hidden flex items-center justify-center w-9 h-9 rounded-full text-foreground hover:text-ember transition-colors"
               aria-label="Menú"
             >
-              {mobile ? (
-                <X size={22} className="animate-in fade-in zoom-in-50 duration-300" />
-              ) : (
-                <Menu size={22} className="animate-in fade-in zoom-in-50 duration-300" />
-              )}
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.span
+                  key={mobile ? "close" : "open"}
+                  initial={{ rotate: -90, opacity: 0 }}
+                  animate={{ rotate: 0, opacity: 1 }}
+                  exit={{ rotate: 90, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="flex"
+                >
+                  {mobile ? <X size={20} /> : <Menu size={20} />}
+                </motion.span>
+              </AnimatePresence>
             </button>
           </div>
         </nav>
-      </div>
+      </motion.div>
 
-      {/* ─── Menú Mobile Desplegable Liquid Glass ─── */}
+      {/* Menú mobile */}
       <AnimatePresence>
         {mobile && (
           <motion.div
-            initial={{ opacity: 0, y: -20, scale: 0.95 }}
+            initial={{ opacity: 0, y: -12, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -20, scale: 0.95 }}
-            transition={{ type: "spring", stiffness: 300, damping: 25 }}
+            exit={{ opacity: 0, y: -12, scale: 0.98 }}
+            transition={{ duration: 0.2, ease: EASE }}
             className="navbar-mobile-wrapper"
           >
             <div className="navbar-mobile-panel-glass">
-              <div className="absolute inset-0 bg-liquid-specular pointer-events-none opacity-40" />
-              <div className="px-5 py-4 space-y-1 relative z-10">
+              <motion.div
+                className="px-4 py-4 space-y-1 relative z-10"
+                initial="hidden"
+                animate="show"
+                variants={{ hidden: {}, show: { transition: { staggerChildren: 0.05 } } }}
+              >
                 {NAV_LINKS.map((link) => {
                   const active = isActive(link.href);
                   return (
-                    <a
+                    <motion.a
                       key={link.href}
                       href={link.href}
                       onClick={() => setMobile(false)}
-                      className={cn(
-                        "mobile-link-glass-item", 
-                        active ? "bg-ember text-char-deep font-extrabold shadow-md" : "text-muted-foreground"
-                      )}
+                      variants={{ hidden: { opacity: 0, x: -12 }, show: { opacity: 1, x: 0 } }}
+                      className={cn("mobile-link-glass-item", active && "!bg-ember !text-on-ember")}
                     >
                       {link.label}
-                    </a>
+                    </motion.a>
                   );
                 })}
 
                 {mounted && user ? (
-                  <div className="pt-3 mt-3 border-t dark:border-white/5 border-stone-200/50 space-y-1">
-                    <p className="text-[10px] text-muted-foreground px-4 uppercase tracking-wider font-bold">
+                  <motion.div
+                    variants={{ hidden: { opacity: 0 }, show: { opacity: 1 } }}
+                    className="pt-3 mt-3 border-t border-border space-y-1"
+                  >
+                    <p className="text-[10px] text-muted-foreground px-4 uppercase tracking-wider font-bold opacity-80">
                       Conectado como: {user.email}
                     </p>
                     <a href="/user/profile" onClick={() => setMobile(false)} className="mobile-sublink-glass">
@@ -236,23 +247,28 @@ export function PublicNavbar() {
                     )}
                     <button
                       onClick={() => { logout(); setMobile(false); }}
-                      className="mobile-sublink-glass text-red-500 dark:text-red-400 font-bold hover:bg-red-500/10"
+                      className="mobile-sublink-glass !text-red-500 dark:!text-red-400 font-bold hover:!bg-red-500/10"
                     >
                       Salir
                     </button>
-                  </div>
+                  </motion.div>
                 ) : mounted && !user ? (
-                  <a href="/login" onClick={() => setMobile(false)} className="mobile-login-glass-btn">
+                  <motion.a
+                    variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0 } }}
+                    href="/login"
+                    onClick={() => setMobile(false)}
+                    className="mobile-login-glass-btn"
+                  >
                     Ingresar a mi Cuenta
-                  </a>
+                  </motion.a>
                 ) : null}
-              </div>
+              </motion.div>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Spacer Responsivo */}
+      {/* Spacer */}
       <div className="h-24" />
     </>
   );
