@@ -1,9 +1,15 @@
-// src/modules/user/Inicio/components/Hero.tsx
 "use client";
 
-import { useState, useEffect, useRef, useMemo, useCallback } from "react";
-import { motion, AnimatePresence, useMotionValue, useSpring } from "framer-motion";
-import { ChevronRight, Calendar, Sparkles, ChevronDown } from "lucide-react";
+import { useState, useEffect, useRef, useCallback } from "react";
+import {
+  motion,
+  AnimatePresence,
+  useMotionValue,
+  useSpring,
+  useTransform,
+} from "framer-motion";
+// Importamos los nuevos iconos de comida/estilo aquí 👇
+import { ChevronRight, Calendar, Sparkles, Quote, Flame, UtensilsCrossed, Compass } from "lucide-react";
 import { HeroButton } from "./HeroButton";
 import { CounterNumber } from "./CounterNumber";
 import { cn } from "@/lib/utils";
@@ -13,17 +19,52 @@ import { cn } from "@/lib/utils";
 // ─────────────────────────────────────────────────────────
 
 const BACKGROUND_IMAGES = [
-  { src: "/imageLanding/parrilla.avif", alt: "Parrilla premium", label: "Parrilla" },
-  { src: "/imageLanding/criollo.avif", alt: "Cocina criolla", label: "Criollo" },
-  { src: "/imageLanding/arabe.avif", alt: "Cocina árabe", label: "Árabe" },
+  {
+    src: "/imageLanding/parrilla.avif",
+    // Cambiamos 'thumb' por una referencia al componente del Icono 👇
+    icon: Flame,
+    alt: "Parrilla premium",
+    label: "Parrilla",
+    kicker: "Sabor al fuego",
+    title1: "Parrilla",
+    title2: "Premium",
+    description:
+      "Cortes seleccionados y brasa lenta para eventos que se recuerdan por el sabor.",
+    quote: "La brasa perfecta no se apura, se domina.",
+    ctaLabel: "Ver menú de parrilla",
+    ctaHref: "/menu?estilo=parrilla",
+  },
+  {
+    src: "/imageLanding/criollo.avif",
+    icon: UtensilsCrossed,
+    alt: "Cocina criolla",
+    label: "Criollo",
+    kicker: "Tradición peruana",
+    title1: "Cocina",
+    title2: "Criolla",
+    description:
+      "Recetas de siempre, reinventadas para tu evento con la calidez de casa.",
+    quote: "Cada receta, una historia de familia.",
+    ctaLabel: "Ver menú criollo",
+    ctaHref: "/menu?estilo=criollo",
+  },
+  {
+    src: "/imageLanding/arabe.avif",
+    icon: Compass, // Ideal para simular la ruta de las especias / oriente
+    alt: "Cocina árabe",
+    label: "Árabe",
+    kicker: "Especias de oriente",
+    title1: "Cocina",
+    title2: "Árabe",
+    description:
+      "Un viaje de especias y texturas para sorprender a tus invitados.",
+    quote: "Donde cada especia cuenta una ruta distinta.",
+    ctaLabel: "Ver menú árabe",
+    ctaHref: "/menu?estilo=arabe",
+  },
 ] as const;
 
-const SLIDE_DURATION = 9000;
-
-const TITLE_WORDS = {
-  line1: ["Servicio", "de", "Catering,"],
-  line2: ["Eventos", "y", "Parrillas"],
-};
+const SLIDE_DURATION = 8000;
 
 const STATS = [
   { value: 500, prefix: "+", label: "Eventos Atendidos" },
@@ -45,23 +86,49 @@ const CTAS = [
     variant: "secondary" as const,
     label: "Cotizar ahora",
     icon: Calendar,
-    iconClassName: "text-ember",
+    iconClassName: "",
   },
 ];
 
-// Partículas ambientales tipo brasa — generadas, no una por una a mano.
-const EMBER_PARTICLE_COUNT = 14;
-const emberParticles = Array.from({ length: EMBER_PARTICLE_COUNT }, (_, i) => {
-  // distribución pseudoaleatoria pero determinística (misma cada render/SSR)
-  const seed = (i * 137.5) % 100; // ángulo áureo → dispersión pareja
-  return {
-    id: i,
-    left: (seed).toFixed(2),
-    delay: ((i % 7) * 0.6).toFixed(2),
-    duration: (6 + (i % 5)).toFixed(2),
-    size: i % 3 === 0 ? 3 : 2,
-  };
-});
+// Cambiamos : Variants por : Record<string, any>
+const textContainerVariants: Record<string, any> = {
+  enter: {},
+  center: { transition: { staggerChildren: 0.09, delayChildren: 0.05 } },
+  exit: {},
+};
+
+const textItemVariants: Record<string, any> = {
+  enter: { opacity: 0, y: 22, filter: "blur(6px)" },
+  center: {
+    opacity: 1,
+    y: 0,
+    filter: "blur(0px)",
+    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+  },
+  exit: { opacity: 0, y: -14, filter: "blur(4px)" },
+};
+
+const imageVariants: Record<string, any> = {
+  enter: { opacity: 0, scale: 1.1, clipPath: "circle(0% at 50% 45%)" },
+  center: {
+    opacity: 1,
+    scale: 1,
+    clipPath: "circle(75% at 50% 45%)",
+    transition: { duration: 1.1, ease: [0.22, 1, 0.36, 1] },
+  },
+  exit: {
+    opacity: 1,
+    scale: 1.03,
+    clipPath: "circle(75% at 50% 45%)",
+    transition: { duration: 0.4, ease: "easeIn" },
+  },
+};
+
+const quoteVariants: Record<string, any> = {
+  enter: { opacity: 0, y: 16 },
+  center: { opacity: 1, y: 0, transition: { duration: 0.5, delay: 0.45 } },
+  exit: { opacity: 0, y: -10, transition: { duration: 0.25 } },
+};
 
 // ─────────────────────────────────────────────────────────
 
@@ -69,19 +136,54 @@ export const Hero = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
+  const frameRef = useRef<HTMLDivElement>(null);
 
-  // Parallax sutil ligado al mouse
+  const current = BACKGROUND_IMAGES[currentSlide];
+  const otherStyles = BACKGROUND_IMAGES.length - 1;
+
   const mvX = useMotionValue(0);
   const mvY = useMotionValue(0);
-  const springX = useSpring(mvX, { stiffness: 60, damping: 20 });
-  const springY = useSpring(mvY, { stiffness: 60, damping: 20 });
+  const parallaxX = useSpring(useTransform(mvX, [-0.5, 0.5], [-10, 10]), {
+    stiffness: 60,
+    damping: 20,
+  });
+  const parallaxY = useSpring(useTransform(mvY, [-0.5, 0.5], [-6, 6]), {
+    stiffness: 60,
+    damping: 20,
+  });
 
-  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const relX = (e.clientX - rect.left) / rect.width - 0.5;
-    const relY = (e.clientY - rect.top) / rect.height - 0.5;
-    mvX.set(relX * 16);
-    mvY.set(relY * 10);
+  const tiltRotateX = useSpring(useTransform(mvY, [-0.5, 0.5], [10, -10]), {
+    stiffness: 150,
+    damping: 18,
+  });
+  const tiltRotateY = useSpring(useTransform(mvX, [-0.5, 0.5], [-12, 12]), {
+    stiffness: 150,
+    damping: 18,
+  });
+
+  const handleMouseMove = useCallback(
+    (e: React.MouseEvent<HTMLElement>) => {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const relX = (e.clientX - rect.left) / rect.width - 0.5;
+      const relY = (e.clientY - rect.top) / rect.height - 0.5;
+      mvX.set(relX);
+      mvY.set(relY);
+
+      if (frameRef.current) {
+        const fr = frameRef.current.getBoundingClientRect();
+        const px = ((e.clientX - fr.left) / fr.width) * 100;
+        const py = ((e.clientY - fr.top) / fr.height) * 100;
+        frameRef.current.style.setProperty("--mx", `${px}%`);
+        frameRef.current.style.setProperty("--my", `${py}%`);
+      }
+    },
+    [mvX, mvY],
+  );
+
+  const resetTilt = useCallback(() => {
+    setIsPaused(false);
+    mvX.set(0);
+    mvY.set(0);
   }, [mvX, mvY]);
 
   useEffect(() => {
@@ -93,216 +195,217 @@ export const Hero = () => {
     return () => clearInterval(timer);
   }, [isPaused]);
 
-  const goToSlide = useCallback((index: number) => {
-    setCurrentSlide(index);
-  }, []);
-
-  // Timings de reveal calculados, no números sueltos repetidos
-  const wordDelays = useMemo(() => {
-    const base = 0.15;
-    const step = 0.09;
-    const all = [...TITLE_WORDS.line1, ...TITLE_WORDS.line2];
-    return all.map((_, i) => base + i * step);
-  }, []);
-  const line1Count = TITLE_WORDS.line1.length;
+  const goToSlide = useCallback((index: number) => setCurrentSlide(index), []);
 
   return (
     <section
       ref={sectionRef}
-      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background"
+      className="hero-section relative min-h-screen flex items-center overflow-hidden bg-background"
       onMouseEnter={() => setIsPaused(true)}
-      onMouseLeave={() => setIsPaused(false)}
+      onMouseLeave={resetTilt}
       onMouseMove={handleMouseMove}
     >
-      {/* Carrusel de fondo */}
-      <div className="absolute inset-0 z-0 overflow-hidden">
-        <AnimatePresence mode="sync">
-          {BACKGROUND_IMAGES.map((img, i) =>
-            i === currentSlide ? (
-              <motion.div
-                key={img.src}
-                className="absolute inset-0"
-                initial={{ opacity: 0, scale: 1.04 }}
-                animate={{ opacity: 0.65, scale: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
-              >
-                <img
-                  src={img.src}
-                  alt={img.alt}
-                  loading={i === 0 ? "eager" : "lazy"}
-                  className="absolute inset-0 w-full h-full object-cover animate-ken-burns"
-                  style={{ animationPlayState: isPaused ? "paused" : "running" }}
-                />
-              </motion.div>
-            ) : null,
-          )}
-        </AnimatePresence>
-      </div>
+      <div className="hero-vignette" />
 
-      {/* Partículas ambientales (brasa/ceniza) */}
-      <div className="absolute inset-0 z-[11] pointer-events-none overflow-hidden">
-        {emberParticles.map((p) => (
-          <span
-            key={p.id}
-            className="absolute bottom-0 rounded-full bg-ember/70 animate-ember-rise"
-            style={{
-              left: `${p.left}%`,
-              width: p.size,
-              height: p.size,
-              animationDelay: `${p.delay}s`,
-              animationDuration: `${p.duration}s`,
-            }}
-          />
-        ))}
-      </div>
+      <div className="relative z-20 w-full max-w-7xl mx-auto px-6 lg:px-10 grid grid-cols-1 lg:grid-cols-[0.85fr_1.15fr] gap-10 lg:gap-14 items-center py-28 lg:py-0">
+        {/* Columna izquierda: texto */}
+        <motion.div style={{ x: parallaxX, y: parallaxY }} className="relative">
+          <motion.span
+            className="hero-badge"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            Experiencias Gastronómicas Premium
+          </motion.span>
 
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/35 to-background z-10" />
-
-      {/* Contenido con parallax */}
-      <motion.div
-        className="relative z-20 text-center px-4 sm:px-6 max-w-5xl mx-auto"
-        style={{ x: springX, y: springY }}
-      >
-        <motion.span
-          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-ember/10 border border-ember/30 text-ember text-xs font-black tracking-[0.2em] uppercase mb-6"
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <Sparkles className="w-3.5 h-3.5 animate-wiggle" />
-          Experiencias Gastronómicas Premium
-        </motion.span>
-
-        <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold leading-[1.15] text-foreground tracking-tight">
-          <span className="block overflow-hidden">
-            {TITLE_WORDS.line1.map((word, i) => (
-              <span key={word} className="inline-block mr-3 overflow-hidden align-top">
-                <motion.span
-                  className="inline-block"
-                  initial={{ y: "110%" }}
-                  animate={{ y: 0 }}
-                  transition={{ delay: wordDelays[i], duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-                >
-                  {word}
-                </motion.span>
-              </span>
-            ))}
-          </span>
-          <span className="block font-display italic font-normal text-ember">
-            {TITLE_WORDS.line2.map((word, i) => (
-              <span key={word} className="inline-block mr-3 overflow-hidden align-top">
-                <motion.span
-                  className="inline-block bg-gradient-to-r from-ember to-amber-300 bg-clip-text text-transparent"
-                  initial={{ y: "110%" }}
-                  animate={{ y: 0 }}
-                  transition={{
-                    delay: wordDelays[line1Count + i],
-                    duration: 0.7,
-                    ease: [0.22, 1, 0.36, 1],
-                  }}
-                >
-                  {word}
-                </motion.span>
-              </span>
-            ))}
-          </span>
-        </h1>
-
-        <motion.div
-          className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.7 }}
-        >
-          {CTAS.map((cta) => {
-            const Icon = cta.icon;
-            return (
-              <a key={cta.href} href={cta.href} className="w-full sm:w-auto group">
-                <HeroButton variant={cta.variant} className="w-full">
-                  {cta.label} <Icon className={cn("w-4 h-4", cta.iconClassName)} />
-                </HeroButton>
-              </a>
-            );
-          })}
-        </motion.div>
-
-        {/* Stats */}
-        <motion.div
-          className="mt-16 w-full max-w-3xl grid grid-cols-3 gap-2 sm:gap-6 p-4 sm:p-6 rounded-2xl backdrop-blur-md shadow-xl
-    bg-[#0b0806]/80 dark:bg-card/80 border border-[#3d2c1f] dark:border-border
-    bg-white/70 border-amber-200/50"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.85 }}
-        >
-          {STATS.map((stat, i) => (
-            <div
-              key={stat.label}
-              className={cn("text-center", i < STATS.length - 1 && "border-r border-border")}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={current.src}
+              variants={textContainerVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              className="mt-6"
             >
-              <h4 className="text-xl sm:text-3xl font-black text-ember font-display">
-                {stat.prefix}
-                <CounterNumber value={stat.value} />
+              <motion.span variants={textItemVariants} className="hero-kicker block">
+                {current.kicker}
+              </motion.span>
+              <motion.h1
+                variants={textItemVariants}
+                className="mt-2 text-5xl sm:text-6xl lg:text-7xl font-extrabold leading-[1.05] text-foreground tracking-tight"
+              >
+                {current.title1}
+                <br />
+                <span className="font-display italic font-normal hero-title-accent">
+                  {current.title2}
+                </span>
+              </motion.h1>
+              <motion.p
+                variants={textItemVariants}
+                className="mt-5 max-w-md text-base text-muted-foreground leading-relaxed"
+              >
+                {current.description}
+              </motion.p>
+            </motion.div>
+          </AnimatePresence>
+
+          <motion.div
+            className="mt-9 flex flex-wrap items-center gap-4"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+          >
+            {CTAS.map((cta) => {
+              const Icon = cta.icon;
+              return (
+                <a key={cta.href} href={cta.href} className="group">
+                  <HeroButton variant={cta.variant}>
+                    {cta.label} <Icon className={cn("w-4 h-4", cta.iconClassName)} />
+                  </HeroButton>
+                </a>
+              );
+            })}
+          </motion.div>
+
+          {/* Stats */}
+          <motion.div
+            className="hero-stats mt-14"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.65 }}
+          >
+            {STATS.map((stat) => (
+              <div key={stat.label} className="hero-stat">
+                <h4 className="hero-stat-value">
+                  {stat.prefix}
+                  <CounterNumber value={stat.value} />
+                </h4>
+                <p className="hero-stat-label">{stat.label}</p>
+              </div>
+            ))}
+            <div className="hero-stat">
+              <h4 className="hero-stat-value hero-stat-value-gradient">
+                {EXTRA_STAT.value}
               </h4>
-              <p className="text-[9px] sm:text-xs text-muted-foreground uppercase tracking-widest mt-1">
-                {stat.label}
-              </p>
+              <p className="hero-stat-label">{EXTRA_STAT.label}</p>
             </div>
-          ))}
-          <div className="text-center">
-            <h4 className="text-xl sm:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-ember to-amber-300 font-display">
-              {EXTRA_STAT.value}
-            </h4>
-            <p className="text-[9px] sm:text-xs text-muted-foreground uppercase tracking-widest mt-1">
-              {EXTRA_STAT.label}
-            </p>
-          </div>
+          </motion.div>
         </motion.div>
 
-        {/* Indicadores de estilo de cocina — controlan el carrusel, no decoran */}
-        <motion.div
-          className="mt-8 flex items-center justify-center gap-3"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1 }}
-        >
-          {BACKGROUND_IMAGES.map((img, i) => {
-            const isActive = i === currentSlide;
-            return (
-              <button
-                key={img.src}
-                type="button"
-                onClick={() => goToSlide(i)}
-                aria-label={`Ver estilo ${img.label}`}
-                aria-pressed={isActive}
-                className="group relative flex flex-col items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60 rounded-md px-1"
-              >
-                <span
-                  className={cn(
-                    "text-[10px] tracking-[0.15em] uppercase transition-colors",
-                    isActive ? "text-ember font-bold" : "text-muted-foreground group-hover:text-foreground",
-                  )}
+        {/* Columna derecha: imagen 3D + cards flotantes */}
+        <div className="relative h-[440px] sm:h-[560px] lg:h-[calc(100vh-11rem)] lg:max-h-[820px] lg:min-h-[600px]">
+          <div className="hero-media-wrap">
+            {Array.from({ length: otherStyles }).map((_, i) => (
+              <div
+                key={`stack-${i}`}
+                className="hero-stack-card"
+                style={{ "--stack-i": i + 1 } as React.CSSProperties}
+                aria-hidden="true"
+              />
+            ))}
+
+            <motion.div
+              ref={frameRef}
+              className="hero-media-frame"
+              style={{
+                rotateX: tiltRotateX,
+                rotateY: tiltRotateY,
+              }}
+            >
+              <AnimatePresence mode="sync">
+                <motion.img
+                  key={current.src}
+                  src={current.src}
+                  alt={current.alt}
+                  loading={currentSlide === 0 ? "eager" : "lazy"}
+                  variants={imageVariants}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  className="hero-media-image"
+                />
+              </AnimatePresence>
+              <div className="hero-media-overlay" />
+              <div className="hero-glass-sheen" />
+
+              {/* Quote flotante */}
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={current.src}
+                  className="hero-quote-card"
+                  variants={quoteVariants}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  style={{ transform: "translateZ(40px)" }}
                 >
-                  {img.label}
-                </span>
-                <span className="relative h-[3px] w-10 rounded-full bg-border/60 overflow-hidden">
-                  {isActive && (
-                    <motion.span
-                      key={currentSlide}
-                      className="absolute inset-y-0 left-0 bg-ember rounded-full"
-                      initial={{ width: "0%" }}
-                      animate={{ width: isPaused ? "0%" : "100%" }}
-                      transition={{ duration: SLIDE_DURATION / 1000, ease: "linear" }}
+                  <Quote className="w-4 h-4 hero-quote-icon" />
+                  <p>{current.quote}</p>
+                </motion.div>
+              </AnimatePresence>
+            </motion.div>
+          </div>
+
+          {/* Bento de thumbnails */}
+          <motion.div
+            className="hero-thumb-panel"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.8, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          >
+            {BACKGROUND_IMAGES.map((img, i) => {
+              const isActive = i === currentSlide;
+              const ThumbIcon = img.icon; // Instanciamos el icono dinámico aquí 👇
+
+              return (
+                <button
+                  key={img.src}
+                  type="button"
+                  onClick={() => goToSlide(i)}
+                  aria-label={`Ver estilo ${img.label}`}
+                  aria-pressed={isActive}
+                  className={cn("hero-thumb", isActive && "hero-thumb-active")}
+                >
+                  {/* Contenedor del Icono reemplazando el <img> roto */}
+                  <span className="hero-thumb-image-wrap flex items-center justify-center bg-black/40 backdrop-blur-md rounded-lg border border-white/10">
+                    <ThumbIcon 
+                      className={cn(
+                        "w-5 h-5 transition-transform duration-300", 
+                        isActive ? "text-amber-400 scale-110" : "text-zinc-400"
+                      )} 
                     />
-                  )}
-                </span>
-              </button>
-            );
-          })}
-        </motion.div>
-      </motion.div>
+                    <span className="hero-thumb-shine" />
+                  </span>
+                  <span className="hero-thumb-meta">
+                    <span className={cn(
+                      "hero-thumb-label truncate font-medium transition-colors",
+                      isActive ? "text-amber-400" : "text-zinc-300"
+                    )}>
+                      {img.label}
+                    </span>
+                    <span className="hero-progress-track">
+                      {isActive && (
+                        <motion.span
+                          key={`${i}-${isPaused}`}
+                          className="hero-progress-fill"
+                          initial={{ width: "0%" }}
+                          animate={{ width: isPaused ? "0%" : "100%" }}
+                          transition={{
+                            duration: isPaused ? 0 : SLIDE_DURATION / 1000,
+                            ease: "linear",
+                          }}
+                        />
+                      )}
+                    </span>
+                  </span>
+                </button>
+              );
+            })}
+          </motion.div>
+        </div>
+      </div>
 
       {/* Scroll indicator */}
       <motion.div
@@ -311,7 +414,7 @@ export const Hero = () => {
         animate={{ opacity: 1 }}
         transition={{ delay: 1.2 }}
       >
-        <span className="text-[10px] tracking-[0.3em] uppercase text-ember/40">
+        <span className="text-[10px] tracking-[0.3em] uppercase hero-scroll-label">
           Descubre más
         </span>
         <span className="relative h-8 w-px bg-border overflow-hidden">

@@ -1,5 +1,3 @@
-// src/modules/user/shared/components/PublicNavbar.tsx
-
 "use client";
 
 import { useState, useEffect, useRef } from "react";
@@ -33,13 +31,12 @@ export function PublicNavbar() {
     setMounted(true);
     setPath(window.location.pathname);
 
-    const onScroll = () => setScrolled(window.scrollY > 24);
+    const onScroll = () => setScrolled(window.scrollY > 15);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Cerrar dropdown al hacer clic fuera
   useEffect(() => {
     if (!dropdown) return;
     const close = (e: MouseEvent) => {
@@ -53,58 +50,30 @@ export function PublicNavbar() {
 
   const isActive = (href: string) => (href === "/" ? path === "/" : path.startsWith(href));
 
-  // ─── Clases dinámicas según tema y scroll ───
-  const headerClasses = cn(
-    "fixed top-0 inset-x-0 z-50 border-b backdrop-blur-md transition-all duration-300",
-    scrolled ? "shadow-lg" : "",
-    // Modo oscuro
-    "dark:bg-char-deep/95 dark:border-char",
-    !scrolled && "dark:bg-char-deep/80 dark:border-char/40",
-    // Modo claro
-    "bg-white/90 border-stone-200/60",
-    !scrolled && "bg-white/70 border-stone-200/30",
-  );
-
-  const linkPillClasses = cn(
-    "hidden md:flex items-center gap-1 rounded-full border px-1.5 py-1.5 backdrop-blur-sm",
-    "dark:bg-char/60 dark:border-char/50",
-    "bg-stone-100/80 border-stone-200/60",
-  );
-
-  const logoBgClasses = cn(
-    "w-11 h-11 rounded-xl border flex items-center justify-center transition-all duration-300",
-    "dark:bg-char dark:border-char dark:shadow-[0_0_20px_color-mix(in_oklch,var(--ember)_15%,transparent)]",
-    "bg-amber-50 border-amber-200 shadow-[0_0_20px_rgba(201,151,74,0.15)]",
-    "group-hover:border-ember/50 group-hover:shadow-[0_0_24px_color-mix(in_oklch,var(--ember)_25%,transparent)]",
-  );
-
   return (
     <>
-      <header className={headerClasses}>
-        {/* Línea dorada superior */}
-        <div className="h-[2px] bg-gradient-to-r from-transparent via-ember/50 to-transparent" />
-
-        <nav className={cn(
-          "max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between transition-all duration-300",
-          scrolled ? "h-16" : "h-[76px]"
-        )}>
-          {/* ─── Logo ─── */}
-          <a href="/" className="flex items-center gap-3 group shrink-0">
-            <div className={logoBgClasses}>
-              <ChefHat className="text-ember w-5 h-5 transition-transform duration-500 group-hover:-rotate-12" />
+      {/* Contenedor Flotante Principal */}
+      <div className={cn("navbar-wrapper", scrolled && "scrolled")}>
+        <nav className="navbar-capsule-glass">
+          <div className="absolute inset-0 bg-liquid-specular pointer-events-none rounded-full opacity-60 dark:opacity-40" />
+          
+          {/* ─── Logo con Animación Fluida ─── */}
+          <a href="/" className="flex items-center gap-2.5 group shrink-0 select-none relative z-10">
+            <div className="logo-icon-box-glass">
+              <ChefHat className="text-ember w-5 h-5 transition-transform duration-600 ease-[0.34,1.56,0.64,1] group-hover:rotate-[-15deg] group-hover:scale-115" />
             </div>
             <div className="hidden sm:block">
-              <h1 className="font-display text-xl font-bold leading-none tracking-wide text-foreground">
+              <h1 className="font-display text-sm md:text-base font-black leading-none tracking-wide text-foreground">
                 DeParraSpitz
               </h1>
-              <p className="text-ember text-[10px] font-black tracking-[0.22em] mt-1.5">
-                CATERING & EVENTOS
+              <p className="text-ember text-[8px] font-black tracking-[0.25em] mt-1 uppercase opacity-90">
+                Catering & Eventos
               </p>
             </div>
           </a>
 
-          {/* ─── Links desktop ─── */}
-          <div className={linkPillClasses}>
+          {/* ─── Links Desktop (Efecto Píldora Líquida) ─── */}
+          <div className="nav-links-pill-glass">
             {NAV_LINKS.map((link) => {
               const active = isActive(link.href);
               return (
@@ -112,93 +81,77 @@ export function PublicNavbar() {
                   key={link.href}
                   href={link.href}
                   className={cn(
-                    "relative px-4 py-2 rounded-full text-sm font-medium transition-all duration-300",
-                    active
-                      ? "text-char-deep bg-ember font-semibold shadow-[0_2px_12px_color-mix(in_oklch,var(--ember)_35%,transparent)]"
-                      : "text-muted-foreground hover:text-ember hover:bg-accent/50",
+                    "nav-link-item-glass", 
+                    active ? "text-char-deep font-extrabold mix-blend-normal" : "text-muted-foreground/90"
                   )}
                 >
-                  {link.label}
+                  <span className="relative z-20">{link.label}</span>
+                  {active && (
+                    <motion.div
+                      layoutId="liquidActivePill"
+                      className="absolute inset-0 bg-ember rounded-full shadow-[0_4px_16px_color-mix(in_oklch,var(--ember)_50%,transparent)] border border-white/20"
+                      /* Configuración elástica/líquida de la píldora activa */
+                      transition={{ type: "spring", stiffness: 320, damping: 22, mass: 0.8 }}
+                    />
+                  )}
                 </a>
               );
             })}
           </div>
 
-          {/* ─── Acciones ─── */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          {/* ─── Acciones de la Derecha ─── */}
+          <div className="flex items-center gap-2 relative z-10">
             <ThemeToggle />
 
-            {/* Usuario desktop */}
+            {/* Usuario Desktop */}
             {!mounted ? (
-              <div className="hidden md:block w-20 h-9 bg-muted animate-pulse rounded-lg" />
+              <div className="hidden md:block w-24 h-8 bg-muted/40 animate-pulse rounded-full" />
             ) : user ? (
               <div className="relative hidden md:block" ref={dropdownRef}>
-                <button
-                  onClick={() => setDropdown(!dropdown)}
-                  className={cn(
-                    "flex items-center gap-2 border px-4 py-2 rounded-xl transition-all cursor-pointer max-w-[220px]",
-                    "dark:bg-char dark:border-char dark:hover:border-ember/40 dark:text-white/70",
-                    "bg-stone-100 border-stone-200 hover:border-amber-300 text-stone-600",
-                  )}
-                >
-                  <User size={16} className="text-ember shrink-0" />
-                  <span className="truncate text-xs font-medium">
+                <button onClick={() => setDropdown(!dropdown)} className="user-dropdown-btn-glass">
+                  <User size={14} className="text-ember shrink-0" />
+                  <span className="truncate text-xs font-bold">
                     {user.name || user.email || "Mi Cuenta"}
                   </span>
                   <ChevronDown
-                    size={14}
-                    className={cn(
-                      "text-muted-foreground transition-transform duration-300",
-                      dropdown && "rotate-180",
-                    )}
+                    size={12}
+                    className={cn("text-muted-foreground transition-transform duration-500 ease-out", dropdown && "rotate-180")}
                   />
                 </button>
 
                 <AnimatePresence>
                   {dropdown && (
                     <motion.div
-                      initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                      initial={{ opacity: 0, y: 12, scale: 0.94 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 8, scale: 0.96 }}
-                      transition={{ duration: 0.15 }}
-                      className={cn(
-                        "absolute right-0 mt-2 w-52 rounded-xl border shadow-2xl py-1.5 z-50 origin-top-right",
-                        "dark:bg-char-deep dark:border-char",
-                        "bg-white border-stone-200",
-                      )}
+                      exit={{ opacity: 0, y: 12, scale: 0.94 }}
+                      transition={{ duration: 0.25, ease: [0.34, 1.56, 0.64, 1] }}
+                      className="dropdown-menu-glass"
                     >
-                      <div className="px-4 py-2 border-b mb-1 dark:border-char/50 border-stone-100">
-                        <p className="text-[11px] text-muted-foreground uppercase tracking-wider font-bold">
+                      <div className="px-4 py-2.5 border-b dark:border-white/5 border-stone-200/50">
+                        <p className="text-[9px] text-muted-foreground uppercase tracking-widest font-black">
                           Sesión activa
                         </p>
-                        <p className="text-xs font-semibold text-foreground truncate">
+                        <p className="text-xs font-bold text-foreground truncate mt-0.5">
                           {user.name || "Usuario"}
                         </p>
                       </div>
 
-                      <a
-                        href="/user/profile"
-                        onClick={() => setDropdown(false)}
-                        className="flex items-center gap-2 px-4 py-2 text-sm text-muted-foreground hover:bg-amber-50 dark:hover:bg-ember/10 hover:text-ember transition-colors font-medium"
-                      >
+                      <a href="/user/profile" onClick={() => setDropdown(false)} className="dropdown-link-glass">
                         <User size={14} /> Mi Perfil
                       </a>
 
                       {isAdmin && (
-                        <a
-                          href="/admin/dashboard"
-                          onClick={() => setDropdown(false)}
-                          className="flex items-center gap-2 px-4 py-2 text-sm text-muted-foreground hover:bg-amber-50 dark:hover:bg-ember/10 hover:text-ember transition-colors font-medium"
-                        >
+                        <a href="/admin/dashboard" onClick={() => setDropdown(false)} className="dropdown-link-glass">
                           <LayoutDashboard size={14} /> Dashboard
                         </a>
                       )}
 
-                      <hr className="my-1 dark:border-char/50 border-stone-100" />
+                      <div className="h-[1px] bg-stone-200/50 dark:bg-white/5 my-1" />
 
                       <button
                         onClick={() => { logout(); setDropdown(false); }}
-                        className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors font-medium text-left"
+                        className="dropdown-link-glass text-red-500 dark:text-red-400 hover:bg-red-500/10"
                       >
                         <LogOut size={14} /> Cerrar Sesión
                       </button>
@@ -207,57 +160,50 @@ export function PublicNavbar() {
                 </AnimatePresence>
               </div>
             ) : (
-              <a
-                href="/login"
-                className={cn(
-                  "hidden md:inline-flex items-center px-4 py-2 rounded-full text-sm font-medium transition-all border",
-                  "dark:text-white/50 dark:hover:text-ember dark:border-transparent dark:hover:border-char",
-                  "text-stone-500 hover:text-amber-600 border-transparent hover:border-amber-200 hover:bg-amber-50",
-                )}
-              >
+              <a href="/login" className="login-nav-btn-glass">
                 Ingresar
               </a>
             )}
 
-            {/* Carrito */}
-            <a
-              href="/cart"
-              className="relative p-2 text-muted-foreground hover:text-ember transition-all group"
-            >
-              <ShoppingCart className="w-6 h-6 transition-transform group-hover:scale-110" />
+            {/* Carrito de Compras */}
+            <a href="/cart" className="cart-nav-icon-glass group">
+              <ShoppingCart className="w-5 h-5 transition-all duration-500 ease-out group-hover:scale-115 group-hover:rotate-[-6deg]" />
               {mounted && cartTotal > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 bg-ember text-char-deep text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center shadow-[0_0_10px_color-mix(in_oklch,var(--ember)_50%,transparent)]">
+                <span className="cart-badge-glass">
                   {cartTotal}
                 </span>
               )}
             </a>
 
-            {/* Hamburguesa mobile */}
+            {/* Menú Hamburguesa Mobile */}
             <button
               onClick={() => setMobile(!mobile)}
               className="md:hidden p-2 text-muted-foreground hover:text-ember transition-colors"
               aria-label="Menú"
             >
-              {mobile ? <X size={24} /> : <Menu size={24} />}
+              {mobile ? (
+                <X size={22} className="animate-in fade-in zoom-in-50 duration-300" />
+              ) : (
+                <Menu size={22} className="animate-in fade-in zoom-in-50 duration-300" />
+              )}
             </button>
           </div>
         </nav>
+      </div>
 
-        {/* ─── Menú mobile ─── */}
-        <AnimatePresence>
-          {mobile && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className={cn(
-                "md:hidden border-b overflow-hidden",
-                "dark:bg-char-deep dark:border-char",
-                "bg-white border-stone-200",
-              )}
-            >
-              <div className="px-6 py-4 space-y-1">
+      {/* ─── Menú Mobile Desplegable Liquid Glass ─── */}
+      <AnimatePresence>
+        {mobile && (
+          <motion.div
+            initial={{ opacity: 0, y: -20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.95 }}
+            transition={{ type: "spring", stiffness: 300, damping: 25 }}
+            className="navbar-mobile-wrapper"
+          >
+            <div className="navbar-mobile-panel-glass">
+              <div className="absolute inset-0 bg-liquid-specular pointer-events-none opacity-40" />
+              <div className="px-5 py-4 space-y-1 relative z-10">
                 {NAV_LINKS.map((link) => {
                   const active = isActive(link.href);
                   return (
@@ -266,10 +212,8 @@ export function PublicNavbar() {
                       href={link.href}
                       onClick={() => setMobile(false)}
                       className={cn(
-                        "block font-medium py-2.5 rounded-xl px-4 transition-colors",
-                        active
-                          ? "text-char-deep bg-ember font-semibold"
-                          : "text-muted-foreground hover:bg-accent dark:hover:bg-char",
+                        "mobile-link-glass-item", 
+                        active ? "bg-ember text-char-deep font-extrabold shadow-md" : "text-muted-foreground"
                       )}
                     >
                       {link.label}
@@ -278,42 +222,38 @@ export function PublicNavbar() {
                 })}
 
                 {mounted && user ? (
-                  <div className="pt-3 mt-2 border-t dark:border-char/60 border-stone-200 space-y-1">
-                    <p className="text-[11px] text-muted-foreground px-4 uppercase tracking-wider">
-                      Conectado: {user.email}
+                  <div className="pt-3 mt-3 border-t dark:border-white/5 border-stone-200/50 space-y-1">
+                    <p className="text-[10px] text-muted-foreground px-4 uppercase tracking-wider font-bold">
+                      Conectado como: {user.email}
                     </p>
-                    <a href="/user/profile" onClick={() => setMobile(false)} className="block text-sm py-2 px-4 text-muted-foreground hover:text-ember">
+                    <a href="/user/profile" onClick={() => setMobile(false)} className="mobile-sublink-glass">
                       Mi Perfil
                     </a>
                     {isAdmin && (
-                      <a href="/admin/dashboard" onClick={() => setMobile(false)} className="block text-sm py-2 px-4 text-muted-foreground hover:text-ember">
+                      <a href="/admin/dashboard" onClick={() => setMobile(false)} className="mobile-sublink-glass">
                         Dashboard
                       </a>
                     )}
                     <button
                       onClick={() => { logout(); setMobile(false); }}
-                      className="block text-sm text-red-500 py-2 px-4 w-full text-left hover:bg-red-50 dark:hover:bg-red-500/5 rounded-lg"
+                      className="mobile-sublink-glass text-red-500 dark:text-red-400 font-bold hover:bg-red-500/10"
                     >
                       Salir
                     </button>
                   </div>
                 ) : mounted && !user ? (
-                  <a
-                    href="/login"
-                    onClick={() => setMobile(false)}
-                    className="block text-sm text-ember font-semibold py-2.5 px-4 rounded-xl border dark:border-char border-amber-200 text-center mt-2"
-                  >
-                    Ingresar
+                  <a href="/login" onClick={() => setMobile(false)} className="mobile-login-glass-btn">
+                    Ingresar a mi Cuenta
                   </a>
                 ) : null}
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </header>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {/* Spacer */}
-      <div className={cn("transition-all duration-300", scrolled ? "h-16" : "h-[76px]")} />
+      {/* Spacer Responsivo */}
+      <div className="h-24" />
     </>
   );
 }
