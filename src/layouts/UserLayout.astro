@@ -1,5 +1,6 @@
 ---
 // src/layouts/UserLayout.astro
+import { ClientRouter } from "astro:transitions";
 import { PublicNavbar } from "@/modules/user/shared/components/PublicNavbar";
 import ChatbotWidget from "@/modules/user/chatbot/components/ChatbotWidget";
 import { Toaster } from "sonner";
@@ -24,6 +25,8 @@ const {
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     
+    <ClientRouter />
+
     <!-- SEO -->
     <title>{title}</title>
     <meta name="description" content={description} />
@@ -86,14 +89,44 @@ const {
   </head>
 
   <body class="bg-background text-foreground antialiased min-h-screen flex flex-col transition-colors duration-300">
-    
-    <PublicNavbar client:load />
+    <div id="route-loader" class="pointer-events-none fixed inset-0 z-[9999] hidden items-center justify-center bg-background/80 backdrop-blur-sm transition-opacity duration-300 ease-out opacity-0">
+      <div class="flex flex-col items-center gap-3">
+        <div class="h-12 w-12 animate-spin rounded-full border-4 border-amber-500/20 border-t-amber-500"></div>
+        <span class="text-xs font-bold uppercase tracking-[0.3em] text-amber-500">Cargando</span>
+      </div>
+    </div>
+
+    <PublicNavbar client:load transition:persist />
     
     <div class="flex-1">
       <slot />
     </div>
 
-    <ChatbotWidget client:load />
-    <Toaster richColors position="top-right" client:load />
+    <ChatbotWidget client:idle transition:persist />
+    <Toaster richColors position="top-right" client:idle transition:persist />
   </body>
+
+  <script is:inline>
+    document.addEventListener("astro:before-preparation", () => {
+      const loader = document.getElementById("route-loader");
+      if (!loader) return;
+      loader.classList.remove("hidden");
+      loader.classList.add("flex");
+      requestAnimationFrame(() => {
+        loader.classList.remove("opacity-0");
+        loader.classList.add("opacity-100");
+      });
+    });
+
+    document.addEventListener("astro:page-load", () => {
+      const loader = document.getElementById("route-loader");
+      if (!loader) return;
+      loader.classList.remove("opacity-100");
+      loader.classList.add("opacity-0");
+      setTimeout(() => {
+        loader.classList.add("hidden");
+        loader.classList.remove("flex");
+      }, 250);
+    });
+  </script>
 </html>

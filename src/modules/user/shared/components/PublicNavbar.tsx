@@ -60,7 +60,7 @@ export function PublicNavbar() {
       >
         <nav className="navbar-capsule-glass">
           {/* Logo */}
-          <a href="/" className="relative z-10 flex shrink-0 select-none items-center gap-2.5 group">
+          <a href="/" data-astro-prefetch="hover" className="relative z-10 flex shrink-0 select-none items-center gap-2.5 group">
             <div className="logo-icon-box-glass">
               <ChefHat className="text-ember w-[17px] h-[17px] transition-transform duration-500 ease-out group-hover:-rotate-6 group-hover:scale-110" />
             </div>
@@ -82,6 +82,7 @@ export function PublicNavbar() {
                 <a
                   key={link.href}
                   href={link.href}
+                  data-astro-prefetch="hover"
                   className={cn("nav-link-item-glass", active && "font-bold")}
                   style={active ? { color: "var(--char-deep)" } : undefined}
                 >
@@ -129,12 +130,12 @@ export function PublicNavbar() {
                         <p className="text-xs font-bold text-foreground truncate mt-0.5">{user.name || "Usuario"}</p>
                       </div>
 
-                      <a href="/user/profile" onClick={() => setDropdown(false)} className="dropdown-link-glass">
+                      <a href="/user/profile" data-astro-prefetch="hover" onClick={() => setDropdown(false)} className="dropdown-link-glass">
                         <User size={14} /> Mi Perfil
                       </a>
 
                       {isAdmin && (
-                        <a href="/admin/dashboard" onClick={() => setDropdown(false)} className="dropdown-link-glass">
+                        <a href="/admin/dashboard" data-astro-prefetch="hover" onClick={() => setDropdown(false)} className="dropdown-link-glass">
                           <LayoutDashboard size={14} /> Dashboard
                         </a>
                       )}
@@ -152,11 +153,11 @@ export function PublicNavbar() {
                 </AnimatePresence>
               </div>
             ) : (
-              <a href="/login" className="login-nav-btn-glass">Ingresar</a>
+              <a href="/login" data-astro-prefetch="hover" className="login-nav-btn-glass">Ingresar</a>
             )}
 
             {/* Carrito */}
-            <a href="/cart" className="cart-nav-icon-glass group">
+            <a href="/cart" data-astro-prefetch="hover" className="cart-nav-icon-glass group">
               <ShoppingCart className="w-[17px] h-[17px] transition-transform duration-300 ease-out group-hover:scale-110" />
               <AnimatePresence>
                 {mounted && cartTotal > 0 && (
@@ -220,6 +221,7 @@ export function PublicNavbar() {
                     <motion.a
                       key={link.href}
                       href={link.href}
+                      data-astro-prefetch="hover"
                       onClick={() => setMobile(false)}
                       variants={{ hidden: { opacity: 0, x: -12 }, show: { opacity: 1, x: 0 } }}
                       className={cn("mobile-link-glass-item", active && "!bg-ember !text-on-ember")}
@@ -237,11 +239,11 @@ export function PublicNavbar() {
                     <p className="text-[10px] text-muted-foreground px-4 uppercase tracking-wider font-bold opacity-80">
                       Conectado como: {user.email}
                     </p>
-                    <a href="/user/profile" onClick={() => setMobile(false)} className="mobile-sublink-glass">
+                    <a href="/user/profile" data-astro-prefetch="hover" onClick={() => setMobile(false)} className="mobile-sublink-glass">
                       Mi Perfil
                     </a>
                     {isAdmin && (
-                      <a href="/admin/dashboard" onClick={() => setMobile(false)} className="mobile-sublink-glass">
+                      <a href="/admin/dashboard" data-astro-prefetch="hover" onClick={() => setMobile(false)} className="mobile-sublink-glass">
                         Dashboard
                       </a>
                     )}
@@ -256,6 +258,7 @@ export function PublicNavbar() {
                   <motion.a
                     variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0 } }}
                     href="/login"
+                    data-astro-prefetch="hover"
                     onClick={() => setMobile(false)}
                     className="mobile-login-glass-btn"
                   >
