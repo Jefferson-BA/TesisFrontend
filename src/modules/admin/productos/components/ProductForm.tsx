@@ -13,7 +13,7 @@ export const ProductForm = ({ onProductCreated }: ProductFormProps) => {
   const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
-    name: "", description: "", price: "", stock: "", categoryId: "", imageUrl: "",
+    name: "", description: "", price: "", categoryId: "", imageUrl: "", isAvailable: true
   });
 
   useEffect(() => {
@@ -27,9 +27,11 @@ export const ProductForm = ({ onProductCreated }: ProductFormProps) => {
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const target = e.target as HTMLInputElement;
+    const value = target.type === 'checkbox' ? target.checked : target.value;
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [target.name]: value,
     });
   };
 
@@ -45,11 +47,11 @@ export const ProductForm = ({ onProductCreated }: ProductFormProps) => {
       await createProduct({
         ...formData,
         price: Number(formData.price),
-        stock: Number(formData.stock) || 0,
+        isAvailable: formData.isAvailable
       });
       
       toast.success("Producto creado exitosamente");
-      setFormData({ name: "", description: "", price: "", stock: "", categoryId: "", imageUrl: "" });
+      setFormData({ name: "", description: "", price: "", categoryId: "", imageUrl: "", isAvailable: true });
       onProductCreated();
     } catch (error) {
       console.error(error);
@@ -91,9 +93,9 @@ export const ProductForm = ({ onProductCreated }: ProductFormProps) => {
             <input id="price" name="price" type="number" step="0.01" value={formData.price} onChange={handleChange} placeholder="0.00" className="h-11 px-4 bg-background border border-input text-foreground rounded-lg placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" required />
           </div>
 
-          <div className="flex flex-col gap-2">
-            <label htmlFor="stock" className="text-foreground text-sm font-medium">Stock Inicial</label>
-            <input id="stock" name="stock" type="number" value={formData.stock} onChange={handleChange} placeholder="Cantidad disponible" className="h-11 px-4 bg-background border border-input text-foreground rounded-lg placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring" />
+          <div className="flex items-center gap-2 pt-8">
+            <input id="isAvailable" name="isAvailable" type="checkbox" checked={formData.isAvailable} onChange={handleChange} className="w-5 h-5 rounded border-input text-primary focus:ring-primary" />
+            <label htmlFor="isAvailable" className="text-foreground text-sm font-medium cursor-pointer">Producto Disponible al Público</label>
           </div>
 
           <div className="md:col-span-2 flex flex-col gap-2">

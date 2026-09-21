@@ -3,7 +3,8 @@ export interface Product {
   name: string;
   description?: string;
   price: number | string;
-  stock: number;
+  stock?: number;
+  isAvailable?: boolean;
   image?: string;
   category?: string;
   isPromo?: boolean;

@@ -7,7 +7,7 @@ import type { Product } from "@/modules/user/menu/interfaces/product.interface";
 import { cn } from "@/lib/utils";
 
 export const Step2Menu = ({ products, isLoading }: { products: Product[]; isLoading: boolean }) => {
-  const { cart, addToCart, removeFromCart } = useCartStore();
+  const { cart, addToCart, removeFromCart, updateQuantity } = useCartStore();
 
   if (isLoading) return (
     <div className="flex flex-col items-center justify-center py-20 text-ember">
@@ -23,17 +23,25 @@ export const Step2Menu = ({ products, isLoading }: { products: Product[]; isLoad
         {products.map((p) => {
           const inCart = cart.find((i) => i.id === p.id);
           const imgSrc = (p as any).imageUrl || (p as any).image;
+          // Asumimos isAvailable false solo si viene explícitamente como false o si aún usa stock y es 0
+          const isAvailable = p.isAvailable !== false && (p as any).stock !== 0;
 
           return (
             <div
               key={p.id}
               className={cn(
-                "rounded-xl overflow-hidden border transition-colors",
+                "rounded-xl overflow-hidden border transition-colors relative",
+                !isAvailable && "opacity-60 grayscale pointer-events-none",
                 inCart
                   ? "border-ember bg-ember/5 dark:bg-zinc-900"
                   : "border-border bg-card dark:bg-zinc-900/50 dark:border-zinc-800"
               )}
             >
+              {!isAvailable && (
+                <div className="absolute top-2 right-2 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded z-10 uppercase tracking-widest shadow-lg">
+                  No Disponible
+                </div>
+              )}
               {imgSrc && (
                 <div className="h-32 overflow-hidden relative">
                   <img src={imgSrc} alt={p.name} className="w-full h-full object-cover opacity-80" />
@@ -48,21 +56,39 @@ export const Step2Menu = ({ products, isLoading }: { products: Product[]; isLoad
                 <div className="mt-2 pt-3 border-t border-border dark:border-zinc-800/50">
                   {inCart ? (
                     <div className="flex items-center justify-between">
-                      <button type="button" onClick={() => removeFromCart(p.id)} className="p-1.5 rounded-md bg-muted text-ember hover:bg-border dark:bg-zinc-800">
+                      <button type="button" onClick={() => removeFromCart(p.id)} className="p-1.5 rounded-md bg-destructive/10 text-destructive hover:bg-destructive/20 dark:bg-zinc-800">
                         <Minus className="w-4 h-4" />
                       </button>
-                      <span className="text-sm font-bold text-ember">{inCart.quantity}</span>
-                      <button type="button" onClick={() => addToCart({ id: p.id, name: p.name, price: Number(p.price) })} className="p-1.5 rounded-md bg-ember text-char-deep hover:brightness-110">
-                        <Plus className="w-4 h-4" />
-                      </button>
+                      <input 
+                        type="number" 
+                        min="1" 
+                        className="w-16 h-8 text-center text-sm font-bold bg-muted border border-border rounded-md text-ember focus:outline-none focus:ring-1 focus:ring-ember"
+                        value={inCart.quantity}
+                        onChange={(e) => {
+                          const val = parseInt(e.target.value);
+                          if (!isNaN(val) && val > 0) {
+                            updateQuantity(p.id, val);
+                          } else if (e.target.value === '') {
+                             // Allow empty temporary state before they type
+                          }
+                        }}
+                        onBlur={(e) => {
+                          const val = parseInt(e.target.value);
+                          if (isNaN(val) || val <= 0) {
+                            updateQuantity(p.id, 1);
+                          }
+                        }}
+                      />
+                      <span className="text-xs text-muted-foreground font-medium w-6 text-center">uds</span>
                     </div>
                   ) : (
                     <button
                       type="button"
+                      disabled={!isAvailable}
                       onClick={() => addToCart({ id: p.id, name: p.name, price: Number(p.price) })}
-                      className="w-full py-2 rounded-lg text-xs font-bold uppercase tracking-widest border border-ember/30 text-ember hover:bg-ember hover:text-char-deep transition-colors"
+                      className="w-full py-2 rounded-lg text-xs font-bold uppercase tracking-widest border border-ember/30 text-ember hover:bg-ember hover:text-char-deep transition-colors disabled:opacity-50"
                     >
-                      Agregar
+                      {isAvailable ? "Agregar" : "Agotado"}
                     </button>
                   )}
                 </div>
