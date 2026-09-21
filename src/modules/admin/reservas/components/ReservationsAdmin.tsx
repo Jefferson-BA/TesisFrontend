@@ -103,7 +103,6 @@ export default function ReservationsAdmin() {
     const s = status?.toLowerCase();
     if (s === 'pending_review') return 'bg-yellow-500/10 text-yellow-700 dark:text-yellow-500 border-yellow-500/20';
     if (s === 'approved') return 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-500 border-emerald-500/20';
-    if (s === 'deposit_paid') return 'bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 border-cyan-500/20';
     if (s === 'fully_paid') return 'bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20';
     if (s === 'completed') return 'bg-blue-500/10 text-blue-700 dark:text-blue-500 border-blue-500/20';
     if (s === 'cancelled') return 'bg-red-500/10 text-red-700 dark:text-red-500 border-red-500/20';
@@ -164,12 +163,11 @@ export default function ReservationsAdmin() {
                           value={res.status}
                           onChange={(e) => handleStatusChange(res.id, e.target.value)}
                         >
-                          <option value="pending_review" className="bg-background text-foreground">PENDIENTE REVISIÓN</option>
-                          <option value="approved" className="bg-background text-foreground">APROBADA</option>
-                          <option value="deposit_paid" className="bg-background text-foreground">ADELANTO PAG.</option>
-                          <option value="fully_paid" className="bg-background text-foreground">PAGADA 100%</option>
+                          <option value="pending_review" disabled={res.status === 'fully_paid' || res.status === 'completed'} className="bg-background text-foreground">PENDIENTE REVISIÓN</option>
+                          <option value="approved" disabled={res.status === 'fully_paid' || res.status === 'completed'} className="bg-background text-foreground">APROBADA</option>
+                          <option value="fully_paid" disabled={res.status === 'completed'} className="bg-background text-foreground">PAGADA 100%</option>
                           <option value="completed" className="bg-background text-foreground">COMPLETADA</option>
-                          <option value="cancelled" className="bg-background text-foreground">CANCELADA</option>
+                          <option value="cancelled" disabled={res.status === 'fully_paid' || res.status === 'completed'} className="bg-background text-foreground">CANCELADA</option>
                         </select>
                       </td>
 
