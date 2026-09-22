@@ -6,6 +6,8 @@ export interface Product {
   stock?: number;
   isAvailable?: boolean;
   image?: string;
-  category?: string;
+  imageUrl?: string;
+  category?: string | { id: string; name: string };
+  categoryId?: string;
   isPromo?: boolean;
 }

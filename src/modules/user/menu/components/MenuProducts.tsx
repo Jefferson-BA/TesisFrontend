@@ -5,8 +5,10 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { toast } from "sonner";
 import { getProducts } from "@/modules/admin/productos/services/product.service";
+import { getActivePromotions } from "@/modules/admin/promociones/services/promotion.service";
 import { useCartStore } from "@/modules/admin/promociones/store/cartStore";
 import type { Product } from "../interfaces/product.interface";
+import type { Promotion } from "@/modules/admin/promociones/interfaces/promotion.interface";
 import { MenuHero } from "./MenuHero";
 import { MenuFilter } from "./MenuFilter";
 import { ProductCard } from "./ProductCard";
@@ -21,12 +23,18 @@ export const MenuProducts = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOrder, setSortOrder] = useState<"default" | "asc" | "desc">("default");
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 500]);
+  const [activePromos, setActivePromos] = useState<Promotion[]>([]);
   const addToCart = useCartStore((s) => s.addToCart);
 
   useEffect(() => {
     getProducts()
       .then((r) => setProducts(Array.isArray(r) ? r : r.data || []))
       .finally(() => setLoading(false));
+
+    // Load active promotions silently (no blocking spinner)
+    getActivePromotions()
+      .then((data) => setActivePromos(Array.isArray(data) ? data : []))
+      .catch(() => setActivePromos([]));
   }, []);
 
   const categories = useMemo(() => {
@@ -125,6 +133,7 @@ export const MenuProducts = () => {
               <ProductCard
                 key={p.id}
                 product={p}
+                activePromos={activePromos}
                 onView={() => setSelected(p)}
                 onAdd={() => handleAddToCart(p)}
               />
