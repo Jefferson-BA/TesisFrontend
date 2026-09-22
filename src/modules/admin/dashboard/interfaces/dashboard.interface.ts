@@ -11,6 +11,9 @@ export interface DashboardStats {
     reservationsStatus: {
       pending: number;
       approved: number;
+      fully_paid: number;
+      completed: number;
+      cancelled: number;
     };
   };
 }

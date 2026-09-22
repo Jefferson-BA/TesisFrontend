@@ -51,12 +51,25 @@ export function useAdminStats() {
   const estadoReservas = data ? [
     { name: "Pendientes", value: data.charts.reservationsStatus.pending },
     { name: "Aprobadas", value: data.charts.reservationsStatus.approved },
+    { name: "Pagadas 100%", value: data.charts.reservationsStatus.fully_paid },
+    { name: "Completadas", value: data.charts.reservationsStatus.completed },
+    { name: "Canceladas", value: data.charts.reservationsStatus.cancelled },
   ] : [{ name: "Sin datos", value: 1 }];
+
+  // 4. Conteos individuales por estado (para el card de notificaciones)
+  const reservationStatusCounts = {
+    pending: data?.charts.reservationsStatus.pending ?? 0,
+    approved: data?.charts.reservationsStatus.approved ?? 0,
+    fully_paid: data?.charts.reservationsStatus.fully_paid ?? 0,
+    completed: data?.charts.reservationsStatus.completed ?? 0,
+    cancelled: data?.charts.reservationsStatus.cancelled ?? 0,
+  };
 
   return {
     ventasPorMes,
     usuariosData,
     estadoReservas,
+    reservationStatusCounts,
     isLoading,
     isError
   };
