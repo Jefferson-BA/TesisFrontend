@@ -5,20 +5,17 @@ import vercel from '@astrojs/vercel';
 import tailwindcss from '@tailwindcss/vite';
 import { fileURLToPath } from 'url';
 
-// https://astro.build/config
 export default defineConfig({
   output: "server",
   adapter: vercel(),
 
   integrations: [react()],
 
-  // 🔥 Prefetch inteligente
   prefetch: {
     defaultStrategy: 'hover',
     prefetchAll: false,
   },
 
-  // 🔥 Build optimizado
   build: {
     inlineStylesheets: 'auto',
   },
@@ -51,7 +48,7 @@ export default defineConfig({
       },
     },
     ssr: {
-      noExternal: ['@radix-ui/*', 'lucide-react', 'framer-motion'],
+      noExternal: ['@radix-ui/*', 'lucide-react', 'framer-motion', 'recharts', 'react-is'],
     },
   },
 });
