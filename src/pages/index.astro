@@ -7,7 +7,7 @@ import { Hero } from "@/modules/user/Inicio/components/Hero";
 import { Servicios } from "@/modules/user/Inicio/components/Servicios";
 import { Testimonios } from "@/modules/user/Inicio/components/Testimonios";
 import { Contacto } from "@/modules/user/Inicio/components/Contacto";
-import PromoBanner from "@/modules/admin/promociones/components/PromoBanner";
+import { PromoSection } from "@/modules/user/Inicio/components/PromoSection";
 
 ---
 <UserLayout 
@@ -20,10 +20,10 @@ import PromoBanner from "@/modules/admin/promociones/components/PromoBanner";
     
     <!-- Servicios: Necesita JS para tilt → visible -->
     <Servicios client:visible />
-    
-    <!-- PromoBanner: Si solo es visual → estático. Si tiene JS → visible -->
-    <PromoBanner client:visible />
-    
+
+    <!-- PromoSection: Entre Especialidades y Testimonios → visible -->
+    <PromoSection client:visible />
+
     <!-- Testimonios: Animaciones con framer-motion → visible -->
     <Testimonios client:visible />
     

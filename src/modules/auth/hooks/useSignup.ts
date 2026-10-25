@@ -12,6 +12,8 @@ export const useSignup = () => {
         email: data.email,
         password: data.password,
         phone: (data as any).phone, // 👈 ¡Súper importante para que viaje por la API!
+        acceptedTerms: data.acceptedTerms ?? true,
+        acceptedPrivacy: data.acceptedPrivacy ?? true,
       };
       return authService.signup(payload);
     },

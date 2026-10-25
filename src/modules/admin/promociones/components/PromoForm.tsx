@@ -18,6 +18,11 @@ import { getCategories } from '@/modules/admin/productos/services/category.servi
 import type { Promotion, CreatePromotionDto, DiscountType, ApplyTo } from '../interfaces/promotion.interface';
 import { getPromoLabel, formatPromoDates } from '../utils/promoUtils';
 
+/** Toggle activo/inactivo sin recargar la página */
+async function togglePromoActive(promo: Promotion): Promise<Promotion> {
+  return updatePromotion(promo.id, { isActive: !promo.isActive });
+}
+
 /* ─── EMPTY FORM STATE ─── */
 const EMPTY_FORM: CreatePromotionDto = {
   title: '',
@@ -100,14 +105,20 @@ function PromoModal({ open, editing, products, categories, onClose, onSaved }: P
     e.preventDefault();
     setLoading(true);
     try {
-      const payload: CreatePromotionDto = {
+      const payload: any = {
         ...form,
+        discountType: form.discountType.toLowerCase(),
+        applyTo: form.applyTo.toLowerCase(),
         discountValue: Number(form.discountValue),
         minQuantity: form.discountType === 'buy_x_get_discount' ? Number(form.minQuantity) : undefined,
-        productId: form.applyTo === 'product' ? form.productId : null,
-        categoryId: form.applyTo === 'category' ? form.categoryId : null,
+        productId: form.applyTo === 'product' && form.productId ? form.productId : undefined,
+        categoryId: form.applyTo === 'category' && form.categoryId ? form.categoryId : undefined,
         imageUrl: form.imageUrl?.trim() || undefined,
+        startDate: form.startDate.includes('T') ? form.startDate : `${form.startDate}T00:00:00Z`,
+        endDate: form.endDate.includes('T') ? form.endDate : `${form.endDate}T23:59:59Z`,
       };
+
+      console.log('SENDING PAYLOAD:', payload);
 
       if (editing) {
         await updatePromotion(editing.id, payload);
@@ -119,8 +130,9 @@ function PromoModal({ open, editing, products, categories, onClose, onSaved }: P
       onSaved();
       onClose();
     } catch (err: any) {
-      console.error(err);
-      toast.error(err?.response?.data?.message ?? 'Error al guardar la promoción');
+      console.error('BACKEND ERROR DATA:', err?.response?.data);
+      const msg = err?.response?.data?.message;
+      toast.error(Array.isArray(msg) ? msg.join(', ') : (msg ?? 'Error al guardar la promoción'));
     } finally {
       setLoading(false);
     }
@@ -444,6 +456,7 @@ function PromoModal({ open, editing, products, categories, onClose, onSaved }: P
 export default function PromotionsAdmin() {
   const [promos, setPromos] = useState<Promotion[]>([]);
   const [loading, setLoading] = useState(true);
+  const [togglingId, setTogglingId] = useState<number | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Promotion | null>(null);
   const [products, setProducts] = useState<any[]>([]);
@@ -473,12 +486,41 @@ export default function PromotionsAdmin() {
       .catch(console.error);
   }, [fetchPromos]);
 
+  /**
+   * Toggle isActive optimistic: actualiza la UI de inmediato y luego llama
+   * al backend. Si el backend falla, revierte el cambio local.
+   */
+  const handleToggleActive = async (promo: Promotion) => {
+    if (togglingId === promo.id) return; // debounce
+    setTogglingId(promo.id);
+
+    // Optimistic update
+    setPromos((prev) =>
+      prev.map((p) => (p.id === promo.id ? { ...p, isActive: !p.isActive } : p))
+    );
+
+    try {
+      await togglePromoActive(promo);
+      toast.success(
+        !promo.isActive ? '✓ Promoción activada' : '✗ Promoción desactivada'
+      );
+    } catch (err: any) {
+      // Revert on error
+      setPromos((prev) =>
+        prev.map((p) => (p.id === promo.id ? { ...p, isActive: promo.isActive } : p))
+      );
+      toast.error(err?.response?.data?.message ?? 'Error al cambiar el estado');
+    } finally {
+      setTogglingId(null);
+    }
+  };
+
   const handleDelete = async (promo: Promotion) => {
     if (!confirm(`¿Eliminar la promoción "${promo.title}"?`)) return;
     try {
       await deletePromotion(promo.id);
       toast.success('Promoción eliminada');
-      await fetchPromos();
+      setPromos((prev) => prev.filter((p) => p.id !== promo.id));
     } catch (err: any) {
       toast.error(err?.response?.data?.message ?? 'Error al eliminar');
     }
@@ -613,20 +655,28 @@ export default function PromotionsAdmin() {
                       </span>
                     </td>
 
-                    {/* Estado */}
+                    {/* Estado — clickable toggle */}
                     <td className="px-4 py-4 text-center">
-                      <span
-                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg font-bold text-xs border ${
+                      <button
+                        id={`btn-toggle-promo-${promo.id}`}
+                        type="button"
+                        onClick={() => handleToggleActive(promo)}
+                        disabled={togglingId === promo.id}
+                        title={promo.isActive ? 'Haz clic para desactivar' : 'Haz clic para activar'}
+                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg font-bold text-xs border transition-all cursor-pointer hover:scale-105 disabled:opacity-60 disabled:cursor-not-allowed ${
                           promo.isActive
-                            ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
-                            : 'bg-secondary text-muted-foreground border-border'
+                            ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20'
+                            : 'bg-secondary text-muted-foreground border-border hover:bg-amber-500/10 hover:text-amber-600 hover:border-amber-500/20'
                         }`}
                       >
-                        {promo.isActive
-                          ? <><CheckCircle2 size={11} /> Activa</>
-                          : <><XCircle size={11} /> Inactiva</>
-                        }
-                      </span>
+                        {togglingId === promo.id ? (
+                          <span className="w-3 h-3 border-2 border-current/30 border-t-current rounded-full animate-spin" />
+                        ) : promo.isActive ? (
+                          <><CheckCircle2 size={11} /> Activa</>
+                        ) : (
+                          <><XCircle size={11} /> Inactiva</>
+                        )}
+                      </button>
                     </td>
 
                     {/* Acciones */}

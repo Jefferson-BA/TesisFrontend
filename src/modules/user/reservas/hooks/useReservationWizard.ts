@@ -30,7 +30,14 @@ export const useReservationWizard = () => {
         eventType: "Boda",
         notes: "",
         paymentMethod: "card",
+        acceptedTerms: false,
+        acceptedPrivacy: false,
     });
+
+    const cartTotal = cart.reduce(
+        (acc, item) => acc + (Number(item.price) || 0) * (Number(item.quantity) || 1),
+        0
+    );
 
     useEffect(() => {
         const fetchMenu = async () => {
@@ -62,6 +69,12 @@ export const useReservationWizard = () => {
             return;
         }
 
+        if (!formData.date) {
+            toast.error("Por favor completa la fecha del evento en el Paso 3.");
+            setCurrentStep(3);
+            return;
+        }
+
         const items = cart.map((item) => ({
             productId: String(item.id),
             quantity: Number(item.quantity),
@@ -77,7 +90,10 @@ export const useReservationWizard = () => {
                 guestsCount: Number(formData.guests) || 1,
                 venueAddress: formData.address || "Dirección pendiente",
                 city: formData.city || "Ciudad pendiente",
+                additionalNotes: formData.notes || "",
                 items: items,
+                acceptedTerms: (formData as any).acceptedTerms ?? true,
+                acceptedPrivacy: (formData as any).acceptedPrivacy ?? true,
             };
 
             await createReservation(reservationPayload);
@@ -87,10 +103,10 @@ export const useReservationWizard = () => {
             
             clearCart(); 
 
-            // Redirigir al usuario (Ajusta la URL "/perfil/reservas" a la ruta real de tu proyecto)
+            // Redirigir al usuario al perfil
             setTimeout(() => {
-                window.location.href = "/"; 
-            }, 2500);
+                window.location.href = "/user/profile"; 
+            }, 2000);
 
         } catch (error: any) {
             console.error("Error al procesar reserva:", error);
@@ -104,10 +120,13 @@ export const useReservationWizard = () => {
 
     return {
         currentStep,
+        setCurrentStep,
         formData,
         products,
         isLoadingProducts,
         isLoadingSubmit,
+        cart,
+        cartTotal,
         handleChange,
         setFormData,
         nextStep,

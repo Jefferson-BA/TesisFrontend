@@ -144,6 +144,7 @@ export const MenuProducts = () => {
 
       <MenuModal
         selected={selected}
+        activePromos={activePromos}
         onClose={() => setSelected(null)}
         onConfirm={() => {
           if (selected) {

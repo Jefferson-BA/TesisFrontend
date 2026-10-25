@@ -7,6 +7,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useState, useRef, useEffect } from "react";
 import "../../../styles/globals.css";
+import { LegalCheckboxes, type LegalCheckboxesValue } from "@/modules/shared/legal/LegalCheckboxes";
 
 const queryClient = new QueryClient();
 
@@ -47,6 +48,8 @@ function RegisterFormInner() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [legal, setLegal] = useState<LegalCheckboxesValue>({ acceptedTerms: false, acceptedPrivacy: false });
+  const [legalError, setLegalError] = useState("");
   const cardRef = useRef<HTMLDivElement>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -78,8 +81,21 @@ function RegisterFormInner() {
   const confirmPassReg = register("confirmPassword");
 
   const onSubmit = (data: RegisterFormData) => {
-    // 🟢 'data' ya contiene la propiedad 'phone' limpia gracias a react-hook-form y zod
-    signup(data, {
+    if (!legal.acceptedTerms || !legal.acceptedPrivacy) {
+      setLegalError("Debes aceptar los Términos y Condiciones y la Política de Privacidad para registrarte.");
+      return;
+    }
+    setLegalError("");
+    
+    // Merge legal into data
+    const payload = {
+      ...data,
+      acceptedTerms: true,
+      acceptedPrivacy: true,
+    };
+
+    // 'payload' ya contiene la propiedad 'phone' limpia gracias a react-hook-form y zod
+    signup(payload, {
       onSuccess: () =>
         toast.success("¡Cuenta creada con éxito! 🎉", {
           style: { background: "#120d0a", color: "#fff", border: "1px solid #4a3824" },
@@ -297,6 +313,13 @@ function RegisterFormInner() {
                 </div>
                 {errors.confirmPassword && <span className="lf-error">{errors.confirmPassword.message}</span>}
               </div>
+
+              {/* Legal checkboxes */}
+              <LegalCheckboxes
+                value={legal}
+                onChange={(v) => { setLegal(v); if (legalError) setLegalError(""); }}
+                error={legalError}
+              />
 
               {/* Submit */}
               <button

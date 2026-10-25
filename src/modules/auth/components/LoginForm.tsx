@@ -6,6 +6,7 @@ import { Loader2, Mail, Lock, ChefHat, Flame, Star, Clock, MapPin, ArrowRight, E
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useState, useEffect, useRef, useCallback, type MouseEvent } from "react";
+import { LegalCheckboxes, type LegalCheckboxesValue } from "@/modules/shared/legal/LegalCheckboxes";
 
 const localQueryClient = new QueryClient({
   defaultOptions: {
@@ -42,6 +43,8 @@ function LoginFormContent() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [showPassword, setShowPassword] = useState(false);
   const [ripples, setRipples] = useState<Ripple[]>([]);
+  const [legalError, setLegalError] = useState("");
+  const [legal, setLegal] = useState<LegalCheckboxesValue>({ acceptedTerms: false, acceptedPrivacy: false });
   const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -80,6 +83,11 @@ function LoginFormContent() {
   });
 
   const onSubmit = (data: LoginFormData) => {
+    if (!legal.acceptedTerms || !legal.acceptedPrivacy) {
+      setLegalError("Debes aceptar los Términos y Condiciones y la Política de Privacidad para continuar.");
+      return;
+    }
+    setLegalError("");
     login(data, {
       onSuccess: () => toast.success("¡Bienvenido al sistema! 🔥"),
       onError: () => toast.error("Credenciales incorrectas"),
@@ -205,6 +213,13 @@ function LoginFormContent() {
               </div>
               {errors.password && <p className="lf-error">{errors.password.message}</p>}
             </div>
+
+            {/* Legal checkboxes */}
+            <LegalCheckboxes
+              value={legal}
+              onChange={(v) => { setLegal(v); if (legalError) setLegalError(""); }}
+              error={legalError}
+            />
 
             <button
               type="submit"

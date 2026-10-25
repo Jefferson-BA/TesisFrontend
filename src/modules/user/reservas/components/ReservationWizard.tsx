@@ -21,7 +21,11 @@ const STEPS = [
 export default function ReservationWizard() {
   const wizard = useReservationWizard();
   const cart = useCartStore((s) => s.cart);
-  const cartTotal = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const cartTotal = wizard.cartTotal ?? cart.reduce(
+    (acc, item) => acc + (Number(item.price) || 0) * (Number(item.quantity) || 1),
+    0
+  );
+  const legalAccepted = !!(wizard.formData.acceptedTerms && wizard.formData.acceptedPrivacy);
 
   return (
     <div className="w-full max-w-4xl mx-auto mt-6 px-4 sm:px-0 relative">
@@ -48,7 +52,15 @@ export default function ReservationWizard() {
               {wizard.currentStep === 1 && <Step1Contact formData={wizard.formData} handleChange={wizard.handleChange} />}
               {wizard.currentStep === 2 && <Step2Menu products={wizard.products} isLoading={wizard.isLoadingProducts} />}
               {wizard.currentStep === 3 && <Step3Logistics formData={wizard.formData} handleChange={wizard.handleChange} wizard={wizard} />}
-              {wizard.currentStep === 4 && <Step4Payment formData={wizard.formData} setFormData={wizard.setFormData} cartTotal={cartTotal} />}
+              {wizard.currentStep === 4 && (
+                <Step4Payment
+                  formData={wizard.formData}
+                  setFormData={wizard.setFormData}
+                  cartTotal={cartTotal}
+                  cart={cart}
+                  goToStep={wizard.setCurrentStep}
+                />
+              )}
             </motion.div>
           </AnimatePresence>
         </div>
@@ -61,6 +73,7 @@ export default function ReservationWizard() {
           nextStep={wizard.nextStep}
           submitReservation={wizard.submitReservation}
           isLoading={wizard.isLoadingSubmit}
+          legalAccepted={legalAccepted}
         />
       </div>
     </div>
@@ -123,7 +136,7 @@ const Stepper = ({ currentStep }: { currentStep: number }) => (
 );
 
 // ─── NavBar ───
-const NavBar = ({ currentStep, totalSteps, prevStep, nextStep, submitReservation, isLoading }: any) => (
+const NavBar = ({ currentStep, totalSteps, prevStep, nextStep, submitReservation, isLoading, legalAccepted }: any) => (
   <div className="flex items-center justify-between p-6 bg-muted/30 dark:bg-zinc-900/80 border-t border-border dark:border-zinc-800">
     <button
       onClick={prevStep}
@@ -143,14 +156,22 @@ const NavBar = ({ currentStep, totalSteps, prevStep, nextStep, submitReservation
         Continuar
       </button>
     ) : (
-      <button
-        onClick={submitReservation}
-        disabled={isLoading}
-        className="px-6 py-2.5 bg-ember hover:brightness-110 text-char-deep font-bold rounded-lg text-sm flex items-center gap-2 disabled:opacity-70"
-      >
-        {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <CreditCard className="w-4 h-4" />}
-        Confirmar y Enviar reserva
-      </button>
+      <div className="flex flex-col items-end gap-1">
+        {!legalAccepted && (
+          <p className="text-[10px] text-amber-600 dark:text-amber-400 font-semibold">
+            Acepta los términos para confirmar
+          </p>
+        )}
+        <button
+          onClick={submitReservation}
+          disabled={isLoading || !legalAccepted}
+          title={!legalAccepted ? "Debes aceptar los Términos y Política de Privacidad" : undefined}
+          className="px-6 py-2.5 bg-ember hover:brightness-110 text-char-deep font-bold rounded-lg text-sm flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+        >
+          {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <CreditCard className="w-4 h-4" />}
+          Confirmar y Enviar reserva
+        </button>
+      </div>
     )}
   </div>
 );

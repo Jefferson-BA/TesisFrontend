@@ -42,8 +42,9 @@ export interface ReservationPayload {
   venueAddress: string;
   city: string;
   items: ReservationItem[];
-  notes?: string;
-  paymentMethod?: string;
+  additionalNotes?: string;
+  acceptedTerms?: boolean;
+  acceptedPrivacy?: boolean;
 }
 
 // ─── Respuesta del backend al crear reserva ───

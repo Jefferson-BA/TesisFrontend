@@ -13,7 +13,8 @@ export function calcDiscountedPrice(
   promo: Promotion,
   qty: number = 1
 ): number {
-  switch (promo.discountType) {
+  const type = (promo.discountType || '').toLowerCase();
+  switch (type) {
     case 'percentage':
       return price * (1 - promo.discountValue / 100);
 
@@ -36,7 +37,8 @@ export function calcDiscountedPrice(
  * Ej. "20% OFF", "S/ 15 OFF", "2x1 · 30% OFF"
  */
 export function getPromoLabel(promo: Promotion): string {
-  switch (promo.discountType) {
+  const type = (promo.discountType || '').toLowerCase();
+  switch (type) {
     case 'percentage':
       return `${promo.discountValue}% OFF`;
     case 'fixed_amount':
@@ -57,9 +59,10 @@ export function promoAppliesToProduct(
   productId: string,
   categoryId?: string
 ): boolean {
-  if (promo.applyTo === 'all') return true;
-  if (promo.applyTo === 'product' && promo.product?.id === productId) return true;
-  if (promo.applyTo === 'category' && categoryId && promo.category?.id === categoryId) return true;
+  const apply = (promo.applyTo || '').toLowerCase();
+  if (apply === 'all') return true;
+  if (apply === 'product' && promo.product?.id === productId) return true;
+  if (apply === 'category' && categoryId && promo.category?.id === categoryId) return true;
   return false;
 }
 
