@@ -5,5 +5,8 @@ declare global {
   interface Window {
     Culqi: any;
     culqi: () => void;
+    CulqiCheckout: any;
+    Culqi3DS?: any;
+    culqi3ds?: () => void;
   }
-}
+}

@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { CulqiPayment } from "@/modules/payments/components/CulqiPayment";
 import { useCartStore } from "@/modules/admin/promociones/store/cartStore";
@@ -20,6 +20,7 @@ export default function CheckoutPage() {
   const [isCulqiOpen, setIsCulqiOpen] = useState(false);
   const [orderId, setOrderId] = useState("");
   const [isCreatingOrder, setIsCreatingOrder] = useState(false);
+  const isCreatingOrderRef = useRef(false);
 
   const subtotal = cart.reduce((acc, item) => acc + Number(item.price) * Number(item.quantity), 0);
   const serviceFee = subtotal * 0.10;
@@ -34,7 +35,14 @@ export default function CheckoutPage() {
   };
 
   const handlePagarClick = async () => {
+    // Candado sincrónico inmediato para evitar doble petición de creación de orden
+    if (isCreatingOrderRef.current || isCreatingOrder) {
+      console.warn("⚠️ Petición de orden ya en progreso.");
+      return;
+    }
+
     try {
+      isCreatingOrderRef.current = true;
       setIsCreatingOrder(true);
       toast.loading("Preparando tu orden...", { id: "create-order" });
 
@@ -58,6 +66,7 @@ export default function CheckoutPage() {
       toast.error(Array.isArray(msg) ? msg[0] : msg, { id: "create-order" });
     } finally {
       setIsCreatingOrder(false);
+      isCreatingOrderRef.current = false;
     }
   };
 
@@ -126,11 +135,18 @@ export default function CheckoutPage() {
         {/* Botón de pago */}
         {!orderId && (
           <>
-            <button onClick={handlePagarClick} disabled={isCreatingOrder}
-              className="w-full flex items-center justify-center gap-2 bg-ember hover:brightness-110 text-char-deep font-bold py-4 rounded-xl transition-all active:scale-[0.98] relative overflow-hidden group disabled:opacity-70">
+            <button
+              type="button"
+              onClick={handlePagarClick}
+              disabled={isCreatingOrder}
+              className={cn(
+                "w-full flex items-center justify-center gap-2 bg-ember hover:brightness-110 text-char-deep font-bold py-4 rounded-xl transition-all active:scale-[0.98] relative overflow-hidden group",
+                isCreatingOrder && "opacity-60 cursor-not-allowed pointer-events-none"
+              )}
+            >
               {!isCreatingOrder && <span className="absolute inset-0 bg-[linear-gradient(115deg,transparent_30%,color-mix(in_oklch,white_50%,transparent)_50%,transparent_70%)] animate-shimmer" />}
               {isCreatingOrder ? <Loader2 className="w-5 h-5 relative z-10 animate-spin" /> : <CreditCard className="w-5 h-5 relative z-10" />}
-              <span className="relative z-10">{isCreatingOrder ? "Preparando..." : "Pagar de Forma Segura"}</span>
+              <span className="relative z-10">{isCreatingOrder ? "Preparando pago..." : "Pagar de Forma Segura"}</span>
             </button>
             <div className="mt-4 flex items-center justify-center gap-2 text-[10px] text-muted-foreground">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" /> Pago encriptado y procesado por Culqi
@@ -145,7 +161,10 @@ export default function CheckoutPage() {
             amount={totalAmount}
             userEmail={user?.email || "email@ejemplo.com"}
             isOpen={isCulqiOpen}
-            onClose={() => setIsCulqiOpen(false)}
+            onClose={() => {
+              setIsCulqiOpen(false);
+              setOrderId("");
+            }}
             onSuccessCallback={handleSuccess}
           />
         )}

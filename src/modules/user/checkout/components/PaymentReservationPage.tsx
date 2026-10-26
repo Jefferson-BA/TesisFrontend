@@ -29,12 +29,14 @@ function PaymentReservationContent() {
   const [reservationId, setReservationId] = useState("");
   const [amount, setAmount] = useState(0);
   const [isCreatingOrder, setIsCreatingOrder] = useState(false);
+  const isCreatingOrderRef = useRef(false);
   const [isCulqiReady, setIsCulqiReady] = useState(false);
   const [isBackendProcessing, setIsBackendProcessing] = useState(false);
   const [isDark, setIsDark] = useState(true);
 
   const culqiRef = useRef<any>(null);
   const processingRef = useRef(false);
+  const processedTokensRef = useRef<Set<string>>(new Set());
   const containerId = useRef(`culqi-${Date.now()}`).current;
 
   // Detectar tema
@@ -53,24 +55,47 @@ function PaymentReservationContent() {
     if (p.get("amount")) setAmount(Number(p.get("amount")));
   }, []);
 
-  // Script Culqi
+  // Script Culqi y limpieza de listeners
   useEffect(() => {
-    if (document.getElementById("culqi-checkout-js")) { setIsCulqiReady(true); return; }
-    const s = document.createElement("script");
-    s.src = "https://js.culqi.com/checkout-js";
-    s.id = "culqi-checkout-js";
-    s.async = true;
-    s.onload = () => setIsCulqiReady(true);
-    document.body.appendChild(s);
-    return () => { culqiRef.current?.close(); };
+    if (document.getElementById("culqi-checkout-js")) {
+      setIsCulqiReady(true);
+    } else {
+      const s = document.createElement("script");
+      s.src = "https://js.culqi.com/checkout-js";
+      s.id = "culqi-checkout-js";
+      s.async = true;
+      s.onload = () => setIsCulqiReady(true);
+      document.body.appendChild(s);
+    }
+
+    return () => {
+      if (typeof window !== "undefined") {
+        window.culqi = () => {};
+        if (window.culqi3ds) window.culqi3ds = () => {};
+        if (window.Culqi) window.Culqi.token = null;
+      }
+      culqiRef.current?.close();
+    };
   }, []);
 
   useEffect(() => {
-    if (step === "pago" && orderId && isCulqiReady) setTimeout(openCulqi, 200);
+    if (step === "pago" && orderId && isCulqiReady) {
+      processingRef.current = false;
+      setIsBackendProcessing(false);
+      const timer = setTimeout(openCulqi, 200);
+      return () => clearTimeout(timer);
+    }
   }, [step, orderId, isCulqiReady]);
 
   const handleContinuar = async () => {
+    // Candado sincrónico inmediato contra doble clic
+    if (isCreatingOrderRef.current || isCreatingOrder) {
+      console.warn("⚠️ Preparación de orden ya en proceso.");
+      return;
+    }
+
     try {
+      isCreatingOrderRef.current = true;
       setIsCreatingOrder(true);
       toast.loading("Preparando orden...", { id: "order" });
       const res = await createOrder({ reservationId: Number(reservationId) });
@@ -80,18 +105,32 @@ function PaymentReservationContent() {
       setOrderId(String(id));
       setStep("pago");
     } catch (e: any) {
-      toast.error(e.response?.data?.message || "Error", { id: "order" });
+      toast.error(e.response?.data?.message || "Error al preparar la orden", { id: "order" });
     } finally {
       setIsCreatingOrder(false);
+      isCreatingOrderRef.current = false;
     }
   };
 
   const handlePayment = (tokenId: string) => {
-    if (processingRef.current) return;
+    // 1. Candado sincrónico inmediato
+    if (processingRef.current) {
+      console.warn("⚠️ Intento de pago bloqueado: ya hay una transacción en proceso.");
+      return;
+    }
+
+    // 2. Control estricto de unicidad de token Culqi (previene 'Operación denegada')
+    if (!tokenId || processedTokensRef.current.has(tokenId)) {
+      console.warn("⚠️ Token ya consumido o inválido. Evitando reenvío duplicado:", tokenId);
+      return;
+    }
+
     processingRef.current = true;
+    processedTokensRef.current.add(tokenId);
     setIsBackendProcessing(true);
     culqiRef.current?.close();
-    toast.loading("Procesando pago...", { id: "pay", duration: Infinity });
+
+    toast.loading("Procesando pago de forma segura con Culqi...", { id: "pay", duration: Infinity });
     payOrder(
       { orderId, tokenId, email: user?.email || "cliente@email.com", amount },
       {
@@ -100,14 +139,15 @@ function PaymentReservationContent() {
             toast.success("¡Pago exitoso!", { id: "pay" });
             setIsBackendProcessing(false);
             setStep("completado");
-            processingRef.current = false;
             setTimeout(() => location.replace("/user/profile"), 2500);
           }, 1500);
         },
         onError: (e: any) => {
-          toast.error(e.response?.data?.message || "Error", { id: "pay" });
+          toast.error(e.response?.data?.message || "Error al procesar el pago", { id: "pay" });
           setIsBackendProcessing(false);
+          // Liberamos el candado para permitir un nuevo intento con un NUEVO token
           processingRef.current = false;
+          // NOTA: processedTokensRef mantiene el tokenId quemado
         },
       }
     );
@@ -117,6 +157,10 @@ function PaymentReservationContent() {
     if (!window.CulqiCheckout || !orderId) return;
     const pk = import.meta.env.PUBLIC_CULQI_KEY;
     if (!pk) { toast.error("Falta llave pública"); return setStep("resumen"); }
+
+    // Limpieza de contenedor previo
+    const el = document.getElementById(containerId);
+    if (el) el.innerHTML = "";
 
     const methods = { tarjeta: true, yape: true, billetera: false, bancaMovil: false, agente: false, cuotealo: false };
 
@@ -132,11 +176,30 @@ function PaymentReservationContent() {
       },
     });
 
-    culqiRef.current.culqi = () => {
-      if (culqiRef.current.token) handlePayment(culqiRef.current.token.id);
-      else if (culqiRef.current.order) { culqiRef.current.close(); setStep("completado"); setTimeout(() => location.replace("/user/profile"), 2500); }
-      else if (culqiRef.current.error) { toast.error(culqiRef.current.error.user_message); culqiRef.current.close(); }
+    const handleCulqiCallback = () => {
+      const token = culqiRef.current?.token || (typeof window !== "undefined" ? window.Culqi?.token : null);
+      if (token?.id) {
+        const tokenId = token.id;
+        // 🔥 Quema inmediata en el cliente: nulificar antes de enviar para evitar dobles lecturas
+        if (culqiRef.current) culqiRef.current.token = null;
+        if (typeof window !== "undefined" && window.Culqi) window.Culqi.token = null;
+        handlePayment(tokenId);
+      } else if (culqiRef.current?.order || (typeof window !== "undefined" && window.Culqi?.order)) {
+        culqiRef.current?.close();
+        setStep("completado");
+        setTimeout(() => location.replace("/user/profile"), 2500);
+      } else if (culqiRef.current?.error || (typeof window !== "undefined" && window.Culqi?.error)) {
+        const err = culqiRef.current?.error || window.Culqi?.error;
+        toast.error(err?.user_message || "Error al procesar la tarjeta", { id: "pay" });
+        culqiRef.current?.close();
+      }
     };
+
+    culqiRef.current.culqi = handleCulqiCallback;
+    if (typeof window !== "undefined") {
+      window.culqi = handleCulqiCallback;
+      window.culqi3ds = handleCulqiCallback;
+    }
 
     culqiRef.current.open();
   };
@@ -207,10 +270,17 @@ function PaymentReservationContent() {
               <a href="/user/profile" className="inline-flex items-center justify-center gap-2 rounded-xl border border-border px-6 py-3 text-sm font-bold text-muted-foreground transition-colors hover:border-ember/30 hover:text-foreground">
                 <ArrowLeft size={16} /> Volver
               </a>
-              <button onClick={handleContinuar} disabled={isCreatingOrder}
-                className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-ember to-amber-600 px-6 py-3 font-bold text-char-deep shadow-lg transition-all hover:brightness-110 active:scale-[0.98] disabled:opacity-70">
+              <button
+                type="button"
+                onClick={handleContinuar}
+                disabled={isCreatingOrder}
+                className={cn(
+                  "inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-ember to-amber-600 px-6 py-3 font-bold text-char-deep shadow-lg transition-all hover:brightness-110 active:scale-[0.98]",
+                  isCreatingOrder && "opacity-60 cursor-not-allowed pointer-events-none"
+                )}
+              >
                 {isCreatingOrder ? <Loader2 className="size-5 animate-spin" /> : <CreditCard className="size-5" />}
-                {isCreatingOrder ? "Preparando..." : "Confirmar y Pagar"}
+                {isCreatingOrder ? "Preparando pago..." : "Confirmar y Pagar"}
                 <ArrowRight className="size-5" />
               </button>
             </div>
@@ -226,8 +296,21 @@ function PaymentReservationContent() {
       {step === "pago" && (
         <div className={cn("fixed inset-0 top-[80px] z-40 flex flex-col", isDark ? "bg-[#0b0806]" : "bg-stone-50")}>
           <div className={cn("flex shrink-0 items-center justify-between border-b px-6 py-4 backdrop-blur-sm", isDark ? "border-[#3d2c1f] bg-[#140d0b]/95" : "border-stone-200 bg-white/95")}>
-            <button onClick={() => { culqiRef.current?.close(); setStep("resumen"); setOrderId(""); }}
-              className={cn("inline-flex items-center gap-2 text-sm transition-colors", isDark ? "text-zinc-400 hover:text-white" : "text-stone-500 hover:text-stone-900")}>
+            <button
+              type="button"
+              onClick={() => {
+                if (isBackendProcessing) return;
+                culqiRef.current?.close();
+                setStep("resumen");
+                setOrderId("");
+              }}
+              disabled={isBackendProcessing}
+              className={cn(
+                "inline-flex items-center gap-2 text-sm transition-colors",
+                isDark ? "text-zinc-400 hover:text-white" : "text-stone-500 hover:text-stone-900",
+                isBackendProcessing && "opacity-40 cursor-not-allowed pointer-events-none"
+              )}
+            >
               <ArrowLeft size={16} /> Volver
             </button>
             <div className="text-right">
@@ -240,7 +323,7 @@ function PaymentReservationContent() {
           <AnimatePresence>
             {isBackendProcessing && (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/90 backdrop-blur-md">
+                className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/90 backdrop-blur-md pointer-events-auto">
                 <div className="mx-4 max-w-sm rounded-2xl border border-ember/20 bg-card p-8 text-center shadow-2xl">
                   <Loader2 className="mx-auto mb-4 size-12 animate-spin text-ember" />
                   <h3 className="mb-2 text-xl font-bold text-foreground">Validando Transacción</h3>
@@ -248,7 +331,7 @@ function PaymentReservationContent() {
                     <motion.div className="h-full rounded-full bg-gradient-to-r from-ember to-amber-600"
                       animate={{ width: ["0%", "100%"] }} transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }} />
                   </div>
-                  <p className="text-sm text-muted-foreground">No cierres esta ventana.</p>
+                  <p className="text-sm text-muted-foreground">Estamos procesando tu pago con Culqi. Por favor, no cierres esta ventana ni recargues la página.</p>
                 </div>
               </motion.div>
             )}

@@ -33,15 +33,21 @@ function CulqiPaymentInner({
   const { mutate: payOrder } = usePayOrder();
   
   const culqiInstanceRef = useRef<any>(null);
-  const isProcessingPaymentRef = useRef(false);
+  const isPaymentInFlightRef = useRef(false);
+  const processedTokensRef = useRef<Set<string>>(new Set());
   const processingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const containerId = useRef(`culqi-container-${Date.now()}`).current;
 
-  // Limpiar al desmontar
+  // Limpiar listeners y pasarela al desmontar
   useEffect(() => {
     return () => {
       if (processingTimeoutRef.current) {
         clearTimeout(processingTimeoutRef.current);
+      }
+      if (typeof window !== "undefined") {
+        window.culqi = () => {};
+        if (window.culqi3ds) window.culqi3ds = () => {};
+        if (window.Culqi) window.Culqi.token = null;
       }
       if (culqiInstanceRef.current?.close) {
         culqiInstanceRef.current.close();
@@ -65,25 +71,38 @@ function CulqiPaymentInner({
 
   useEffect(() => {
     if (isOpen && isScriptLoaded && orderId) {
-      isProcessingPaymentRef.current = false;
+      isPaymentInFlightRef.current = false;
       setIsBackendProcessing(false);
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         openCulqiCheckout();
       }, 150);
+      return () => clearTimeout(timer);
     }
   }, [isOpen, isScriptLoaded, orderId]);
 
   const handlePaymentToBackend = (tokenId: string) => {
-    if (isProcessingPaymentRef.current) return;
+    // 1. Candado sincrónico inmediato contra doble petición en el mismo tick
+    if (isPaymentInFlightRef.current) {
+      console.warn("⚠️ Intento de pago bloqueado: ya hay una transacción en proceso.");
+      return;
+    }
     
-    isProcessingPaymentRef.current = true;
+    // 2. Control de unicidad de token Culqi (previene 'Operación denegada' por reuso)
+    if (!tokenId || processedTokensRef.current.has(tokenId)) {
+      console.warn("⚠️ Token ya consumido o inválido. Evitando reenvío duplicado:", tokenId);
+      return;
+    }
+    
+    isPaymentInFlightRef.current = true;
+    processedTokensRef.current.add(tokenId);
     setIsBackendProcessing(true);
     
+    // Cerrar pasarela Culqi inmediatamente para evitar reinteracciones del usuario en el iframe
     if (culqiInstanceRef.current?.close) {
       culqiInstanceRef.current.close();
     }
 
-    toast.loading("Procesando pago de forma segura...", {
+    toast.loading("Procesando pago de forma segura con Culqi...", {
       id: "payment-toast",
       duration: Infinity,
     });
@@ -95,7 +114,7 @@ function CulqiPaymentInner({
           console.log("✅ Pago exitoso:", data);
           
           processingTimeoutRef.current = setTimeout(() => {
-            toast.success("¡Pago exitoso! Tu reserva ha sido confirmada.", {
+            toast.success("¡Pago exitoso! Tu orden ha sido confirmada.", {
               id: "payment-toast",
               duration: 3000,
             });
@@ -107,15 +126,14 @@ function CulqiPaymentInner({
             }
             
             onClose();
-            isProcessingPaymentRef.current = false;
-          }, 2000);
+          }, 1500);
         },
         onError: (error: any) => {
           console.error("❌ Error en pago:", error);
           
           const errorMessage =
             error.response?.data?.message ||
-            "La tarjeta fue rechazada o hubo un error.";
+            "La tarjeta fue rechazada o hubo un error al procesar la operación.";
           
           toast.error(`Error en el pago: ${errorMessage}`, {
             id: "payment-toast",
@@ -123,7 +141,9 @@ function CulqiPaymentInner({
           });
           
           setIsBackendProcessing(false);
-          isProcessingPaymentRef.current = false;
+          // Liberamos el candado para permitir un nuevo intento con un NUEVO token
+          isPaymentInFlightRef.current = false;
+          // NOTA: processedTokensRef mantiene el tokenId quemado para evitar que vuelva a enviarse jamás
           onClose();
         },
       },
@@ -265,24 +285,44 @@ function CulqiPaymentInner({
       },
     };
 
+    // Limpieza de contenedor previo para evitar iframes fantasma duplicados
+    const container = document.getElementById(containerId);
+    if (container) {
+      container.innerHTML = "";
+    }
+
     culqiInstanceRef.current = new window.CulqiCheckout(publicKey, config);
 
-    culqiInstanceRef.current.culqi = () => {
-      if (culqiInstanceRef.current.token) {
-        handlePaymentToBackend(culqiInstanceRef.current.token.id);
-      } else if (culqiInstanceRef.current.order) {
+    // Handler único y seguro para eventos Culqi / Culqi3DS
+    const handleCulqiEvent = () => {
+      const token = culqiInstanceRef.current?.token || (typeof window !== "undefined" ? window.Culqi?.token : null);
+      if (token?.id) {
+        const tokenId = token.id;
+        // 🔥 Quema inmediata en el cliente: nulificar antes de enviar para evitar dobles lecturas
+        if (culqiInstanceRef.current) culqiInstanceRef.current.token = null;
+        if (typeof window !== "undefined" && window.Culqi) window.Culqi.token = null;
+        handlePaymentToBackend(tokenId);
+      } else if (culqiInstanceRef.current?.order || (typeof window !== "undefined" && window.Culqi?.order)) {
         toast.success("Orden procesada correctamente.");
-        culqiInstanceRef.current.close();
+        culqiInstanceRef.current?.close();
         onClose();
         if (onSuccessCallback) onSuccessCallback();
-      } else if (culqiInstanceRef.current.error) {
+      } else if (culqiInstanceRef.current?.error || (typeof window !== "undefined" && window.Culqi?.error)) {
+        const error = culqiInstanceRef.current?.error || window.Culqi?.error;
         toast.error(
-          culqiInstanceRef.current.error.user_message || "Error al procesar la tarjeta",
+          error?.user_message || "Error al procesar la tarjeta",
+          { id: "payment-toast" }
         );
-        culqiInstanceRef.current.close();
+        culqiInstanceRef.current?.close();
         onClose();
       }
     };
+
+    culqiInstanceRef.current.culqi = handleCulqiEvent;
+    if (typeof window !== "undefined") {
+      window.culqi = handleCulqiEvent;
+      window.culqi3ds = handleCulqiEvent;
+    }
 
     culqiInstanceRef.current.open();
   };
@@ -293,7 +333,7 @@ function CulqiPaymentInner({
     <>
       {/* Loader de procesamiento */}
       {isBackendProcessing && (
-        <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/90 backdrop-blur-md">
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/90 backdrop-blur-md pointer-events-auto">
           <div className="bg-gradient-to-br from-neutral-900 to-neutral-800 border-2 border-amber-500/30 p-8 rounded-2xl flex flex-col items-center max-w-sm w-full mx-4 shadow-2xl">
             <div className="relative mb-6">
               <div className="absolute inset-0 w-16 h-16 border-4 border-amber-500/20 rounded-full animate-ping" />
@@ -312,7 +352,7 @@ function CulqiPaymentInner({
             
             <p className="text-neutral-400 text-sm text-center">
               Estamos procesando tu pago de forma segura con Culqi. 
-              Por favor, no cierres esta ventana.
+              Por favor, no cierres esta ventana ni recargues la página.
             </p>
             
             <div className="mt-4 flex items-center gap-2 text-xs text-neutral-500">
@@ -333,7 +373,11 @@ function CulqiPaymentInner({
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 bg-black/20 hover:bg-black/40 text-white/80 hover:text-white rounded-lg flex items-center justify-center transition-all"
+            disabled={isBackendProcessing}
+            aria-label="Cerrar pasarela de pago"
+            className={`w-8 h-8 bg-black/20 hover:bg-black/40 text-white/80 hover:text-white rounded-lg flex items-center justify-center transition-all ${
+              isBackendProcessing ? "opacity-30 cursor-not-allowed pointer-events-none" : ""
+            }`}
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
