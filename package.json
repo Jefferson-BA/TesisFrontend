@@ -3,13 +3,14 @@
   "type": "module",
   "version": "0.0.1",
   "scripts": {
-   "dev": "astro dev --port 4321",
+    "dev": "astro dev --port 4321",
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro"
   },
   "dependencies": {
     "@astrojs/react": "^5.0.4",
+    "@astrojs/vercel": "^8.0.0",
     "@fontsource-variable/geist": "^5.2.8",
     "@hookform/resolvers": "^5.2.2",
     "@tailwindcss/vite": "^4.2.4",
@@ -25,6 +26,7 @@
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
     "react-hook-form": "^7.74.0",
+    "react-is": "^19.3.1",
     "react-markdown": "^10.1.0",
     "recharts": "^3.8.1",
     "shadcn": "^4.5.0",
