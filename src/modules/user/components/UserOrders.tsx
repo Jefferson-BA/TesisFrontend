@@ -9,10 +9,11 @@ import { getUserReservations } from "@/modules/user/reservas/services/reservatio
 import {
   Clock, CheckCircle, CreditCard, XCircle, AlertCircle, Smartphone,
   DollarSign, Calendar, ChevronDown, ChevronUp, ChevronLeft, ChevronRight,
-  MapPin, Users, FileText, ArrowRight, type LucideIcon,
+  MapPin, Users, FileText, ArrowRight, Eye, type LucideIcon,
 } from "lucide-react";
 import { useUser } from "../hooks/useUser";
 import { cn } from "@/lib/utils";
+import { ReservationDetailModal } from "./ReservationDetailModal";
 
 const localQueryClient = new QueryClient({ defaultOptions: { queries: { refetchOnWindowFocus: true, retry: 1 } } });
 
@@ -93,6 +94,8 @@ function UserOrdersContent() {
   const { user } = useUser();
   const [expandedId, setExpandedId] = useState<string | number | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const { data: reservations = [], isLoading } = useQuery<Reservation[]>({
     queryKey: ["user-reservations"],
@@ -189,7 +192,19 @@ function UserOrdersContent() {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedReservation(res);
+                        setIsModalOpen(true);
+                      }}
+                      title="Ver detalle completo"
+                      className="p-1.5 rounded-lg bg-card hover:bg-muted text-muted-foreground hover:text-ember border border-border/70 hover:border-ember/40 transition-colors cursor-pointer"
+                    >
+                      <Eye size={15} />
+                    </button>
                     <span className={cn("px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border", meta.badgeClass)}>
                       {meta.label}
                     </span>
@@ -278,15 +293,29 @@ function UserOrdersContent() {
                           </div>
                         )}
 
-                        {/* Acción: Pagar si está aprobada */}
-                        {res.status === "approved" && (
-                          <a
-                            href={`/user/pagar-reserva?reservationId=${res.id}&amount=${Number(res.totalAmount || 0).toFixed(2)}`}
-                            className="inline-flex items-center gap-2 px-4 py-2 bg-ember hover:brightness-110 text-char-deep text-xs font-bold rounded-xl transition-all"
+                        {/* Acciones: Ver detalle completo + Pagar si está aprobada */}
+                        <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-border">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedReservation(res);
+                              setIsModalOpen(true);
+                            }}
+                            className="inline-flex items-center gap-2 px-4 py-2 bg-secondary hover:bg-secondary/80 text-foreground text-xs font-bold rounded-xl border border-border hover:border-ember/40 transition-all cursor-pointer"
                           >
-                            <CreditCard size={14} /> Pagar Reserva <ArrowRight size={14} />
-                          </a>
-                        )}
+                            <Eye size={14} className="text-ember" />
+                            Ver detalle completo
+                          </button>
+
+                          {res.status === "approved" && (
+                            <a
+                              href={`/user/pagar-reserva?reservationId=${res.id}&amount=${Number(res.totalAmount || 0).toFixed(2)}`}
+                              className="inline-flex items-center gap-2 px-4 py-2 bg-ember hover:brightness-110 text-char-deep text-xs font-bold rounded-xl transition-all shadow-sm"
+                            >
+                              <CreditCard size={14} /> Pagar Reserva <ArrowRight size={14} />
+                            </a>
+                          )}
+                        </div>
                       </div>
                     </motion.div>
                   )}
@@ -331,6 +360,17 @@ function UserOrdersContent() {
           </button>
         </div>
       )}
+
+      {/* Modal de Detalle Completo de la Reserva */}
+      <ReservationDetailModal
+        open={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setSelectedReservation(null);
+        }}
+        reservation={selectedReservation}
+        currentUser={user}
+      />
     </div>
   );
 }
