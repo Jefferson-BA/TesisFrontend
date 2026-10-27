@@ -176,61 +176,61 @@ export function SuperadminUsersTable() {
     <div className="space-y-6">
       {/* 📊 Tarjetas de Métricas de Usuarios */}
       <div className="grid gap-4 sm:grid-cols-3">
-        <Card className="bg-zinc-900/90 border-zinc-800 text-white">
+        <Card className="bg-card border-border text-card-foreground">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-zinc-400">Superadministradores</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Superadministradores</CardTitle>
             <ShieldAlert className="h-5 w-5 text-red-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-extrabold text-white">
-              {isLoading ? <Skeleton className="h-8 w-14 bg-zinc-800" /> : stats?.superadmin ?? 0}
+            <div className="text-3xl font-extrabold text-foreground">
+              {isLoading ? <Skeleton className="h-8 w-14 bg-muted" /> : stats?.superadmin ?? 0}
             </div>
-            <p className="text-xs text-zinc-500 mt-1">Control maestro de plataforma</p>
+            <p className="text-xs text-muted-foreground mt-1">Control maestro de plataforma</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-zinc-900/90 border-zinc-800 text-white">
+        <Card className="bg-card border-border text-card-foreground">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-zinc-400">Administradores</CardTitle>
-            <ShieldCheck className="h-5 w-5 text-purple-400" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">Administradores</CardTitle>
+            <ShieldCheck className="h-5 w-5 text-purple-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-extrabold text-purple-400">
-              {isLoading ? <Skeleton className="h-8 w-14 bg-zinc-800" /> : stats?.admin ?? 0}
+            <div className="text-3xl font-extrabold text-purple-600 dark:text-purple-400">
+              {isLoading ? <Skeleton className="h-8 w-14 bg-muted" /> : stats?.admin ?? 0}
             </div>
-            <p className="text-xs text-zinc-500 mt-1">Gestión operativa del restaurante</p>
+            <p className="text-xs text-muted-foreground mt-1">Gestión operativa del restaurante</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-zinc-900/90 border-zinc-800 text-white">
+        <Card className="bg-card border-border text-card-foreground">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-zinc-400">Clientes / Comensales</CardTitle>
-            <Users className="h-5 w-5 text-emerald-400" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">Clientes / Comensales</CardTitle>
+            <Users className="h-5 w-5 text-emerald-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-extrabold text-white">
-              {isLoading ? <Skeleton className="h-8 w-14 bg-zinc-800" /> : stats?.user ?? 0}
+            <div className="text-3xl font-extrabold text-foreground">
+              {isLoading ? <Skeleton className="h-8 w-14 bg-muted" /> : stats?.user ?? 0}
             </div>
-            <p className="text-xs text-zinc-500 mt-1">Cuentas regulares de compras</p>
+            <p className="text-xs text-muted-foreground mt-1">Cuentas regulares de compras</p>
           </CardContent>
         </Card>
       </div>
 
       {/* 🔍 Barra de Filtros y Búsqueda */}
-      <Card className="bg-zinc-900/70 border-zinc-800">
+      <Card className="bg-card border-border">
         <CardContent className="p-4">
           <div className="flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
             <form onSubmit={handleSearchSubmit} className="flex-1 flex gap-2">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
                   placeholder="Buscar por nombre, correo electrónico..."
-                  className="pl-9 bg-zinc-950/60 border-zinc-800 text-white placeholder:text-zinc-500 text-sm focus-visible:ring-primary"
+                  className="pl-9 bg-background border-input text-foreground placeholder:text-muted-foreground text-sm focus-visible:ring-primary"
                 />
               </div>
-              <Button type="submit" variant="secondary" className="border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-white">
+              <Button type="submit" variant="secondary" className="border border-border">
                 Buscar
               </Button>
             </form>
@@ -239,10 +239,10 @@ export function SuperadminUsersTable() {
               {/* Filtro por Rol */}
               <div className="w-36">
                 <Select defaultValue="all" onValueChange={handleRoleFilterChange}>
-                  <SelectTrigger className="bg-zinc-950/60 border-zinc-800 text-white">
+                  <SelectTrigger className="bg-background border-input text-foreground">
                     <SelectValue placeholder="Rol" />
                   </SelectTrigger>
-                  <SelectContent className="bg-zinc-900 border-zinc-800 text-white">
+                  <SelectContent className="bg-popover border-border text-popover-foreground">
                     <SelectItem value="all">Todos los roles</SelectItem>
                     <SelectItem value="superadmin">Superadmin</SelectItem>
                     <SelectItem value="admin">Admin</SelectItem>
@@ -254,10 +254,10 @@ export function SuperadminUsersTable() {
               {/* Filtro por Estado */}
               <div className="w-36">
                 <Select defaultValue="all" onValueChange={handleStatusFilterChange}>
-                  <SelectTrigger className="bg-zinc-950/60 border-zinc-800 text-white">
+                  <SelectTrigger className="bg-background border-input text-foreground">
                     <SelectValue placeholder="Estado" />
                   </SelectTrigger>
-                  <SelectContent className="bg-zinc-900 border-zinc-800 text-white">
+                  <SelectContent className="bg-popover border-border text-popover-foreground">
                     <SelectItem value="all">Todos los estados</SelectItem>
                     <SelectItem value="active">Activos</SelectItem>
                     <SelectItem value="suspended">Suspendidos</SelectItem>
@@ -271,7 +271,7 @@ export function SuperadminUsersTable() {
                 onClick={() => refetch()}
                 disabled={isFetching}
                 title="Actualizar tabla"
-                className="border-zinc-800 bg-zinc-950 text-zinc-400 hover:text-white"
+                className="border-border bg-card text-muted-foreground hover:text-foreground"
               >
                 <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
               </Button>
@@ -281,51 +281,51 @@ export function SuperadminUsersTable() {
       </Card>
 
       {/* 📋 Tabla de Usuarios */}
-      <Card className="bg-zinc-900/90 border-zinc-800">
-        <CardHeader className="border-b border-zinc-800 pb-4">
+      <Card className="bg-card border-border">
+        <CardHeader className="border-b border-border pb-4">
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-lg font-bold text-white flex items-center gap-2">
+              <CardTitle className="text-lg font-bold text-foreground flex items-center gap-2">
                 <Shield className="h-5 w-5 text-primary" />
                 Directorio de Usuarios y Privilegios
               </CardTitle>
-              <CardDescription className="text-zinc-400 text-xs">
+              <CardDescription className="text-muted-foreground text-xs">
                 Asigna privilegios administrativos, activa o suspende cuentas con confirmación obligatoria.
               </CardDescription>
             </div>
-            <div className="text-xs text-zinc-500">
-              Total registrados: <span className="font-semibold text-zinc-300">{meta?.total ?? 0}</span>
+            <div className="text-xs text-muted-foreground">
+              Total registrados: <span className="font-semibold text-foreground">{meta?.total ?? 0}</span>
             </div>
           </div>
         </CardHeader>
 
         <CardContent className="p-0">
           <Table>
-            <TableHeader className="bg-zinc-950/50">
-              <TableRow className="border-zinc-800">
-                <TableHead className="text-zinc-400 font-semibold">Usuario</TableHead>
-                <TableHead className="text-zinc-400 font-semibold">Rol Actual</TableHead>
-                <TableHead className="text-zinc-400 font-semibold">Estado</TableHead>
-                <TableHead className="text-zinc-400 font-semibold">Contacto</TableHead>
-                <TableHead className="text-zinc-400 font-semibold">Registro</TableHead>
-                <TableHead className="text-right text-zinc-400 font-semibold pr-6">Acciones Críticas</TableHead>
+            <TableHeader className="bg-muted/40">
+              <TableRow className="border-border">
+                <TableHead className="text-muted-foreground font-semibold">Usuario</TableHead>
+                <TableHead className="text-muted-foreground font-semibold">Rol Actual</TableHead>
+                <TableHead className="text-muted-foreground font-semibold">Estado</TableHead>
+                <TableHead className="text-muted-foreground font-semibold">Contacto</TableHead>
+                <TableHead className="text-muted-foreground font-semibold">Registro</TableHead>
+                <TableHead className="text-right text-muted-foreground font-semibold pr-6">Acciones Críticas</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
                 Array.from({ length: 5 }).map((_, i) => (
-                  <TableRow key={i} className="border-zinc-800">
-                    <TableCell><Skeleton className="h-5 w-32 bg-zinc-800" /></TableCell>
-                    <TableCell><Skeleton className="h-5 w-20 bg-zinc-800" /></TableCell>
-                    <TableCell><Skeleton className="h-5 w-16 bg-zinc-800" /></TableCell>
-                    <TableCell><Skeleton className="h-5 w-28 bg-zinc-800" /></TableCell>
-                    <TableCell><Skeleton className="h-5 w-24 bg-zinc-800" /></TableCell>
-                    <TableCell className="text-right"><Skeleton className="h-8 w-24 ml-auto bg-zinc-800" /></TableCell>
+                  <TableRow key={i} className="border-border">
+                    <TableCell><Skeleton className="h-5 w-32 bg-muted" /></TableCell>
+                    <TableCell><Skeleton className="h-5 w-20 bg-muted" /></TableCell>
+                    <TableCell><Skeleton className="h-5 w-16 bg-muted" /></TableCell>
+                    <TableCell><Skeleton className="h-5 w-28 bg-muted" /></TableCell>
+                    <TableCell><Skeleton className="h-5 w-24 bg-muted" /></TableCell>
+                    <TableCell className="text-right"><Skeleton className="h-8 w-24 ml-auto bg-muted" /></TableCell>
                   </TableRow>
                 ))
               ) : users.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="h-32 text-center text-zinc-500">
+                  <TableCell colSpan={6} className="h-32 text-center text-muted-foreground">
                     No se encontraron usuarios con los filtros aplicados.
                   </TableCell>
                 </TableRow>
@@ -336,19 +336,19 @@ export function SuperadminUsersTable() {
                   const isUserAdmin = roleName === 'admin';
 
                   return (
-                    <TableRow key={u.id} className="border-zinc-800/80 hover:bg-zinc-800/40 transition-colors">
+                    <TableRow key={u.id} className="border-border/80 hover:bg-muted/40 transition-colors">
                       <TableCell>
                         <div className="flex flex-col">
-                          <span className="font-semibold text-white flex items-center gap-1.5">
+                          <span className="font-semibold text-foreground flex items-center gap-1.5">
                             {u.name}
                             {isUserSuperadmin && (
-                              <Badge variant="outline" className="text-[10px] py-0 px-1.5 border-red-500/40 text-red-400 bg-red-950/20">
+                              <Badge variant="outline" className="text-[10px] py-0 px-1.5 border-red-500/40 text-red-600 dark:text-red-400 bg-red-500/10 dark:bg-red-950/20">
                                 MAESTRO
                               </Badge>
                             )}
                           </span>
-                          <span className="text-xs text-zinc-400 flex items-center gap-1">
-                            <Mail className="h-3 w-3 text-zinc-500" />
+                          <span className="text-xs text-muted-foreground flex items-center gap-1">
+                            <Mail className="h-3 w-3 text-muted-foreground/70" />
                             {u.email}
                           </span>
                         </div>
@@ -356,15 +356,15 @@ export function SuperadminUsersTable() {
 
                       <TableCell>
                         {isUserSuperadmin ? (
-                          <Badge className="bg-red-500/20 text-red-400 border border-red-500/30 font-medium">
+                          <Badge className="bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500/30 font-medium">
                             Superadmin
                           </Badge>
                         ) : isUserAdmin ? (
-                          <Badge className="bg-purple-500/20 text-purple-400 border border-purple-500/30 font-medium">
+                          <Badge className="bg-purple-500/20 text-purple-600 dark:text-purple-400 border border-purple-500/30 font-medium">
                             Admin
                           </Badge>
                         ) : (
-                          <Badge variant="outline" className="border-zinc-700 text-zinc-400">
+                          <Badge variant="outline" className="border-border text-muted-foreground">
                             Usuario
                           </Badge>
                         )}
@@ -372,34 +372,34 @@ export function SuperadminUsersTable() {
 
                       <TableCell>
                         {u.isActive ? (
-                          <Badge className="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 gap-1">
-                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                          <Badge className="bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 gap-1">
+                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
                             Activo
                           </Badge>
                         ) : (
-                          <Badge className="bg-zinc-800 text-zinc-400 border border-zinc-700 gap-1">
-                            <span className="h-1.5 w-1.5 rounded-full bg-zinc-500" />
+                          <Badge className="bg-muted text-muted-foreground border border-border gap-1">
+                            <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground" />
                             Suspendido
                           </Badge>
                         )}
                       </TableCell>
 
                       <TableCell>
-                        <div className="text-xs text-zinc-400 space-y-0.5">
+                        <div className="text-xs text-muted-foreground space-y-0.5">
                           {u.phone ? (
                             <div className="flex items-center gap-1">
-                              <Phone className="h-3 w-3 text-zinc-500" />
+                              <Phone className="h-3 w-3 text-muted-foreground/70" />
                               <span>{u.phone}</span>
                             </div>
                           ) : (
-                            <span className="text-zinc-600 italic">Sin teléfono</span>
+                            <span className="text-muted-foreground/60 italic">Sin teléfono</span>
                           )}
                         </div>
                       </TableCell>
 
                       <TableCell>
-                        <span className="text-xs text-zinc-400 flex items-center gap-1">
-                          <Calendar className="h-3 w-3 text-zinc-500" />
+                        <span className="text-xs text-muted-foreground flex items-center gap-1">
+                          <Calendar className="h-3 w-3 text-muted-foreground/70" />
                           {new Date(u.createdAt).toLocaleDateString('es-PE')}
                         </span>
                       </TableCell>
@@ -412,7 +412,7 @@ export function SuperadminUsersTable() {
                             size="icon-sm"
                             onClick={() => openEditModal(u)}
                             title="Editar datos"
-                            className="text-zinc-400 hover:text-white hover:bg-zinc-800"
+                            className="text-muted-foreground hover:text-foreground hover:bg-muted"
                           >
                             <Edit2 className="h-4 w-4" />
                           </Button>
@@ -422,7 +422,7 @@ export function SuperadminUsersTable() {
                             variant="outline"
                             size="sm"
                             onClick={() => openRoleModal(u)}
-                            className="h-8 gap-1.5 text-xs border-purple-500/30 text-purple-400 bg-purple-950/20 hover:bg-purple-900/40"
+                            className="h-8 gap-1.5 text-xs border-purple-500/30 text-purple-600 dark:text-purple-400 bg-purple-500/10 dark:bg-purple-950/20 hover:bg-purple-500/20"
                           >
                             <Lock className="h-3 w-3" />
                             Cambiar Rol
@@ -435,8 +435,8 @@ export function SuperadminUsersTable() {
                             onClick={() => openStatusModal(u)}
                             className={`h-8 gap-1.5 text-xs ${
                               u.isActive
-                                ? 'border-red-500/30 text-red-400 bg-red-950/20 hover:bg-red-900/40'
-                                : 'border-emerald-500/30 text-emerald-400 bg-emerald-950/20 hover:bg-emerald-900/40'
+                                ? 'border-red-500/30 text-red-600 dark:text-red-400 bg-red-500/10 dark:bg-red-950/20 hover:bg-red-500/20'
+                                : 'border-emerald-500/30 text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 dark:bg-emerald-950/20 hover:bg-emerald-500/20'
                             }`}
                           >
                             {u.isActive ? (
@@ -462,10 +462,10 @@ export function SuperadminUsersTable() {
 
           {/* Paginación */}
           {meta && meta.lastPage > 1 && (
-            <div className="flex items-center justify-between p-4 border-t border-zinc-800 text-xs text-zinc-400">
+            <div className="flex items-center justify-between p-4 border-t border-border text-xs text-muted-foreground">
               <div>
-                Página <span className="text-white font-medium">{meta.page}</span> de{' '}
-                <span className="text-white font-medium">{meta.lastPage}</span> ({meta.total} usuarios)
+                Página <span className="text-foreground font-medium">{meta.page}</span> de{' '}
+                <span className="text-foreground font-medium">{meta.lastPage}</span> ({meta.total} usuarios)
               </div>
               <div className="flex items-center gap-2">
                 <Button
@@ -478,7 +478,7 @@ export function SuperadminUsersTable() {
                       offset: Math.max(0, (prev.offset || 0) - (prev.limit || 10)),
                     }))
                   }
-                  className="border-zinc-800 bg-zinc-950 text-zinc-300"
+                  className="border-border bg-card text-foreground"
                 >
                   <ChevronLeft className="h-4 w-4 mr-1" />
                   Anterior
@@ -493,7 +493,7 @@ export function SuperadminUsersTable() {
                       offset: (prev.offset || 0) + (prev.limit || 10),
                     }))
                   }
-                  className="border-zinc-800 bg-zinc-950 text-zinc-300"
+                  className="border-border bg-card text-foreground"
                 >
                   Siguiente
                   <ChevronRight className="h-4 w-4 ml-1" />
@@ -518,17 +518,17 @@ export function SuperadminUsersTable() {
           onConfirm={handleConfirmRoleChange}
         >
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-zinc-300">
+            <label className="text-xs font-medium text-foreground">
               Selecciona el nuevo rol a asignar:
             </label>
             <Select
               value={selectedNewRole}
               onValueChange={(val) => setSelectedNewRole(val as RoleType)}
             >
-              <SelectTrigger className="bg-zinc-900 border-zinc-800 text-white">
+              <SelectTrigger className="bg-background border-input text-foreground">
                 <SelectValue placeholder="Nuevo Rol" />
               </SelectTrigger>
-              <SelectContent className="bg-zinc-900 border-zinc-800 text-white">
+              <SelectContent className="bg-popover border-border text-popover-foreground">
                 <SelectItem value="user">Usuario (Cliente estándar)</SelectItem>
                 <SelectItem value="admin">Admin (Gestor de restaurante)</SelectItem>
                 <SelectItem value="superadmin">Superadmin (Acceso maestro)</SelectItem>
@@ -559,9 +559,9 @@ export function SuperadminUsersTable() {
 
       {/* ✏️ MODAL: Edición de Datos Personales (No destructiva) */}
       <Dialog open={!!editProfileUser} onOpenChange={(open) => !open && setEditProfileUser(null)}>
-        <DialogContent className="sm:max-w-md bg-zinc-950 border-zinc-800 text-white">
+        <DialogContent className="sm:max-w-md bg-card border-border text-foreground">
           <DialogHeader>
-            <DialogTitle className="text-lg font-bold text-white flex items-center gap-2">
+            <DialogTitle className="text-lg font-bold text-foreground flex items-center gap-2">
               <Edit2 className="h-5 w-5 text-primary" />
               Editar Perfil de Usuario
             </DialogTitle>
@@ -569,32 +569,32 @@ export function SuperadminUsersTable() {
 
           <form onSubmit={handleSaveProfile} className="space-y-4 py-2">
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-zinc-300">Nombre Completo</label>
+              <label className="text-xs font-medium text-foreground">Nombre Completo</label>
               <Input
                 value={profileName}
                 onChange={(e) => setProfileName(e.target.value)}
                 required
-                className="bg-zinc-900 border-zinc-800 text-white"
+                className="bg-background border-input text-foreground"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-zinc-300">Teléfono</label>
+              <label className="text-xs font-medium text-foreground">Teléfono</label>
               <Input
                 value={profilePhone}
                 onChange={(e) => setProfilePhone(e.target.value)}
                 placeholder="+51999888777"
-                className="bg-zinc-900 border-zinc-800 text-white"
+                className="bg-background border-input text-foreground"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-zinc-300">Dirección</label>
+              <label className="text-xs font-medium text-foreground">Dirección</label>
               <Input
                 value={profileAddress}
                 onChange={(e) => setProfileAddress(e.target.value)}
                 placeholder="Av. Principal 123"
-                className="bg-zinc-900 border-zinc-800 text-white"
+                className="bg-background border-input text-foreground"
               />
             </div>
 
@@ -603,7 +603,7 @@ export function SuperadminUsersTable() {
                 type="button"
                 variant="outline"
                 onClick={() => setEditProfileUser(null)}
-                className="border-zinc-800 bg-zinc-900 text-zinc-300"
+                className="border-border bg-card text-foreground"
               >
                 Cancelar
               </Button>

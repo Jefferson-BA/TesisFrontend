@@ -3,6 +3,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/shared/AppSidebar";
 import { CustomTrigger } from "@/components/shared/CustomTrigger";
 import { QueryProvider } from "@/components/shared/QueryProvider";
+import ThemeToggle from "@/modules/user/shared/components/Themetoggle";
 import { Toaster } from "sonner";
 import { ShieldAlert } from "lucide-react";
 
@@ -50,6 +51,10 @@ export default function AdminLayoutReact({
                 )}
               </div>
             </div>
+
+            <div className="flex items-center gap-3">
+              <ThemeToggle />
+            </div>
           </header>
 
           <div className="p-6 flex-1 w-full max-w-7xl mx-auto min-w-0">
@@ -57,8 +62,8 @@ export default function AdminLayoutReact({
           </div>
         </main>
 
-        {/* Notificaciones Toast en tiempo real */}
-        <Toaster richColors position="top-right" theme="dark" closeButton />
+        {/* Notificaciones Toast adaptables al tema */}
+        <Toaster richColors position="top-right" closeButton />
       </SidebarProvider>
     </QueryProvider>
   );

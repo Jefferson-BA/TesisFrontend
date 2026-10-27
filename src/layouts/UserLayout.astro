@@ -20,7 +20,7 @@ const {
 ---
 
 <!DOCTYPE html>
-<html lang="es" class="dark">
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -42,24 +42,54 @@ const {
     <!-- View Transitions API nativa -->
     <meta name="view-transition" content="same-origin" />
 
-    <!-- Tema inicial (evita flash) -->
+    <!-- Tema inicial y sincronización (evita flash y persiste en transiciones / pestañas) -->
     <script is:inline>
       (function() {
-        const t = localStorage.getItem("deparraspitz-theme");
-        const d = window.matchMedia("(prefers-color-scheme: dark)").matches;
-        try {
-          const parsed = JSON.parse(t);
-          const theme = parsed?.state?.theme;
-          if (theme === "dark" || (!theme && d)) {
+        function resolveTheme() {
+          try {
+            const rawZustand = localStorage.getItem("deparraspitz-theme");
+            if (rawZustand) {
+              const parsed = JSON.parse(rawZustand);
+              if (parsed?.state?.theme === "light" || parsed?.state?.theme === "dark") {
+                return parsed.state.theme;
+              }
+            }
+            const rawSimple = localStorage.getItem("theme");
+            if (rawSimple === "light" || rawSimple === "dark") {
+              return rawSimple;
+            }
+          } catch (e) {}
+
+          // Por defecto dark, o según preferencia del sistema
+          return window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+        }
+
+        function applyTheme(theme) {
+          const isDark = theme === "dark";
+          if (isDark) {
             document.documentElement.classList.add("dark");
             document.documentElement.style.colorScheme = "dark";
-          }
-        } catch {
-          if (d) {
-            document.documentElement.classList.add("dark");
-            document.documentElement.style.colorScheme = "dark";
+          } else {
+            document.documentElement.classList.remove("dark");
+            document.documentElement.style.colorScheme = "light";
           }
         }
+
+        // 1. Aplicación inmediata en la carga inicial
+        const currentTheme = resolveTheme();
+        applyTheme(currentTheme);
+
+        // 2. Persistir tema tras la navegación de Astro (ClientRouter / View Transitions)
+        document.addEventListener("astro:after-swap", function() {
+          applyTheme(resolveTheme());
+        });
+
+        // 3. Sincronizar instantáneamente si el usuario cambia el tema en otra pestaña
+        window.addEventListener("storage", function(e) {
+          if (e.key === "deparraspitz-theme" || e.key === "theme") {
+            applyTheme(resolveTheme());
+          }
+        });
       })();
     </script>
 

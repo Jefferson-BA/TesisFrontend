@@ -149,13 +149,13 @@ export function SuperadminAuditView() {
       <div className="space-y-4">
         {/* Si encontramos un cambio de valor directo, renderizamos un comparador visual */}
         {(hasRoleDiff || hasAmountDiff || hasStatusDiff) && (
-          <div className="p-4 rounded-xl bg-zinc-900 border border-zinc-800 space-y-2">
-            <span className="text-xs uppercase font-bold tracking-wider text-zinc-400">
+          <div className="p-4 rounded-xl bg-muted/40 border border-border space-y-2">
+            <span className="text-xs uppercase font-bold tracking-wider text-muted-foreground">
               Diferencia Detectada (Antes vs. Después)
             </span>
             <div className="flex items-center gap-3 text-sm">
-              <div className="flex-1 p-2.5 rounded bg-red-950/30 border border-red-800/40 text-red-300">
-                <span className="text-[10px] text-zinc-400 block font-mono">VALOR ANTERIOR</span>
+              <div className="flex-1 p-2.5 rounded bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-300">
+                <span className="text-[10px] text-muted-foreground block font-mono">VALOR ANTERIOR</span>
                 <span className="font-semibold">
                   {hasRoleDiff && String(details.previousRole)}
                   {hasAmountDiff && `S/ ${Number(details.previousAmount).toFixed(2)}`}
@@ -163,10 +163,10 @@ export function SuperadminAuditView() {
                 </span>
               </div>
 
-              <ArrowRight className="h-4 w-4 text-zinc-500 shrink-0" />
+              <ArrowRight className="h-4 w-4 text-muted-foreground shrink-0" />
 
-              <div className="flex-1 p-2.5 rounded bg-emerald-950/30 border border-emerald-800/40 text-emerald-300">
-                <span className="text-[10px] text-zinc-400 block font-mono">VALOR ACTUAL</span>
+              <div className="flex-1 p-2.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-300">
+                <span className="text-[10px] text-muted-foreground block font-mono">VALOR ACTUAL</span>
                 <span className="font-semibold">
                   {hasRoleDiff && String(details.newRole)}
                   {hasAmountDiff && `S/ ${Number(details.newAmount).toFixed(2)}`}
@@ -176,7 +176,7 @@ export function SuperadminAuditView() {
             </div>
 
             {details.reason && (
-              <p className="text-xs text-zinc-400 italic pt-1">
+              <p className="text-xs text-muted-foreground italic pt-1">
                 Motivo: &quot;{details.reason}&quot;
               </p>
             )}
@@ -184,9 +184,9 @@ export function SuperadminAuditView() {
         )}
 
         {/* Visor de Código JSON Completo */}
-        <div className="relative rounded-xl border border-zinc-800 bg-zinc-950 p-4">
-          <div className="flex items-center justify-between pb-2 border-b border-zinc-800 mb-2">
-            <span className="text-xs font-mono text-zinc-400 flex items-center gap-1.5">
+        <div className="relative rounded-xl border border-border bg-muted/40 p-4">
+          <div className="flex items-center justify-between pb-2 border-b border-border mb-2">
+            <span className="text-xs font-mono text-muted-foreground flex items-center gap-1.5">
               <Code2 className="h-3.5 w-3.5 text-primary" />
               Payload JSON de Auditoría
             </span>
@@ -194,11 +194,11 @@ export function SuperadminAuditView() {
               variant="ghost"
               size="sm"
               onClick={handleCopyJSON}
-              className="h-7 text-xs text-zinc-400 hover:text-white"
+              className="h-7 text-xs text-muted-foreground hover:text-foreground"
             >
               {copied ? (
                 <>
-                  <Check className="h-3.5 w-3.5 text-emerald-400 mr-1" />
+                  <Check className="h-3.5 w-3.5 text-emerald-500 mr-1" />
                   Copiado
                 </>
               ) : (
@@ -209,7 +209,7 @@ export function SuperadminAuditView() {
               )}
             </Button>
           </div>
-          <pre className="text-xs font-mono text-emerald-400 overflow-x-auto max-h-64 p-2">
+          <pre className="text-xs font-mono text-emerald-600 dark:text-emerald-400 overflow-x-auto max-h-64 p-2">
             {JSON.stringify(details, null, 2)}
           </pre>
         </div>
@@ -220,20 +220,20 @@ export function SuperadminAuditView() {
   return (
     <div className="space-y-6">
       {/* 🔍 Barra de Filtros */}
-      <Card className="bg-zinc-900/70 border-zinc-800">
+      <Card className="bg-card border-border">
         <CardContent className="p-4">
           <div className="flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
             <form onSubmit={handleSearchSubmit} className="flex-1 flex gap-2">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
                   placeholder="Buscar por usuario, IP, entidad o ID..."
-                  className="pl-9 bg-zinc-950/60 border-zinc-800 text-white placeholder:text-zinc-500 text-sm focus-visible:ring-primary"
+                  className="pl-9 bg-background border-input text-foreground placeholder:text-muted-foreground text-sm focus-visible:ring-primary"
                 />
               </div>
-              <Button type="submit" variant="secondary" className="border border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-white">
+              <Button type="submit" variant="secondary" className="border border-border">
                 Buscar
               </Button>
             </form>
@@ -241,10 +241,10 @@ export function SuperadminAuditView() {
             <div className="flex items-center gap-2">
               <div className="w-48">
                 <Select defaultValue="all" onValueChange={handleActionFilterChange}>
-                  <SelectTrigger className="bg-zinc-950/60 border-zinc-800 text-white text-xs">
+                  <SelectTrigger className="bg-background border-input text-foreground text-xs">
                     <SelectValue placeholder="Filtrar por Acción" />
                   </SelectTrigger>
-                  <SelectContent className="bg-zinc-900 border-zinc-800 text-white">
+                  <SelectContent className="bg-popover border-border text-popover-foreground">
                     <SelectItem value="all">Todas las acciones</SelectItem>
                     <SelectItem value="USER_ROLE_CHANGED">Cambio de Rol</SelectItem>
                     <SelectItem value="USER_STATUS_CHANGED">Cambio de Estado</SelectItem>
@@ -263,7 +263,7 @@ export function SuperadminAuditView() {
                 onClick={() => refetch()}
                 disabled={isFetching}
                 title="Refrescar logs"
-                className="border-zinc-800 bg-zinc-950 text-zinc-400 hover:text-white"
+                className="border-border bg-card text-muted-foreground hover:text-foreground"
               >
                 <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
               </Button>
@@ -273,59 +273,59 @@ export function SuperadminAuditView() {
       </Card>
 
       {/* 📜 Tabla de Bitácora de Auditoría */}
-      <Card className="bg-zinc-900/90 border-zinc-800">
-        <CardHeader className="border-b border-zinc-800 pb-4">
+      <Card className="bg-card border-border">
+        <CardHeader className="border-b border-border pb-4">
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-lg font-bold text-white flex items-center gap-2">
+              <CardTitle className="text-lg font-bold text-foreground flex items-center gap-2">
                 <Activity className="h-5 w-5 text-primary" />
                 Bitácora de Auditoría Maestra (Audit Trail)
               </CardTitle>
-              <CardDescription className="text-zinc-400 text-xs">
+              <CardDescription className="text-muted-foreground text-xs">
                 Registro inmutable de acciones críticas, dirección IP de origen y cambios realizados.
               </CardDescription>
             </div>
-            <div className="text-xs text-zinc-500">
-              Eventos totales: <span className="font-semibold text-zinc-300">{meta?.total ?? 0}</span>
+            <div className="text-xs text-muted-foreground">
+              Eventos totales: <span className="font-semibold text-foreground">{meta?.total ?? 0}</span>
             </div>
           </div>
         </CardHeader>
 
         <CardContent className="p-0">
           <Table>
-            <TableHeader className="bg-zinc-950/50">
-              <TableRow className="border-zinc-800">
-                <TableHead className="text-zinc-400 font-semibold">Fecha y Hora</TableHead>
-                <TableHead className="text-zinc-400 font-semibold">Acción</TableHead>
-                <TableHead className="text-zinc-400 font-semibold">Entidad / Recurso</TableHead>
-                <TableHead className="text-zinc-400 font-semibold">Ejecutado Por</TableHead>
-                <TableHead className="text-zinc-400 font-semibold">Dirección IP</TableHead>
-                <TableHead className="text-right text-zinc-400 font-semibold pr-6">Detalles</TableHead>
+            <TableHeader className="bg-muted/40">
+              <TableRow className="border-border">
+                <TableHead className="text-muted-foreground font-semibold">Fecha y Hora</TableHead>
+                <TableHead className="text-muted-foreground font-semibold">Acción</TableHead>
+                <TableHead className="text-muted-foreground font-semibold">Entidad / Recurso</TableHead>
+                <TableHead className="text-muted-foreground font-semibold">Ejecutado Por</TableHead>
+                <TableHead className="text-muted-foreground font-semibold">Dirección IP</TableHead>
+                <TableHead className="text-right text-muted-foreground font-semibold pr-6">Detalles</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
                 Array.from({ length: 6 }).map((_, i) => (
-                  <TableRow key={i} className="border-zinc-800">
-                    <TableCell><Skeleton className="h-5 w-28 bg-zinc-800" /></TableCell>
-                    <TableCell><Skeleton className="h-5 w-24 bg-zinc-800" /></TableCell>
-                    <TableCell><Skeleton className="h-5 w-20 bg-zinc-800" /></TableCell>
-                    <TableCell><Skeleton className="h-5 w-32 bg-zinc-800" /></TableCell>
-                    <TableCell><Skeleton className="h-5 w-24 bg-zinc-800" /></TableCell>
-                    <TableCell className="text-right"><Skeleton className="h-8 w-20 ml-auto bg-zinc-800" /></TableCell>
+                  <TableRow key={i} className="border-border">
+                    <TableCell><Skeleton className="h-5 w-28 bg-muted" /></TableCell>
+                    <TableCell><Skeleton className="h-5 w-24 bg-muted" /></TableCell>
+                    <TableCell><Skeleton className="h-5 w-20 bg-muted" /></TableCell>
+                    <TableCell><Skeleton className="h-5 w-32 bg-muted" /></TableCell>
+                    <TableCell><Skeleton className="h-5 w-24 bg-muted" /></TableCell>
+                    <TableCell className="text-right"><Skeleton className="h-8 w-20 ml-auto bg-muted" /></TableCell>
                   </TableRow>
                 ))
               ) : logs.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="h-32 text-center text-zinc-500">
+                  <TableCell colSpan={6} className="h-32 text-center text-muted-foreground">
                     No hay registros de auditoría registrados para este criterio.
                   </TableCell>
                 </TableRow>
               ) : (
                 logs.map((log) => (
-                  <TableRow key={log.id} className="border-zinc-800/80 hover:bg-zinc-800/40 transition-colors">
+                  <TableRow key={log.id} className="border-border/80 hover:bg-muted/40 transition-colors">
                     <TableCell>
-                      <div className="text-xs text-zinc-300 font-mono">
+                      <div className="text-xs text-foreground font-mono">
                         {new Date(log.createdAt).toLocaleString('es-PE')}
                       </div>
                     </TableCell>
@@ -333,24 +333,24 @@ export function SuperadminAuditView() {
                     <TableCell>{getActionBadge(log.action)}</TableCell>
 
                     <TableCell>
-                      <Badge variant="outline" className="border-zinc-700 text-zinc-300 font-mono text-xs">
+                      <Badge variant="outline" className="border-border text-foreground font-mono text-xs">
                         {log.entity} #{log.entityId}
                       </Badge>
                     </TableCell>
 
                     <TableCell>
                       <div className="flex flex-col">
-                        <span className="text-xs font-semibold text-white flex items-center gap-1">
+                        <span className="text-xs font-semibold text-foreground flex items-center gap-1">
                           <User className="h-3 w-3 text-primary" />
                           {log.performedByName}
                         </span>
-                        <span className="text-[11px] text-zinc-400">{log.performedByEmail}</span>
+                        <span className="text-[11px] text-muted-foreground">{log.performedByEmail}</span>
                       </div>
                     </TableCell>
 
                     <TableCell>
-                      <div className="flex items-center gap-1.5 text-xs font-mono text-zinc-400">
-                        <Globe className="h-3 w-3 text-zinc-500" />
+                      <div className="flex items-center gap-1.5 text-xs font-mono text-muted-foreground">
+                        <Globe className="h-3 w-3 text-muted-foreground/70" />
                         {log.ipAddress || '127.0.0.1'}
                       </div>
                     </TableCell>
@@ -360,7 +360,7 @@ export function SuperadminAuditView() {
                         variant="outline"
                         size="sm"
                         onClick={() => setSelectedLog(log)}
-                        className="h-8 gap-1.5 text-xs border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-zinc-200"
+                        className="h-8 gap-1.5 text-xs border-border bg-card hover:bg-muted text-foreground"
                       >
                         <Eye className="h-3.5 w-3.5 text-primary" />
                         Inspeccionar
@@ -377,7 +377,7 @@ export function SuperadminAuditView() {
       {/* 🔍 MODAL: Inspección de Diferencias JSON */}
       {selectedLog && (
         <Dialog open={!!selectedLog} onOpenChange={(open) => !open && setSelectedLog(null)}>
-          <DialogContent className="sm:max-w-xl bg-zinc-950 border-zinc-800 text-white shadow-2xl">
+          <DialogContent className="sm:max-w-xl bg-card border-border text-foreground shadow-2xl">
             <DialogHeader>
               <div className="flex items-center gap-2">
                 <Badge variant="outline" className="border-primary/40 text-primary bg-primary/10 text-xs">
@@ -385,11 +385,11 @@ export function SuperadminAuditView() {
                 </Badge>
                 {getActionBadge(selectedLog.action)}
               </div>
-              <DialogTitle className="text-lg font-bold text-white mt-1">
+              <DialogTitle className="text-lg font-bold text-foreground mt-1">
                 Inspección de Registro #{selectedLog.id}
               </DialogTitle>
-              <DialogDescription className="text-zinc-400 text-xs">
-                Ejecutado por <span className="text-white font-medium">{selectedLog.performedByName}</span> ({selectedLog.performedByRole}) el {new Date(selectedLog.createdAt).toLocaleString('es-PE')} desde IP {selectedLog.ipAddress}.
+              <DialogDescription className="text-muted-foreground text-xs">
+                Ejecutado por <span className="text-foreground font-medium">{selectedLog.performedByName}</span> ({selectedLog.performedByRole}) el {new Date(selectedLog.createdAt).toLocaleString('es-PE')} desde IP {selectedLog.ipAddress}.
               </DialogDescription>
             </DialogHeader>
 

@@ -71,7 +71,7 @@ export default function AdminOrdersTable() {
           <h2 className="text-xl font-black text-primary uppercase tracking-wide">Gestión de Pedidos</h2>
           <p className="text-xs text-muted-foreground mt-1">Control logístico y despacho automatizado por órdenes vinculadas.</p>
         </div>
-        <div className="bg-[#0e0a08] p-1 rounded-xl border border-zinc-800/60">
+        <div className="bg-muted/40 p-1 rounded-xl border border-border">
           <OrderReservationFilter onSelectReservation={handleReservationChange} />
         </div>
       </div>

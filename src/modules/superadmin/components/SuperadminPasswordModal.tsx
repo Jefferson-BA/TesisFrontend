@@ -89,16 +89,16 @@ export function SuperadminPasswordModal({
 
   return (
     <Dialog open={open} onOpenChange={(val) => !isLoading && onOpenChange(val)}>
-      <DialogContent className="sm:max-w-md bg-zinc-950 border-zinc-800 text-white shadow-2xl">
+      <DialogContent className="sm:max-w-md bg-card border-border text-foreground shadow-2xl">
         <DialogHeader className="gap-2">
           <div className="flex items-center justify-between">
             <Badge
               variant="outline"
               className={`gap-1.5 px-2.5 py-1 text-xs font-semibold uppercase tracking-wider ${
                 isDestructive
-                  ? 'border-red-500/30 text-red-400 bg-red-950/30'
+                  ? 'border-red-500/30 text-red-600 dark:text-red-400 bg-red-500/10 dark:bg-red-950/30'
                   : isAmber
-                  ? 'border-amber-500/30 text-amber-400 bg-amber-950/30'
+                  ? 'border-amber-500/30 text-amber-600 dark:text-amber-400 bg-amber-500/10 dark:bg-amber-950/30'
                   : 'border-primary/30 text-primary bg-primary/10'
               }`}
             >
@@ -107,12 +107,12 @@ export function SuperadminPasswordModal({
             </Badge>
           </div>
 
-          <DialogTitle className="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+          <DialogTitle className="text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
             {title}
           </DialogTitle>
 
           {description && (
-            <DialogDescription className="text-zinc-400 text-sm">
+            <DialogDescription className="text-muted-foreground text-sm">
               {description}
             </DialogDescription>
           )}
@@ -120,10 +120,10 @@ export function SuperadminPasswordModal({
 
         <form onSubmit={handleSubmit} className="space-y-4 py-2">
           {/* Alerta de impacto / auditoría */}
-          <div className="flex items-start gap-3 p-3 rounded-lg bg-zinc-900/80 border border-zinc-800 text-xs text-zinc-300">
-            <AlertTriangle className="h-5 w-5 text-amber-400 shrink-0 mt-0.5" />
+          <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50 border border-border text-xs text-muted-foreground">
+            <AlertTriangle className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
             <p className="leading-relaxed">
-              Esta operación crítica quedará registrada en el <span className="text-white font-medium">Audit Trail</span> junto con tu usuario, dirección IP y sello de tiempo.
+              Esta operación crítica quedará registrada en el <span className="text-foreground font-semibold">Audit Trail</span> junto con tu usuario, dirección IP y sello de tiempo.
             </p>
           </div>
 
@@ -133,8 +133,8 @@ export function SuperadminPasswordModal({
           {/* Campo Motivo */}
           {requireReason && (
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-zinc-300">
-                {reasonLabel} <span className="text-red-400">*</span>
+              <label className="text-xs font-medium text-foreground">
+                {reasonLabel} <span className="text-red-500">*</span>
               </label>
               <textarea
                 value={reason}
@@ -142,16 +142,16 @@ export function SuperadminPasswordModal({
                 placeholder={reasonPlaceholder}
                 disabled={isLoading}
                 rows={2}
-                className="w-full resize-none rounded-md border border-zinc-800 bg-zinc-900/60 p-2.5 text-sm text-white placeholder:text-zinc-500 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50"
+                className="w-full resize-none rounded-md border border-input bg-background p-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50"
               />
             </div>
           )}
 
           {/* Campo Contraseña Superadmin */}
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-zinc-300 flex items-center gap-1.5">
-              <KeyRound className="h-3.5 w-3.5 text-zinc-400" />
-              Contraseña de Superadmin <span className="text-red-400">*</span>
+            <label className="text-xs font-medium text-foreground flex items-center gap-1.5">
+              <KeyRound className="h-3.5 w-3.5 text-muted-foreground" />
+              Contraseña de Superadmin <span className="text-red-500">*</span>
             </label>
             <div className="relative">
               <Input
@@ -161,12 +161,12 @@ export function SuperadminPasswordModal({
                 placeholder="Ingresa tu contraseña para autorizar"
                 disabled={isLoading}
                 autoComplete="current-password"
-                className="pr-10 bg-zinc-900/60 border-zinc-800 text-white placeholder:text-zinc-500 focus-visible:ring-primary"
+                className="pr-10 bg-background border-input text-foreground placeholder:text-muted-foreground focus-visible:ring-primary"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white transition-colors"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                 tabIndex={-1}
               >
                 {showPassword ? (
@@ -180,8 +180,8 @@ export function SuperadminPasswordModal({
 
           {/* Mensaje de Error */}
           {error && (
-            <div className="p-2.5 rounded-md bg-red-950/40 border border-red-800/50 text-red-300 text-xs flex items-center gap-2">
-              <ShieldAlert className="h-4 w-4 text-red-400 shrink-0" />
+            <div className="p-2.5 rounded-md bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-300 text-xs flex items-center gap-2">
+              <ShieldAlert className="h-4 w-4 text-red-500 shrink-0" />
               <span>{error}</span>
             </div>
           )}
@@ -192,7 +192,7 @@ export function SuperadminPasswordModal({
               variant="outline"
               onClick={() => onOpenChange(false)}
               disabled={isLoading}
-              className="border-zinc-800 bg-zinc-900 hover:bg-zinc-800 text-zinc-300"
+              className="border-border bg-card hover:bg-muted text-foreground"
             >
               Cancelar
             </Button>

@@ -111,8 +111,8 @@ export function SuperadminSettingsView() {
       <Card
         className={`border transition-all duration-300 ${
           isMaintenanceActive
-            ? 'bg-rose-950/20 border-rose-500/50 shadow-rose-950/50 shadow-xl'
-            : 'bg-zinc-900/90 border-zinc-800'
+            ? 'bg-rose-500/10 border-rose-500/50 shadow-rose-500/10 shadow-xl'
+            : 'bg-card border-border'
         }`}
       >
         <CardContent className="p-6">
@@ -121,8 +121,8 @@ export function SuperadminSettingsView() {
               <div
                 className={`p-3 rounded-2xl ${
                   isMaintenanceActive
-                    ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30 animate-pulse'
-                    : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                    ? 'bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/30 animate-pulse'
+                    : 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30'
                 }`}
               >
                 <Power className="h-7 w-7" />
@@ -130,28 +130,28 @@ export function SuperadminSettingsView() {
 
               <div>
                 <div className="flex items-center gap-2">
-                  <h3 className="text-xl font-bold text-white">
+                  <h3 className="text-xl font-bold text-foreground">
                     Modo Mantenimiento de la Plataforma
                   </h3>
                   {isMaintenanceActive ? (
-                    <Badge className="bg-rose-500/20 text-rose-300 border border-rose-500/40">
+                    <Badge className="bg-rose-500/20 text-rose-600 dark:text-rose-300 border border-rose-500/40">
                       ACTIVO
                     </Badge>
                   ) : (
-                    <Badge className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                    <Badge className="bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 border border-emerald-500/40">
                       EN LÍNEA
                     </Badge>
                   )}
                 </div>
 
-                <p className="text-zinc-400 text-sm mt-1 max-w-2xl">
+                <p className="text-muted-foreground text-sm mt-1 max-w-2xl">
                   {isMaintenanceActive
                     ? 'El acceso a clientes y comensales está bloqueado actualmente. Solo el rol Superadmin puede acceder al sistema.'
                     : 'La plataforma está completamente disponible y recibiendo pedidos y reservas en tiempo real.'}
                 </p>
 
                 {isMaintenanceActive && maintenance?.customMessage && (
-                  <div className="mt-3 p-2.5 rounded-lg bg-zinc-950/60 border border-zinc-800 text-xs text-rose-300 font-mono">
+                  <div className="mt-3 p-2.5 rounded-lg bg-muted/40 border border-border text-xs text-rose-600 dark:text-rose-400 font-mono">
                     Mensaje mostrado: &quot;{maintenance.customMessage}&quot;
                   </div>
                 )}
@@ -163,8 +163,8 @@ export function SuperadminSettingsView() {
               disabled={isLoadingMaintenance}
               className={`h-11 px-5 font-semibold text-sm gap-2 shrink-0 ${
                 isMaintenanceActive
-                  ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-950 shadow-lg'
-                  : 'bg-rose-600 hover:bg-rose-700 text-white shadow-rose-950 shadow-lg'
+                  ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg'
+                  : 'bg-rose-600 hover:bg-rose-700 text-white shadow-lg'
               }`}
             >
               <Power className="h-4 w-4" />
@@ -175,15 +175,15 @@ export function SuperadminSettingsView() {
       </Card>
 
       {/* 🔑 Credenciales e Integraciones Externas (Llaves Enmascaradas) */}
-      <Card className="bg-zinc-900/90 border-zinc-800">
-        <CardHeader className="border-b border-zinc-800 pb-4">
+      <Card className="bg-card border-border">
+        <CardHeader className="border-b border-border pb-4">
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-lg font-bold text-white flex items-center gap-2">
-                <Key className="h-5 w-5 text-amber-400" />
+              <CardTitle className="text-lg font-bold text-foreground flex items-center gap-2">
+                <Key className="h-5 w-5 text-amber-500" />
                 Llaves API y Credenciales Enmascaradas
               </CardTitle>
-              <CardDescription className="text-zinc-400 text-xs">
+              <CardDescription className="text-muted-foreground text-xs">
                 Tokens y secretos protegidos. La edición exige reautenticación estricta con contraseña de Superadmin.
               </CardDescription>
             </div>
@@ -194,26 +194,26 @@ export function SuperadminSettingsView() {
                 refetchConfigs();
                 refetchMaintenance();
               }}
-              className="border-zinc-800 bg-zinc-950 text-zinc-400 hover:text-white"
+              className="border-border bg-card text-muted-foreground hover:text-foreground"
             >
               <RefreshCw className="h-4 w-4" />
             </Button>
           </div>
         </CardHeader>
 
-        <CardContent className="p-4 divide-y divide-zinc-800/80">
+        <CardContent className="p-4 divide-y divide-border/80">
           {isLoadingConfigs ? (
             Array.from({ length: 3 }).map((_, i) => (
               <div key={i} className="py-4 flex justify-between items-center">
                 <div className="space-y-1">
-                  <Skeleton className="h-5 w-40 bg-zinc-800" />
-                  <Skeleton className="h-4 w-64 bg-zinc-800" />
+                  <Skeleton className="h-5 w-40 bg-muted" />
+                  <Skeleton className="h-4 w-64 bg-muted" />
                 </div>
-                <Skeleton className="h-9 w-24 bg-zinc-800" />
+                <Skeleton className="h-9 w-24 bg-muted" />
               </div>
             ))
           ) : integrationConfigs.length === 0 ? (
-            <div className="py-8 text-center text-zinc-500 text-sm">
+            <div className="py-8 text-center text-muted-foreground text-sm">
               No se han registrado llaves secretas en la base de datos.
             </div>
           ) : (
@@ -224,17 +224,17 @@ export function SuperadminSettingsView() {
               >
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-sm font-bold text-white">
+                    <span className="font-mono text-sm font-bold text-foreground">
                       {config.key}
                     </span>
-                    <Badge variant="outline" className="border-amber-500/40 text-amber-400 text-[10px] gap-1">
+                    <Badge variant="outline" className="border-amber-500/40 text-amber-600 dark:text-amber-400 text-[10px] gap-1">
                       <Lock className="h-2.5 w-2.5" />
                       SECRETO
                     </Badge>
                   </div>
-                  <p className="text-xs text-zinc-400 mt-0.5">{config.description}</p>
-                  <div className="mt-2 inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-zinc-950 border border-zinc-800 font-mono text-xs text-zinc-300">
-                    <Lock className="h-3 w-3 text-zinc-500" />
+                  <p className="text-xs text-muted-foreground mt-0.5">{config.description}</p>
+                  <div className="mt-2 inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-muted/40 border border-border font-mono text-xs text-foreground">
+                    <Lock className="h-3 w-3 text-muted-foreground" />
                     <span>{config.value}</span>
                   </div>
                 </div>
@@ -243,9 +243,9 @@ export function SuperadminSettingsView() {
                   variant="outline"
                   size="sm"
                   onClick={() => handleOpenEditConfig(config)}
-                  className="border-zinc-700 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 gap-1.5 text-xs h-9 self-start md:self-center"
+                  className="border-border bg-card hover:bg-muted text-foreground gap-1.5 text-xs h-9 self-start md:self-center"
                 >
-                  <Edit3 className="h-3.5 w-3.5 text-amber-400" />
+                  <Edit3 className="h-3.5 w-3.5 text-amber-500" />
                   Actualizar Llave
                 </Button>
               </div>
@@ -257,25 +257,25 @@ export function SuperadminSettingsView() {
       {/* ⚙️ Parámetros Globales del Sistema (Generales y Financieros) */}
       <div className="grid gap-6 md:grid-cols-2">
         {/* Parámetros Financieros */}
-        <Card className="bg-zinc-900/90 border-zinc-800">
-          <CardHeader className="border-b border-zinc-800 pb-3">
-            <CardTitle className="text-base font-bold text-white flex items-center gap-2">
-              <Layers className="h-4 w-4 text-emerald-400" />
+        <Card className="bg-card border-border">
+          <CardHeader className="border-b border-border pb-3">
+            <CardTitle className="text-base font-bold text-foreground flex items-center gap-2">
+              <Layers className="h-4 w-4 text-emerald-500" />
               Parámetros Financieros
             </CardTitle>
           </CardHeader>
           <CardContent className="p-4 space-y-4">
             {financialConfigs.length === 0 ? (
-              <p className="text-xs text-zinc-500 italic">No hay parámetros financieros registrados.</p>
+              <p className="text-xs text-muted-foreground italic">No hay parámetros financieros registrados.</p>
             ) : (
               financialConfigs.map((cfg) => (
-                <div key={cfg.id} className="p-3 rounded-lg bg-zinc-950/60 border border-zinc-800 flex items-center justify-between">
+                <div key={cfg.id} className="p-3 rounded-lg bg-muted/40 border border-border flex items-center justify-between">
                   <div>
-                    <span className="font-mono text-xs font-semibold text-white block">
+                    <span className="font-mono text-xs font-semibold text-foreground block">
                       {cfg.key}
                     </span>
-                    <span className="text-xs text-zinc-400">{cfg.description}</span>
-                    <div className="text-sm font-bold text-emerald-400 mt-1">
+                    <span className="text-xs text-muted-foreground">{cfg.description}</span>
+                    <div className="text-sm font-bold text-emerald-600 dark:text-emerald-400 mt-1">
                       {cfg.value}
                     </div>
                   </div>
@@ -283,7 +283,7 @@ export function SuperadminSettingsView() {
                     variant="ghost"
                     size="sm"
                     onClick={() => handleOpenEditConfig(cfg)}
-                    className="text-zinc-400 hover:text-white"
+                    className="text-muted-foreground hover:text-foreground"
                   >
                     <Edit3 className="h-4 w-4" />
                   </Button>
@@ -294,25 +294,25 @@ export function SuperadminSettingsView() {
         </Card>
 
         {/* Parámetros Generales */}
-        <Card className="bg-zinc-900/90 border-zinc-800">
-          <CardHeader className="border-b border-zinc-800 pb-3">
-            <CardTitle className="text-base font-bold text-white flex items-center gap-2">
+        <Card className="bg-card border-border">
+          <CardHeader className="border-b border-border pb-3">
+            <CardTitle className="text-base font-bold text-foreground flex items-center gap-2">
               <Server className="h-4 w-4 text-primary" />
               Parámetros Generales
             </CardTitle>
           </CardHeader>
           <CardContent className="p-4 space-y-4">
             {generalConfigs.length === 0 ? (
-              <p className="text-xs text-zinc-500 italic">No hay parámetros generales registrados.</p>
+              <p className="text-xs text-muted-foreground italic">No hay parámetros generales registrados.</p>
             ) : (
               generalConfigs.map((cfg) => (
-                <div key={cfg.id} className="p-3 rounded-lg bg-zinc-950/60 border border-zinc-800 flex items-center justify-between">
+                <div key={cfg.id} className="p-3 rounded-lg bg-muted/40 border border-border flex items-center justify-between">
                   <div>
-                    <span className="font-mono text-xs font-semibold text-white block">
+                    <span className="font-mono text-xs font-semibold text-foreground block">
                       {cfg.key}
                     </span>
-                    <span className="text-xs text-zinc-400">{cfg.description}</span>
-                    <div className="text-sm font-medium text-zinc-200 mt-1">
+                    <span className="text-xs text-muted-foreground">{cfg.description}</span>
+                    <div className="text-sm font-medium text-foreground mt-1">
                       {cfg.value}
                     </div>
                   </div>
@@ -320,7 +320,7 @@ export function SuperadminSettingsView() {
                     variant="ghost"
                     size="sm"
                     onClick={() => handleOpenEditConfig(cfg)}
-                    className="text-zinc-400 hover:text-white"
+                    className="text-muted-foreground hover:text-foreground"
                   >
                     <Edit3 className="h-4 w-4" />
                   </Button>
@@ -350,14 +350,14 @@ export function SuperadminSettingsView() {
       >
         {!isMaintenanceActive && (
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-zinc-300">
+            <label className="text-xs font-medium text-foreground">
               Mensaje público mostrado a los usuarios:
             </label>
             <Input
               value={maintenanceCustomMessage}
               onChange={(e) => setMaintenanceCustomMessage(e.target.value)}
               placeholder="Ej. Realizando mejoras en la infraestructura..."
-              className="bg-zinc-900 border-zinc-800 text-white text-sm"
+              className="bg-background border-input text-foreground text-sm"
             />
           </div>
         )}
@@ -382,8 +382,8 @@ export function SuperadminSettingsView() {
         >
           <div className="space-y-3">
             <div className="space-y-1">
-              <label className="text-xs font-medium text-zinc-300">
-                Nuevo Valor para {editingConfig.key} <span className="text-red-400">*</span>
+              <label className="text-xs font-medium text-foreground">
+                Nuevo Valor para {editingConfig.key} <span className="text-red-500">*</span>
               </label>
               <Input
                 value={newConfigValue}
@@ -394,19 +394,19 @@ export function SuperadminSettingsView() {
                     : 'Ingresa el nuevo valor...'
                 }
                 required
-                className="bg-zinc-900 border-zinc-800 text-white font-mono text-sm"
+                className="bg-background border-input text-foreground font-mono text-sm"
               />
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-medium text-zinc-300">
+              <label className="text-xs font-medium text-foreground">
                 Descripción / Nota adicional (Opcional)
               </label>
               <Input
                 value={newConfigDescription}
                 onChange={(e) => setNewConfigDescription(e.target.value)}
                 placeholder="Motivo o detalle del parámetro..."
-                className="bg-zinc-900 border-zinc-800 text-white text-sm"
+                className="bg-background border-input text-foreground text-sm"
               />
             </div>
           </div>

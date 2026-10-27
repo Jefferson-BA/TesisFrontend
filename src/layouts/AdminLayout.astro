@@ -16,21 +16,50 @@ const { title = "Panel Administrativo | DeParraSpitz" } = Astro.props;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
 
+    <!-- Tema inicial y sincronización en Admin / Superadmin -->
     <script is:inline>
-      const getTheme = () => {
-        if (typeof localStorage !== "undefined" && localStorage.getItem("theme")) {
-          return localStorage.getItem("theme");
+      (function() {
+        function resolveTheme() {
+          try {
+            const rawZustand = localStorage.getItem("deparraspitz-theme");
+            if (rawZustand) {
+              const parsed = JSON.parse(rawZustand);
+              if (parsed?.state?.theme === "light" || parsed?.state?.theme === "dark") {
+                return parsed.state.theme;
+              }
+            }
+            const rawSimple = localStorage.getItem("theme");
+            if (rawSimple === "light" || rawSimple === "dark") {
+              return rawSimple;
+            }
+          } catch (e) {}
+          return window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
         }
-        return "dark"; // Modo oscuro por defecto
-      };
-      
-      const theme = getTheme();
-      if (theme === "light") {
-        document.documentElement.classList.remove("dark");
-      } else {
-        document.documentElement.classList.add("dark");
-      }
-      window.localStorage.setItem("theme", theme);
+
+        function applyTheme(theme) {
+          const isDark = theme === "dark";
+          if (isDark) {
+            document.documentElement.classList.add("dark");
+            document.documentElement.style.colorScheme = "dark";
+          } else {
+            document.documentElement.classList.remove("dark");
+            document.documentElement.style.colorScheme = "light";
+          }
+        }
+
+        const currentTheme = resolveTheme();
+        applyTheme(currentTheme);
+
+        document.addEventListener("astro:after-swap", function() {
+          applyTheme(resolveTheme());
+        });
+
+        window.addEventListener("storage", function(e) {
+          if (e.key === "deparraspitz-theme" || e.key === "theme") {
+            applyTheme(resolveTheme());
+          }
+        });
+      })();
     </script>
   </head>
 
