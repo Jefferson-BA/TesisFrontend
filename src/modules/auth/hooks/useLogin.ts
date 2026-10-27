@@ -2,6 +2,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { authService } from "../services/auth.service";
 import { useAuthStore } from "../store/authStore";
+import { extractRole, getDefaultRouteByRole } from "@/lib/auth-utils";
 
 export const useLogin = () => {
   const setAuth = useAuthStore((state) => state.setAuth);
@@ -10,7 +11,6 @@ export const useLogin = () => {
     mutationFn: (data: any) => authService.login(data),
 
     onSuccess: (response: any) => {
-      // 1. Log detallado para que veas EXACTAMENTE qué devuelve tu backend
       console.log("🟢 LOGIN EXITOSO. Respuesta del backend:", response);
 
       const token =
@@ -26,44 +26,37 @@ export const useLogin = () => {
         response.data?.usuario;
 
       if (!token || !user) {
-        console.warn("⚠️ ALERTA: No se encontró el token o el user en la respuesta. Verifica la estructura del JSON.");
+        console.warn("⚠️ ALERTA: No se encontró el token o el usuario en la respuesta.");
       }
+
+      // 🛡️ Extracción robusta de rol (evita "[object Object]")
+      const role = extractRole(user);
+      console.log("🧭 Rol detectado y validado para redirección:", role);
+
+      // Normalizamos el usuario para que contenga el rol como string limpio
+      const normalizedUser = {
+        ...user,
+        role: role,
+      };
 
       if (token) localStorage.setItem("token", token);
-      if (user) localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("user", JSON.stringify(normalizedUser));
       
-      if (user && token) {
-        setAuth(user, token);
+      if (token) {
+        setAuth(normalizedUser, token);
       }
 
-      // Buscamos el rol de forma segura
-      const role = (
-        user?.role ||
-        user?.rol ||
-        user?.role?.name ||
-        user?.roles?.[0]?.name ||
-        "user"
-      ).toString().toLowerCase();
+      // Guardamos la cookie de sesión para el middleware de Astro (7 días de vigencia)
+      document.cookie = `user-role=${role}; path=/; max-age=604800; SameSite=Lax`;
 
-      console.log("🧭 Rol detectado para redirección:", role);
+      const targetRoute = getDefaultRouteByRole(role);
 
-      document.cookie = `user-role=${role}; path=/; max-age=86400; SameSite=Lax`;
-
-      // 2. Aumentamos el tiempo a 1200ms para que el Toast de éxito se alcance a leer
       setTimeout(() => {
-        if (role === "superadmin") {
-          window.location.href = "/superadmin/dashboard";
-        } else if (role === "admin") {
-          window.location.href = "/admin/dashboard";
-        } else {
-          // Si cae aquí, te enviará a la raíz
-          window.location.href = "/";
-        }
-      }, 1200);
+        window.location.href = targetRoute;
+      }, 1000);
     },
 
     onError: (error: any) => {
-      // 3. Capturamos el error real del backend si las credenciales fallan
       console.error("🔴 ERROR EN EL LOGIN:", error?.response?.data || error.message);
     }
   });

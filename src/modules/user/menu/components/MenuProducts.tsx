@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { getProducts } from "@/modules/admin/productos/services/product.service";
 import { getActivePromotions } from "@/modules/admin/promociones/services/promotion.service";
 import { useCartStore } from "@/modules/admin/promociones/store/cartStore";
+import { findPromoForProduct, calcDiscountedPrice, getPromoLabel } from "@/modules/admin/promociones/utils/promoUtils";
 import type { Product } from "../interfaces/product.interface";
 import type { Promotion } from "@/modules/admin/promociones/interfaces/promotion.interface";
 import { MenuHero } from "./MenuHero";
@@ -25,6 +26,7 @@ export const MenuProducts = () => {
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 500]);
   const [activePromos, setActivePromos] = useState<Promotion[]>([]);
   const addToCart = useCartStore((s) => s.addToCart);
+  const syncPromotions = useCartStore((s) => s.syncPromotions);
 
   useEffect(() => {
     getProducts()
@@ -33,9 +35,13 @@ export const MenuProducts = () => {
 
     // Load active promotions silently (no blocking spinner)
     getActivePromotions()
-      .then((data) => setActivePromos(Array.isArray(data) ? data : []))
+      .then((data) => {
+        const promos = Array.isArray(data) ? data : [];
+        setActivePromos(promos);
+        syncPromotions(promos);
+      })
       .catch(() => setActivePromos([]));
-  }, []);
+  }, [syncPromotions]);
 
   const categories = useMemo(() => {
     return ["Todos", ...new Set(products.map((p) => (p as any).category?.name || (p as any).category || "Criollo"))];
@@ -74,18 +80,41 @@ export const MenuProducts = () => {
 
   const handleAddToCart = useCallback(
     (p: Product) => {
+      const categoryId: string | undefined =
+        p.categoryId ??
+        (typeof p.category === "object" && p.category !== null
+          ? (p.category as any).id
+          : undefined);
+
+      const promo = findPromoForProduct(activePromos, p.id, categoryId);
+      const originalPrice = Number(p.price);
+      const discountedPrice = promo
+        ? calcDiscountedPrice(originalPrice, promo, 1)
+        : null;
+
       addToCart({
         id: p.id,
         name: p.name,
-        price: Number(p.price),
-        imageUrl: (p as any).imageUrl,
-        category: (p as any).category?.name || (p as any).category || "Criollo",
+        price: discountedPrice !== null ? discountedPrice : originalPrice,
+        originalPrice: originalPrice,
+        discountType: promo?.discountType,
+        discountValue: promo ? Number(promo.discountValue) : undefined,
+        minQuantity: promo?.minQuantity,
+        promoLabel: promo ? getPromoLabel(promo) : undefined,
+        promoTitle: promo?.title,
+        imageUrl: (p as any).imageUrl || (p as any).image,
+        category:
+          typeof (p as any).category === "object" && (p as any).category !== null
+            ? (p as any).category?.name
+            : (p as any).category || "Criollo",
+        categoryId,
       });
+
       toast.success(`${p.name} añadido`, {
         style: { background: "var(--card)", color: "var(--foreground)", border: "1px solid var(--ember)" },
       });
     },
-    [addToCart]
+    [addToCart, activePromos]
   );
 
   return (

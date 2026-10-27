@@ -192,28 +192,89 @@ export const Step4Payment = ({
                 )}
               </div>
             ) : (
-              <div className="max-h-40 overflow-y-auto space-y-2 pr-1 custom-scrollbar">
-                {cart.map((item) => (
-                  <div key={item.id} className="flex items-center justify-between text-xs py-1 border-b border-border/40 last:border-none">
-                    <div className="flex-1 truncate mr-2">
-                      <span className="font-medium text-foreground">{item.name}</span>
-                      <span className="text-muted-foreground ml-1.5 text-[11px]">x{item.quantity}</span>
+              <div className="max-h-48 overflow-y-auto space-y-2 pr-1 custom-scrollbar">
+                {cart.map((item) => {
+                  const hasDiscount = !!(item.originalPrice && item.originalPrice > item.price);
+                  const unitOriginal = item.originalPrice !== undefined ? Number(item.originalPrice) : Number(item.price || 0);
+                  const unitFinal = Number(item.price || 0);
+                  const qty = Number(item.quantity || 1);
+
+                  return (
+                    <div key={item.id} className="flex items-center justify-between text-xs py-1.5 border-b border-border/40 last:border-none">
+                      <div className="flex-1 truncate mr-2">
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-medium text-foreground truncate">{item.name}</span>
+                          {item.promoLabel && (
+                            <span className="inline-flex items-center text-[9px] font-black bg-amber-500 text-black px-1.5 py-0.2 rounded-full uppercase shrink-0">
+                              {item.promoLabel}
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2 text-[10px] text-muted-foreground mt-0.5">
+                          <span>x{qty}</span>
+                          {hasDiscount ? (
+                            <>
+                              <span className="line-through text-muted-foreground/60 font-mono">
+                                S/ {unitOriginal.toFixed(2)}
+                              </span>
+                              <span className="text-amber-500 font-semibold font-mono">
+                                S/ {unitFinal.toFixed(2)} c/u
+                              </span>
+                            </>
+                          ) : (
+                            <span className="font-mono">S/ {unitFinal.toFixed(2)} c/u</span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="text-right shrink-0">
+                        {hasDiscount && (
+                          <span className="block text-[10px] text-muted-foreground/60 line-through font-mono">
+                            S/ {(unitOriginal * qty).toFixed(2)}
+                          </span>
+                        )}
+                        <span className={cn("font-mono font-bold", hasDiscount ? "text-amber-500" : "text-foreground")}>
+                          S/ {(unitFinal * qty).toFixed(2)}
+                        </span>
+                      </div>
                     </div>
-                    <span className="font-mono font-semibold text-foreground shrink-0">
-                      S/ {(Number(item.price || 0) * Number(item.quantity || 1)).toFixed(2)}
-                    </span>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
 
-          <div className="pt-3 mt-3 border-t border-border flex items-center justify-between">
-            <span className="text-xs font-bold text-muted-foreground">Total Estimado</span>
-            <span className="text-lg font-bold font-serif text-ember">
-              S/ {safeTotal.toFixed(2)}
-            </span>
-          </div>
+          {(() => {
+            const rawTotal = cart.reduce((acc, item) => {
+              const base = item.originalPrice !== undefined ? Number(item.originalPrice) : Number(item.price || 0);
+              return acc + base * Number(item.quantity || 1);
+            }, 0);
+            const savings = Math.max(0, rawTotal - safeTotal);
+
+            return (
+              <div className="pt-3 mt-3 border-t border-border space-y-1.5">
+                {savings > 0 && (
+                  <>
+                    <div className="flex items-center justify-between text-xs text-muted-foreground">
+                      <span>Subtotal regular</span>
+                      <span className="font-mono line-through text-muted-foreground/70">S/ {rawTotal.toFixed(2)}</span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs text-emerald-600 dark:text-emerald-400 font-medium">
+                      <span className="flex items-center gap-1">
+                        <Sparkles className="w-3.5 h-3.5 text-ember" /> Descuento aplicado
+                      </span>
+                      <span className="font-mono font-bold">- S/ {savings.toFixed(2)}</span>
+                    </div>
+                  </>
+                )}
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-muted-foreground">Total Estimado</span>
+                  <span className="text-lg font-bold font-serif text-ember">
+                    S/ {safeTotal.toFixed(2)}
+                  </span>
+                </div>
+              </div>
+            );
+          })()}
         </div>
       </div>
 

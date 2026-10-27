@@ -50,7 +50,7 @@ export default function ReservationWizard() {
               className="w-full"
             >
               {wizard.currentStep === 1 && <Step1Contact formData={wizard.formData} handleChange={wizard.handleChange} />}
-              {wizard.currentStep === 2 && <Step2Menu products={wizard.products} isLoading={wizard.isLoadingProducts} />}
+              {wizard.currentStep === 2 && <Step2Menu products={wizard.products} activePromos={wizard.activePromos} isLoading={wizard.isLoadingProducts} />}
               {wizard.currentStep === 3 && <Step3Logistics formData={wizard.formData} handleChange={wizard.handleChange} wizard={wizard} />}
               {wizard.currentStep === 4 && (
                 <Step4Payment

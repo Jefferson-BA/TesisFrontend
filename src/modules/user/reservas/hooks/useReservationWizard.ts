@@ -2,21 +2,23 @@ import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { getProducts } from "@/modules/admin/productos/services/product.service";
 import { createReservation } from "@/modules/admin/pedidos/services/order.service"; // 🗑️ Quitamos createOrder
+import { getActivePromotions } from "@/modules/admin/promociones/services/promotion.service";
 import { useCartStore } from "@/modules/admin/promociones/store/cartStore";
 import type { Product } from "@/modules/user/menu/interfaces/product.interface";
+import type { Promotion } from "@/modules/admin/promociones/interfaces/promotion.interface";
 
 export const useReservationWizard = () => {
     const [currentStep, setCurrentStep] = useState<number>(1);
     const [products, setProducts] = useState<Product[]>([]);
+    const [activePromos, setActivePromos] = useState<Promotion[]>([]);
     const [isLoadingProducts, setIsLoadingProducts] = useState<boolean>(true);
     
     // Solo necesitamos el estado de carga
     const [isLoadingSubmit, setIsLoadingSubmit] = useState<boolean>(false);
-    
-    // 🗑️ Quitamos los estados de Culqi (pendingOrderId y isCulqiModalOpen) porque ya no se paga aquí.
 
     const cart = useCartStore((state) => state.cart);
     const clearCart = useCartStore((state) => state.clearCart);
+    const syncPromotions = useCartStore((state) => state.syncPromotions);
 
     const [formData, setFormData] = useState({
         name: "",
@@ -40,20 +42,33 @@ export const useReservationWizard = () => {
     );
 
     useEffect(() => {
-        const fetchMenu = async () => {
+        const fetchMenuAndPromos = async () => {
             try {
-                const res = await getProducts();
-                const data = Array.isArray(res) ? res : res.data || [];
-                setProducts(data);
+                const [resProducts, resPromos] = await Promise.allSettled([
+                    getProducts(),
+                    getActivePromotions(),
+                ]);
+
+                if (resProducts.status === "fulfilled") {
+                    const res = resProducts.value;
+                    const data = Array.isArray(res) ? res : (res as any).data || [];
+                    setProducts(data);
+                }
+
+                if (resPromos.status === "fulfilled") {
+                    const promos = Array.isArray(resPromos.value) ? resPromos.value : [];
+                    setActivePromos(promos);
+                    syncPromotions(promos);
+                }
             } catch (error) {
-                console.error("Error cargando productos:", error);
-                toast.error("Error al cargar la carta y promociones reales.");
+                console.error("Error cargando productos o promociones:", error);
+                toast.error("Error al cargar la carta y promociones.");
             } finally {
                 setIsLoadingProducts(false);
             }
         };
-        fetchMenu();
-    }, []);
+        fetchMenuAndPromos();
+    }, [syncPromotions]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -123,6 +138,7 @@ export const useReservationWizard = () => {
         setCurrentStep,
         formData,
         products,
+        activePromos,
         isLoadingProducts,
         isLoadingSubmit,
         cart,

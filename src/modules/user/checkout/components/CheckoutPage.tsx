@@ -2,12 +2,13 @@
 
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { CulqiPayment } from "@/modules/payments/components/CulqiPayment";
 import { useCartStore } from "@/modules/admin/promociones/store/cartStore";
+import { getActivePromotions } from "@/modules/admin/promociones/services/promotion.service";
 import { useUser } from "@/modules/user/hooks/useUser";
-import { CreditCard, ShieldCheck, ShoppingBag, ArrowLeft, Loader2, Receipt } from "lucide-react";
+import { CreditCard, ShieldCheck, ShoppingBag, ArrowLeft, Loader2, Receipt, Flame, Tag } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/api/axios";
 import { cn } from "@/lib/utils";
@@ -15,6 +16,7 @@ import { cn } from "@/lib/utils";
 export default function CheckoutPage() {
   const cart = useCartStore((s) => s.cart);
   const clearCart = useCartStore((s) => s.clearCart);
+  const syncPromotions = useCartStore((s) => s.syncPromotions);
   const { user } = useUser();
 
   const [isCulqiOpen, setIsCulqiOpen] = useState(false);
@@ -22,7 +24,23 @@ export default function CheckoutPage() {
   const [isCreatingOrder, setIsCreatingOrder] = useState(false);
   const isCreatingOrderRef = useRef(false);
 
+  useEffect(() => {
+    getActivePromotions()
+      .then((promos) => {
+        if (Array.isArray(promos)) {
+          syncPromotions(promos);
+        }
+      })
+      .catch(() => {});
+  }, [syncPromotions]);
+
+  const rawSubtotal = cart.reduce((acc, item) => {
+    const base = item.originalPrice !== undefined ? Number(item.originalPrice) : Number(item.price);
+    return acc + base * Number(item.quantity);
+  }, 0);
+
   const subtotal = cart.reduce((acc, item) => acc + Number(item.price) * Number(item.quantity), 0);
+  const discountSavings = Math.max(0, rawSubtotal - subtotal);
   const serviceFee = subtotal * 0.10;
   const totalAmount = subtotal + serviceFee;
 
@@ -101,23 +119,75 @@ export default function CheckoutPage() {
         {/* Items */}
         <div className="mb-6 space-y-3 rounded-xl border border-border bg-muted/30 p-5">
           <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-3">Productos</p>
-          {cart.map((item) => (
-            <div key={item.id} className="flex justify-between text-sm">
-              <span className="text-foreground truncate flex-1">{item.quantity}x {item.name}</span>
-              <span className="text-muted-foreground ml-4 font-mono">S/ {(Number(item.price) * Number(item.quantity)).toFixed(2)}</span>
-            </div>
-          ))}
+          {cart.map((item) => {
+            const hasDiscount = !!(item.originalPrice && item.originalPrice > item.price);
+            const unitOriginal = item.originalPrice !== undefined ? Number(item.originalPrice) : Number(item.price);
+            const unitFinal = Number(item.price);
+            const qty = Number(item.quantity);
+
+            return (
+              <div key={item.id} className="flex justify-between items-start text-sm py-1 border-b border-border/40 last:border-none">
+                <div className="flex-1 truncate mr-3">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-foreground truncate font-medium">{qty}x {item.name}</span>
+                    {item.promoLabel && (
+                      <span className="inline-flex items-center gap-0.5 bg-amber-500 text-black px-1.5 py-0.2 rounded-full font-black text-[9px] uppercase tracking-wider shrink-0">
+                        <Flame size={9} strokeWidth={3} />
+                        {item.promoLabel}
+                      </span>
+                    )}
+                  </div>
+                  {hasDiscount && (
+                    <p className="text-[10px] text-muted-foreground mt-0.5">
+                      <span className="line-through text-muted-foreground/60 mr-1 font-mono">S/ {unitOriginal.toFixed(2)}</span>
+                      <span className="text-amber-500 font-semibold font-mono">S/ {unitFinal.toFixed(2)} c/u</span>
+                    </p>
+                  )}
+                </div>
+                <div className="text-right shrink-0">
+                  {hasDiscount && (
+                    <span className="block text-[10px] text-muted-foreground/60 line-through font-mono">
+                      S/ {(unitOriginal * qty).toFixed(2)}
+                    </span>
+                  )}
+                  <span className={cn("font-mono font-bold", hasDiscount ? "text-amber-500" : "text-foreground")}>
+                    S/ {(unitFinal * qty).toFixed(2)}
+                  </span>
+                </div>
+              </div>
+            );
+          })}
         </div>
 
         {/* Totales */}
         <div className="mb-6 space-y-2 rounded-xl border border-border bg-muted/20 p-5">
-          <div className="flex justify-between text-sm text-muted-foreground">
-            <span>Subtotal</span>
-            <span className="font-medium text-foreground">S/ {subtotal.toFixed(2)}</span>
-          </div>
+          {discountSavings > 0 ? (
+            <>
+              <div className="flex justify-between text-sm text-muted-foreground">
+                <span>Subtotal regular</span>
+                <span className="font-mono line-through text-muted-foreground/70">S/ {rawSubtotal.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between text-sm text-emerald-600 dark:text-emerald-400 font-medium">
+                <span className="flex items-center gap-1.5">
+                  <Tag size={13} /> Descuento aplicado
+                </span>
+                <span className="font-mono font-bold">- S/ {discountSavings.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between text-sm text-foreground">
+                <span className="font-semibold">Subtotal con descuento</span>
+                <span className="font-semibold font-mono">S/ {subtotal.toFixed(2)}</span>
+              </div>
+            </>
+          ) : (
+            <div className="flex justify-between text-sm text-muted-foreground">
+              <span>Subtotal</span>
+              <span className="font-medium text-foreground font-mono">S/ {subtotal.toFixed(2)}</span>
+            </div>
+          )}
+
           <div className="flex justify-between text-sm text-muted-foreground">
             <span>Servicio (10%)</span>
-            <span className="font-medium text-foreground">S/ {serviceFee.toFixed(2)}</span>
+            <span className="font-medium text-foreground font-mono">S/ {serviceFee.toFixed(2)}</span>
           </div>
           <hr className="border-border my-2" />
           <div className="flex justify-between items-baseline">

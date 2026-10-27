@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingCart, LayoutDashboard, LogOut, ChefHat, User, ChevronDown, Menu, X } from "lucide-react";
+import { ShoppingCart, LayoutDashboard, LogOut, ChefHat, User, ChevronDown, Menu, X, ShieldAlert } from "lucide-react";
 import { useCartStore } from "@/modules/admin/promociones/store/cartStore";
 import { useUser } from "@/modules/user/hooks/useUser";
 import ThemeToggle from "@/modules/user/shared/components/Themetoggle";
@@ -18,7 +18,7 @@ const EASE = [0.16, 1, 0.3, 1] as const;
 
 export function PublicNavbar() {
   const cart = useCartStore((s) => s.cart);
-  const { user, logout, isAdmin } = useUser();
+  const { user, logout, isAdmin, isSuperAdmin } = useUser();
 
   const [mounted, setMounted] = useState(false);
   const [dropdown, setDropdown] = useState(false);
@@ -134,9 +134,20 @@ export function PublicNavbar() {
                         <User size={14} /> Mi Perfil
                       </a>
 
+                      {isSuperAdmin && (
+                        <a
+                          href="/superadmin/dashboard"
+                          data-astro-prefetch="hover"
+                          onClick={() => setDropdown(false)}
+                          className="dropdown-link-glass text-purple-400 font-semibold hover:!text-purple-300"
+                        >
+                          <ShieldAlert size={14} className="text-purple-400" /> Panel Maestro
+                        </a>
+                      )}
+
                       {isAdmin && (
                         <a href="/admin/dashboard" data-astro-prefetch="hover" onClick={() => setDropdown(false)} className="dropdown-link-glass">
-                          <LayoutDashboard size={14} /> Dashboard
+                          <LayoutDashboard size={14} /> Dashboard Admin
                         </a>
                       )}
 
@@ -242,9 +253,14 @@ export function PublicNavbar() {
                     <a href="/user/profile" data-astro-prefetch="hover" onClick={() => setMobile(false)} className="mobile-sublink-glass">
                       Mi Perfil
                     </a>
+                    {isSuperAdmin && (
+                      <a href="/superadmin/dashboard" data-astro-prefetch="hover" onClick={() => setMobile(false)} className="mobile-sublink-glass text-purple-400 font-semibold">
+                        Panel Maestro Superadmin
+                      </a>
+                    )}
                     {isAdmin && (
                       <a href="/admin/dashboard" data-astro-prefetch="hover" onClick={() => setMobile(false)} className="mobile-sublink-glass">
-                        Dashboard
+                        Dashboard Admin
                       </a>
                     )}
                     <button

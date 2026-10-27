@@ -59,10 +59,20 @@ export function promoAppliesToProduct(
   productId: string,
   categoryId?: string
 ): boolean {
+  if (promo.isActive === false) return false;
   const apply = (promo.applyTo || '').toLowerCase();
   if (apply === 'all') return true;
-  if (apply === 'product' && promo.product?.id === productId) return true;
-  if (apply === 'category' && categoryId && promo.category?.id === categoryId) return true;
+
+  const promoProdId = (promo.product as any)?.id ?? (promo as any).productId;
+  if (apply === 'product' && promoProdId !== undefined && promoProdId !== null) {
+    return String(promoProdId) === String(productId);
+  }
+
+  const promoCatId = (promo.category as any)?.id ?? (promo as any).categoryId;
+  if (apply === 'category' && categoryId && promoCatId !== undefined && promoCatId !== null) {
+    return String(promoCatId) === String(categoryId);
+  }
+
   return false;
 }
 

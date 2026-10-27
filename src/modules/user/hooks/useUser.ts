@@ -1,11 +1,13 @@
+// src/modules/user/hooks/useUser.ts
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { extractRole } from "@/lib/auth-utils";
 
 type User = {
-  id?: string;
+  id?: string | number;
   name?: string;
   email?: string;
-  role?: string;
+  role?: any;
 };
 
 export const useUser = () => {
@@ -55,16 +57,20 @@ export const useUser = () => {
     }, 700);
   };
 
+  const userRole = extractRole(user);
   const isLoggedIn = !!user;
-  const isAdmin = user?.role === "admin" || user?.role === "superadmin";
+  const isSuperAdmin = userRole === "superadmin";
+  const isAdmin = userRole === "admin" || isSuperAdmin;
 
   return {
     user,
+    role: userRole,
     setUser,
     updateLocalUser,
     logout,
     loadingUser,
     isLoggedIn,
     isAdmin,
+    isSuperAdmin,
   };
 };

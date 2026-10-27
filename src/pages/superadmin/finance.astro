@@ -1,0 +1,20 @@
+---
+// src/pages/superadmin/finance.astro
+import AdminLayout from "@/layouts/AdminLayout.astro";
+import { SuperadminFinancePage } from "@/modules/superadmin/components/SuperadminFinancePage";
+---
+
+<AdminLayout title="Finanzas y Reembolsos Culqi">
+  <div class="space-y-6">
+    <div>
+      <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight text-white">
+        Permisos Financieros &amp; Culqi Refunds
+      </h2>
+      <p class="text-zinc-400 text-sm mt-1">
+        Métricas consolidadas de facturación, anulaciones forzadas, reembolsos en pasarela bancaria y reajustes de montos.
+      </p>
+    </div>
+
+    <SuperadminFinancePage client:only="react" />
+  </div>
+</AdminLayout>

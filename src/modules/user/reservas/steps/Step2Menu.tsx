@@ -1,12 +1,22 @@
 // src/modules/user/reservas/steps/Step2Menu.tsx
 
-import { Utensils, Loader2, Minus, Plus } from "lucide-react";
+import { Utensils, Loader2, Minus, Plus, Flame } from "lucide-react";
 import { StepHeader } from "../components/WizardUI";
 import { useCartStore } from "@/modules/admin/promociones/store/cartStore";
+import { findPromoForProduct, calcDiscountedPrice, getPromoLabel } from "@/modules/admin/promociones/utils/promoUtils";
 import type { Product } from "@/modules/user/menu/interfaces/product.interface";
+import type { Promotion } from "@/modules/admin/promociones/interfaces/promotion.interface";
 import { cn } from "@/lib/utils";
 
-export const Step2Menu = ({ products, isLoading }: { products: Product[]; isLoading: boolean }) => {
+export const Step2Menu = ({
+  products,
+  activePromos = [],
+  isLoading,
+}: {
+  products: Product[];
+  activePromos?: Promotion[];
+  isLoading: boolean;
+}) => {
   const { cart, addToCart, removeFromCart, updateQuantity } = useCartStore();
 
   if (isLoading) return (
@@ -21,10 +31,21 @@ export const Step2Menu = ({ products, isLoading }: { products: Product[]; isLoad
       <StepHeader icon={<Utensils className="w-4 h-4" />} title="Menú Premium" sub="Seleccione los servicios gastronómicos." />
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
         {products.map((p) => {
-          const inCart = cart.find((i) => i.id === p.id);
+          const inCart = cart.find((i) => String(i.id) === String(p.id));
           const imgSrc = (p as any).imageUrl || (p as any).image;
           // Asumimos isAvailable false solo si viene explícitamente como false o si aún usa stock y es 0
           const isAvailable = p.isAvailable !== false && (p as any).stock !== 0;
+
+          const categoryId: string | undefined =
+            p.categoryId ??
+            (typeof p.category === "object" && p.category !== null
+              ? (p.category as any).id
+              : undefined);
+
+          const promo = findPromoForProduct(activePromos, p.id, categoryId);
+          const originalPrice = Number(p.price);
+          const discountedPrice = promo ? calcDiscountedPrice(originalPrice, promo, 1) : null;
+          const promoLabel = promo ? getPromoLabel(promo) : null;
 
           return (
             <div
@@ -42,11 +63,30 @@ export const Step2Menu = ({ products, isLoading }: { products: Product[]; isLoad
                   No Disponible
                 </div>
               )}
+
+              {isAvailable && promo && promoLabel && (
+                <div className="absolute top-2 right-2 z-10 flex items-center gap-1 bg-amber-500 text-black px-2 py-0.5 rounded-full font-black text-[9px] uppercase tracking-wider shadow-md">
+                  <Flame size={10} strokeWidth={3} />
+                  {promoLabel}
+                </div>
+              )}
+
               {imgSrc && (
                 <div className="h-32 overflow-hidden relative">
                   <img src={imgSrc} alt={p.name} className="w-full h-full object-cover opacity-80" />
-                  <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/80 text-ember text-xs font-bold rounded">
-                    S/ {Number(p.price).toFixed(2)}
+                  <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/80 text-xs font-bold rounded flex items-center gap-1.5">
+                    {discountedPrice !== null ? (
+                      <>
+                        <span className="line-through text-zinc-400 text-[10px] font-mono">
+                          S/ {originalPrice.toFixed(2)}
+                        </span>
+                        <span className="text-amber-400 font-mono">
+                          S/ {discountedPrice.toFixed(2)}
+                        </span>
+                      </>
+                    ) : (
+                      <span className="text-ember font-mono">S/ {originalPrice.toFixed(2)}</span>
+                    )}
                   </div>
                 </div>
               )}
@@ -85,7 +125,25 @@ export const Step2Menu = ({ products, isLoading }: { products: Product[]; isLoad
                     <button
                       type="button"
                       disabled={!isAvailable}
-                      onClick={() => addToCart({ id: p.id, name: p.name, price: Number(p.price) })}
+                      onClick={() =>
+                        addToCart({
+                          id: p.id,
+                          name: p.name,
+                          price: discountedPrice !== null ? discountedPrice : originalPrice,
+                          originalPrice,
+                          discountType: promo?.discountType,
+                          discountValue: promo ? Number(promo.discountValue) : undefined,
+                          minQuantity: promo?.minQuantity,
+                          promoLabel: promoLabel || undefined,
+                          promoTitle: promo?.title,
+                          imageUrl: imgSrc,
+                          category:
+                            typeof (p as any).category === "object" && (p as any).category !== null
+                              ? (p as any).category?.name
+                              : (p as any).category || "Criollo",
+                          categoryId,
+                        })
+                      }
                       className="w-full py-2 rounded-lg text-xs font-bold uppercase tracking-widest border border-ember/30 text-ember hover:bg-ember hover:text-char-deep transition-colors disabled:opacity-50"
                     >
                       {isAvailable ? "Agregar" : "Agotado"}
