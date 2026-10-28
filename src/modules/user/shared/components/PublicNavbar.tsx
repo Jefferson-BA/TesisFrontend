@@ -30,14 +30,26 @@ export function PublicNavbar() {
   const cartTotal = cart.reduce((acc, item) => acc + item.quantity, 0);
   const isActive = (href: string) => (href === "/" ? path === "/" : path.startsWith(href));
 
-  // Mount + scroll state
+  // Mount + scroll + navigation tracking
   useEffect(() => {
     setMounted(true);
     setPath(window.location.pathname);
     const onScroll = () => setScrolled(window.scrollY > 15);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+
+    // Listen for Astro page transitions so active pill follows navigation
+    const updatePath = () => setPath(window.location.pathname);
+    document.addEventListener("astro:page-load", updatePath);
+    document.addEventListener("astro:after-swap", updatePath);
+    window.addEventListener("popstate", updatePath);
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      document.removeEventListener("astro:page-load", updatePath);
+      document.removeEventListener("astro:after-swap", updatePath);
+      window.removeEventListener("popstate", updatePath);
+    };
   }, []);
 
   // Close user dropdown on outside click
@@ -83,8 +95,11 @@ export function PublicNavbar() {
                   key={link.href}
                   href={link.href}
                   data-astro-prefetch="hover"
-                  className={cn("nav-link-item-glass", active && "font-bold")}
-                  style={active ? { color: "var(--char-deep)" } : undefined}
+                  className={cn(
+                    "nav-link-item-glass",
+                    active && "font-bold !text-zinc-950"
+                  )}
+                  onClick={() => setPath(link.href)}
                 >
                   <span className="relative z-20">{link.label}</span>
                   {active && (
@@ -233,9 +248,12 @@ export function PublicNavbar() {
                       key={link.href}
                       href={link.href}
                       data-astro-prefetch="hover"
-                      onClick={() => setMobile(false)}
+                      onClick={() => { setPath(link.href); setMobile(false); }}
                       variants={{ hidden: { opacity: 0, x: -12 }, show: { opacity: 1, x: 0 } }}
-                      className={cn("mobile-link-glass-item", active && "!bg-ember !text-on-ember")}
+                      className={cn(
+                        "mobile-link-glass-item",
+                        active && "active-mobile !bg-ember !text-zinc-950 font-bold"
+                      )}
                     >
                       {link.label}
                     </motion.a>

@@ -300,11 +300,13 @@ body:has([id^="culqi-"]) { overflow: hidden !important; height: 100vh !important
   .logo-icon-box-glass { @apply relative flex h-8 w-8 items-center justify-center rounded-full transition-colors duration-300; background: color-mix(in oklch, var(--ember) 10%, transparent); }
   .group:hover .logo-icon-box-glass { background: color-mix(in oklch, var(--ember) 18%, transparent); box-shadow: 0 0 0 4px color-mix(in oklch, var(--ember) 8%, transparent); }
 
-  .navbar-divider-glass { @apply mx-1 h-4 w-px; background: color-mix(in oklch, var(--on-dark) 14%, transparent); }
+  .navbar-divider-glass { @apply mx-1 h-4 w-px; background: color-mix(in oklch, var(--foreground) 16%, transparent); }
 
   .nav-links-pill-glass { @apply hidden items-center gap-1 md:flex; }
-  .nav-link-item-glass { @apply relative select-none overflow-hidden rounded-full px-4 py-1.5 text-[13px] font-medium transition-colors duration-200; color: color-mix(in oklch, var(--on-dark) 58%, transparent); }
-  .nav-link-item-glass:hover { color: var(--on-dark); }
+  .nav-link-item-glass { @apply relative select-none overflow-hidden rounded-full px-4 py-1.5 text-[13px] font-medium transition-colors duration-200; color: var(--muted-foreground); }
+  .nav-link-item-glass:hover { color: var(--foreground); }
+  .dark .nav-link-item-glass { color: color-mix(in oklch, var(--foreground) 70%, transparent); }
+  .dark .nav-link-item-glass:hover { color: var(--foreground); }
   .nav-pill-active { @apply absolute inset-0 -z-0 rounded-full; background: var(--ember); box-shadow: 0 4px 12px color-mix(in oklch, var(--ember) 35%, transparent); }
 
 
@@ -326,8 +328,8 @@ body:has([id^="culqi-"]) { overflow: hidden !important; height: 100vh !important
   .navbar-mobile-wrapper { @apply fixed inset-x-0 top-20 z-40 flex justify-center px-4 md:hidden; }
   .navbar-mobile-panel-glass { @apply relative w-full max-w-lg overflow-hidden rounded-3xl; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); background: color-mix(in oklch, var(--card) 94%, transparent); border: 1px solid color-mix(in oklch, var(--foreground) 8%, transparent); box-shadow: 0 20px 45px -20px oklch(0 0 0 / 0.2); }
   .dark .navbar-mobile-panel-glass { background: color-mix(in oklch, var(--char-deep) 96%, transparent); border-color: color-mix(in oklch, white 8%, transparent); }
-  .mobile-link-glass-item { @apply block rounded-xl px-4 py-3 text-sm font-semibold transition-colors duration-200; }
-  .mobile-link-glass-item:not(.bg-ember):hover { background: color-mix(in oklch, var(--foreground) 5%, transparent); }
+  .mobile-link-glass-item { @apply block rounded-xl px-4 py-3 text-sm font-semibold text-foreground transition-colors duration-200; }
+  .mobile-link-glass-item:not(.active-mobile):hover { background: color-mix(in oklch, var(--foreground) 5%, transparent); }
   .mobile-sublink-glass { @apply block rounded-lg px-4 py-2.5 text-xs font-semibold text-muted-foreground transition-colors; }
   .mobile-sublink-glass:hover { background: color-mix(in oklch, var(--foreground) 5%, transparent); color: var(--foreground); }
   .mobile-login-glass-btn { @apply mt-2 block rounded-xl py-3 text-center text-xs font-bold transition-transform active:scale-[0.98]; background: var(--ember); color: var(--char-deep); box-shadow: var(--shadow-lift); }
