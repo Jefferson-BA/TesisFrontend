@@ -2,18 +2,28 @@ import { useEffect, useState } from "react";
 import { getActiveAdminReservations } from "@/modules/admin/pedidos/services/order.service";
 
 interface OrderReservationFilterProps {
+  selectedReservationId?: string | number | null;
   onSelectReservation: (reservation: any | null) => void;
 }
 
-export default function OrderReservationFilter({ onSelectReservation }: OrderReservationFilterProps) {
+export default function OrderReservationFilter({
+  selectedReservationId,
+  onSelectReservation,
+}: OrderReservationFilterProps) {
   const [reservations, setReservations] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [selectedValue, setSelectedValue] = useState<string>("");
 
   useEffect(() => {
+    if (selectedReservationId !== undefined) {
+      setSelectedValue(selectedReservationId ? String(selectedReservationId) : "");
+    }
+  }, [selectedReservationId]);
+
+  useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const urlId = params.get("reservationId");
-    if (urlId) {
+    if (urlId && selectedReservationId === undefined) {
       setSelectedValue(urlId);
     }
   }, []);
@@ -29,7 +39,7 @@ export default function OrderReservationFilter({ onSelectReservation }: OrderRes
         const urlId = params.get("reservationId");
 
         if (urlId) {
-          const found = list.find((r: any) => String(r.id) === String(urlId)); 
+          const found = list.find((r: any) => String(r.id) === String(urlId));
           if (found) {
             onSelectReservation(found);
           }
@@ -69,7 +79,7 @@ export default function OrderReservationFilter({ onSelectReservation }: OrderRes
         <option value="">Ver todos los pedidos</option>
         {reservations.map((res) => (
           <option key={res.id} value={res.id}>
-            Reserva de {res.user?.name || res.customerName || res.clientName || `Ref: #${res.id}`}
+            Reserva #{res.id} - {res.user?.name || res.customerName || res.clientName || `Ref: #${res.id}`} ({res.guestsCount || 0} PAX)
           </option>
         ))}
       </select>

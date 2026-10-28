@@ -18,8 +18,16 @@ export const getOrders = async (reservationId?: string | number) => {
 };
 
 export const updateOrderStatus = async (id: string | number, status: string) => {
-  const res = await api.patch(`/orders/${id}`, { status });
-  return res.data;
+  try {
+    const res = await api.patch(`/orders/${id}/status`, { status });
+    return res.data;
+  } catch (err: any) {
+    if (err?.response?.status === 404) {
+      const res = await api.patch(`/orders/${id}`, { status });
+      return res.data;
+    }
+    throw err;
+  }
 };
 
 export const getActiveAdminReservations = async () => {
@@ -27,7 +35,7 @@ export const getActiveAdminReservations = async () => {
   return res.data;
 };
 
-// 🌟 NUEVO: Endpoint para el Polling del cliente de sus propias reservas
+// NUEVO: Endpoint para el Polling del cliente de sus propias reservas
 export const getUserReservations = async () => {
   const res = await api.get("/reservations"); 
   return res.data;
