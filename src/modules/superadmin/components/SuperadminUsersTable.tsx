@@ -1,6 +1,30 @@
 // src/modules/superadmin/components/SuperadminUsersTable.tsx
 
-import React, { useState } from 'react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Table,
   TableBody,
@@ -9,50 +33,31 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Skeleton } from '@/components/ui/skeleton';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from '@/components/ui/dialog';
-import {
-  Users,
-  ShieldCheck,
-  ShieldAlert,
-  UserCheck,
-  UserX,
-  Search,
-  RefreshCw,
-  Edit2,
-  Lock,
+  Calendar,
   ChevronLeft,
   ChevronRight,
-  Shield,
-  Phone,
+  Edit2,
+  Lock,
   Mail,
-  Calendar,
+  Phone,
+  RefreshCw,
+  Search,
+  Shield,
+  ShieldAlert,
+  ShieldCheck,
+  UserCheck,
+  Users,
+  UserX,
 } from 'lucide-react';
+import React, { useState } from 'react';
 
 import { useSuperadminUsers } from '../hooks/useSuperadminUsers';
+import type { RoleType, SuperadminUser } from '../types/superadmin.types';
 import { SuperadminPasswordModal } from './SuperadminPasswordModal';
-import type { SuperadminUser, RoleType } from '../types/superadmin.types';
 
 export function SuperadminUsersTable() {
   const {
-    filters,
     setFilters,
     users,
     stats,
@@ -71,21 +76,31 @@ export function SuperadminUsersTable() {
   const [searchInput, setSearchInput] = useState('');
 
   // Estados para modal de cambio de rol
-  const [roleModalUser, setRoleModalUser] = useState<SuperadminUser | null>(null);
+  const [roleModalUser, setRoleModalUser] = useState<SuperadminUser | null>(
+    null,
+  );
   const [selectedNewRole, setSelectedNewRole] = useState<RoleType>('admin');
 
   // Estados para modal de cambio de estado (activo/suspendido)
-  const [statusModalUser, setStatusModalUser] = useState<SuperadminUser | null>(null);
+  const [statusModalUser, setStatusModalUser] = useState<SuperadminUser | null>(
+    null,
+  );
 
   // Estados para modal de edición de datos personales
-  const [editProfileUser, setEditProfileUser] = useState<SuperadminUser | null>(null);
+  const [editProfileUser, setEditProfileUser] = useState<SuperadminUser | null>(
+    null,
+  );
   const [profileName, setProfileName] = useState('');
   const [profilePhone, setProfilePhone] = useState('');
   const [profileAddress, setProfileAddress] = useState('');
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setFilters((prev) => ({ ...prev, search: searchInput.trim() || undefined, offset: 0 }));
+    setFilters((prev) => ({
+      ...prev,
+      search: searchInput.trim() || undefined,
+      offset: 0,
+    }));
   };
 
   const handleRoleFilterChange = (val: string) => {
@@ -178,40 +193,64 @@ export function SuperadminUsersTable() {
       <div className="grid gap-4 sm:grid-cols-3">
         <Card className="bg-card border-border text-card-foreground">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Superadministradores</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Superadministradores
+            </CardTitle>
             <ShieldAlert className="h-5 w-5 text-red-500" />
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-extrabold text-foreground">
-              {isLoading ? <Skeleton className="h-8 w-14 bg-muted" /> : stats?.superadmin ?? 0}
+              {isLoading ? (
+                <Skeleton className="h-8 w-14 bg-muted" />
+              ) : (
+                (stats?.superadmin ?? 0)
+              )}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">Control maestro de plataforma</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Control maestro de plataforma
+            </p>
           </CardContent>
         </Card>
 
         <Card className="bg-card border-border text-card-foreground">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Administradores</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Administradores
+            </CardTitle>
             <ShieldCheck className="h-5 w-5 text-purple-500" />
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-extrabold text-purple-600 dark:text-purple-400">
-              {isLoading ? <Skeleton className="h-8 w-14 bg-muted" /> : stats?.admin ?? 0}
+              {isLoading ? (
+                <Skeleton className="h-8 w-14 bg-muted" />
+              ) : (
+                (stats?.admin ?? 0)
+              )}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">Gestión operativa del restaurante</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Gestión operativa del restaurante
+            </p>
           </CardContent>
         </Card>
 
         <Card className="bg-card border-border text-card-foreground">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Clientes / Comensales</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Clientes / Comensales
+            </CardTitle>
             <Users className="h-5 w-5 text-emerald-500" />
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-extrabold text-foreground">
-              {isLoading ? <Skeleton className="h-8 w-14 bg-muted" /> : stats?.user ?? 0}
+              {isLoading ? (
+                <Skeleton className="h-8 w-14 bg-muted" />
+              ) : (
+                (stats?.user ?? 0)
+              )}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">Cuentas regulares de compras</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Cuentas regulares de compras
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -230,7 +269,11 @@ export function SuperadminUsersTable() {
                   className="pl-9 bg-background border-input text-foreground placeholder:text-muted-foreground text-sm focus-visible:ring-primary"
                 />
               </div>
-              <Button type="submit" variant="secondary" className="border border-border">
+              <Button
+                type="submit"
+                variant="secondary"
+                className="border border-border"
+              >
                 Buscar
               </Button>
             </form>
@@ -238,7 +281,10 @@ export function SuperadminUsersTable() {
             <div className="flex flex-wrap items-center gap-2">
               {/* Filtro por Rol */}
               <div className="w-36">
-                <Select defaultValue="all" onValueChange={handleRoleFilterChange}>
+                <Select
+                  defaultValue="all"
+                  onValueChange={handleRoleFilterChange}
+                >
                   <SelectTrigger className="bg-background border-input text-foreground">
                     <SelectValue placeholder="Rol" />
                   </SelectTrigger>
@@ -253,7 +299,10 @@ export function SuperadminUsersTable() {
 
               {/* Filtro por Estado */}
               <div className="w-36">
-                <Select defaultValue="all" onValueChange={handleStatusFilterChange}>
+                <Select
+                  defaultValue="all"
+                  onValueChange={handleStatusFilterChange}
+                >
                   <SelectTrigger className="bg-background border-input text-foreground">
                     <SelectValue placeholder="Estado" />
                   </SelectTrigger>
@@ -273,7 +322,9 @@ export function SuperadminUsersTable() {
                 title="Actualizar tabla"
                 className="border-border bg-card text-muted-foreground hover:text-foreground"
               >
-                <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
+                <RefreshCw
+                  className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`}
+                />
               </Button>
             </div>
           </div>
@@ -290,11 +341,15 @@ export function SuperadminUsersTable() {
                 Directorio de Usuarios y Privilegios
               </CardTitle>
               <CardDescription className="text-muted-foreground text-xs">
-                Asigna privilegios administrativos, activa o suspende cuentas con confirmación obligatoria.
+                Asigna privilegios administrativos, activa o suspende cuentas
+                con confirmación obligatoria.
               </CardDescription>
             </div>
             <div className="text-xs text-muted-foreground">
-              Total registrados: <span className="font-semibold text-foreground">{meta?.total ?? 0}</span>
+              Total registrados:{' '}
+              <span className="font-semibold text-foreground">
+                {meta?.total ?? 0}
+              </span>
             </div>
           </div>
         </CardHeader>
@@ -303,29 +358,56 @@ export function SuperadminUsersTable() {
           <Table>
             <TableHeader className="bg-muted/40">
               <TableRow className="border-border">
-                <TableHead className="text-muted-foreground font-semibold">Usuario</TableHead>
-                <TableHead className="text-muted-foreground font-semibold">Rol Actual</TableHead>
-                <TableHead className="text-muted-foreground font-semibold">Estado</TableHead>
-                <TableHead className="text-muted-foreground font-semibold">Contacto</TableHead>
-                <TableHead className="text-muted-foreground font-semibold">Registro</TableHead>
-                <TableHead className="text-right text-muted-foreground font-semibold pr-6">Acciones Críticas</TableHead>
+                <TableHead className="text-muted-foreground font-semibold">
+                  Usuario
+                </TableHead>
+                <TableHead className="text-muted-foreground font-semibold">
+                  Rol Actual
+                </TableHead>
+                <TableHead className="text-muted-foreground font-semibold">
+                  Estado
+                </TableHead>
+                <TableHead className="text-muted-foreground font-semibold">
+                  Contacto
+                </TableHead>
+                <TableHead className="text-muted-foreground font-semibold">
+                  Registro
+                </TableHead>
+                <TableHead className="text-right text-muted-foreground font-semibold pr-6">
+                  Acciones Críticas
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
                 Array.from({ length: 5 }).map((_, i) => (
                   <TableRow key={i} className="border-border">
-                    <TableCell><Skeleton className="h-5 w-32 bg-muted" /></TableCell>
-                    <TableCell><Skeleton className="h-5 w-20 bg-muted" /></TableCell>
-                    <TableCell><Skeleton className="h-5 w-16 bg-muted" /></TableCell>
-                    <TableCell><Skeleton className="h-5 w-28 bg-muted" /></TableCell>
-                    <TableCell><Skeleton className="h-5 w-24 bg-muted" /></TableCell>
-                    <TableCell className="text-right"><Skeleton className="h-8 w-24 ml-auto bg-muted" /></TableCell>
+                    <TableCell>
+                      <Skeleton className="h-5 w-32 bg-muted" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-5 w-20 bg-muted" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-5 w-16 bg-muted" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-5 w-28 bg-muted" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-5 w-24 bg-muted" />
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Skeleton className="h-8 w-24 ml-auto bg-muted" />
+                    </TableCell>
                   </TableRow>
                 ))
               ) : users.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="h-32 text-center text-muted-foreground">
+                  <TableCell
+                    colSpan={6}
+                    className="h-32 text-center text-muted-foreground"
+                  >
                     No se encontraron usuarios con los filtros aplicados.
                   </TableCell>
                 </TableRow>
@@ -336,13 +418,19 @@ export function SuperadminUsersTable() {
                   const isUserAdmin = roleName === 'admin';
 
                   return (
-                    <TableRow key={u.id} className="border-border/80 hover:bg-muted/40 transition-colors">
+                    <TableRow
+                      key={u.id}
+                      className="border-border/80 hover:bg-muted/40 transition-colors"
+                    >
                       <TableCell>
                         <div className="flex flex-col">
                           <span className="font-semibold text-foreground flex items-center gap-1.5">
                             {u.name}
                             {isUserSuperadmin && (
-                              <Badge variant="outline" className="text-[10px] py-0 px-1.5 border-red-500/40 text-red-600 dark:text-red-400 bg-red-500/10 dark:bg-red-950/20">
+                              <Badge
+                                variant="outline"
+                                className="text-[10px] py-0 px-1.5 border-red-500/40 text-red-600 dark:text-red-400 bg-red-500/10 dark:bg-red-950/20"
+                              >
                                 MAESTRO
                               </Badge>
                             )}
@@ -364,7 +452,10 @@ export function SuperadminUsersTable() {
                             Admin
                           </Badge>
                         ) : (
-                          <Badge variant="outline" className="border-border text-muted-foreground">
+                          <Badge
+                            variant="outline"
+                            className="border-border text-muted-foreground"
+                          >
                             Usuario
                           </Badge>
                         )}
@@ -392,7 +483,9 @@ export function SuperadminUsersTable() {
                               <span>{u.phone}</span>
                             </div>
                           ) : (
-                            <span className="text-muted-foreground/60 italic">Sin teléfono</span>
+                            <span className="text-muted-foreground/60 italic">
+                              Sin teléfono
+                            </span>
                           )}
                         </div>
                       </TableCell>
@@ -464,8 +557,13 @@ export function SuperadminUsersTable() {
           {meta && meta.lastPage > 1 && (
             <div className="flex items-center justify-between p-4 border-t border-border text-xs text-muted-foreground">
               <div>
-                Página <span className="text-foreground font-medium">{meta.page}</span> de{' '}
-                <span className="text-foreground font-medium">{meta.lastPage}</span> ({meta.total} usuarios)
+                Página{' '}
+                <span className="text-foreground font-medium">{meta.page}</span>{' '}
+                de{' '}
+                <span className="text-foreground font-medium">
+                  {meta.lastPage}
+                </span>{' '}
+                ({meta.total} usuarios)
               </div>
               <div className="flex items-center gap-2">
                 <Button
@@ -475,7 +573,10 @@ export function SuperadminUsersTable() {
                   onClick={() =>
                     setFilters((prev) => ({
                       ...prev,
-                      offset: Math.max(0, (prev.offset || 0) - (prev.limit || 10)),
+                      offset: Math.max(
+                        0,
+                        (prev.offset || 0) - (prev.limit || 10),
+                      ),
                     }))
                   }
                   className="border-border bg-card text-foreground"
@@ -530,8 +631,12 @@ export function SuperadminUsersTable() {
               </SelectTrigger>
               <SelectContent className="bg-popover border-border text-popover-foreground">
                 <SelectItem value="user">Usuario (Cliente estándar)</SelectItem>
-                <SelectItem value="admin">Admin (Gestor de restaurante)</SelectItem>
-                <SelectItem value="superadmin">Superadmin (Acceso maestro)</SelectItem>
+                <SelectItem value="admin">
+                  Admin (Gestor de restaurante)
+                </SelectItem>
+                <SelectItem value="superadmin">
+                  Superadmin (Acceso maestro)
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -543,14 +648,22 @@ export function SuperadminUsersTable() {
         <SuperadminPasswordModal
           open={!!statusModalUser}
           onOpenChange={(open) => !open && setStatusModalUser(null)}
-          title={statusModalUser.isActive ? `Suspender cuenta de ${statusModalUser.name}` : `Reactivar cuenta de ${statusModalUser.name}`}
+          title={
+            statusModalUser.isActive
+              ? `Suspender cuenta de ${statusModalUser.name}`
+              : `Reactivar cuenta de ${statusModalUser.name}`
+          }
           description={
             statusModalUser.isActive
               ? 'El usuario perderá acceso inmediato a la plataforma y no podrá iniciar sesión.'
               : 'Se restaurará el acceso del usuario para iniciar sesión y operar con normalidad.'
           }
           badgeText="Estado de Cuenta"
-          actionLabel={statusModalUser.isActive ? 'Confirmar Suspensión' : 'Confirmar Reactivación'}
+          actionLabel={
+            statusModalUser.isActive
+              ? 'Confirmar Suspensión'
+              : 'Confirmar Reactivación'
+          }
           variant={statusModalUser.isActive ? 'destructive' : 'amber'}
           isLoading={isUpdatingStatus}
           onConfirm={handleConfirmStatusChange}
@@ -558,7 +671,10 @@ export function SuperadminUsersTable() {
       )}
 
       {/* ✏️ MODAL: Edición de Datos Personales (No destructiva) */}
-      <Dialog open={!!editProfileUser} onOpenChange={(open) => !open && setEditProfileUser(null)}>
+      <Dialog
+        open={!!editProfileUser}
+        onOpenChange={(open) => !open && setEditProfileUser(null)}
+      >
         <DialogContent className="sm:max-w-md bg-card border-border text-foreground">
           <DialogHeader>
             <DialogTitle className="text-lg font-bold text-foreground flex items-center gap-2">
@@ -569,7 +685,9 @@ export function SuperadminUsersTable() {
 
           <form onSubmit={handleSaveProfile} className="space-y-4 py-2">
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-foreground">Nombre Completo</label>
+              <label className="text-xs font-medium text-foreground">
+                Nombre Completo
+              </label>
               <Input
                 value={profileName}
                 onChange={(e) => setProfileName(e.target.value)}
@@ -579,7 +697,9 @@ export function SuperadminUsersTable() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-foreground">Teléfono</label>
+              <label className="text-xs font-medium text-foreground">
+                Teléfono
+              </label>
               <Input
                 value={profilePhone}
                 onChange={(e) => setProfilePhone(e.target.value)}
@@ -589,7 +709,9 @@ export function SuperadminUsersTable() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-foreground">Dirección</label>
+              <label className="text-xs font-medium text-foreground">
+                Dirección
+              </label>
               <Input
                 value={profileAddress}
                 onChange={(e) => setProfileAddress(e.target.value)}

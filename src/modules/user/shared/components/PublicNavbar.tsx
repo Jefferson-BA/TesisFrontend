@@ -1,17 +1,25 @@
-"use client";
-
-import { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingCart, LayoutDashboard, LogOut, ChefHat, User, ChevronDown, Menu, X, ShieldAlert } from "lucide-react";
-import { useCartStore } from "@/modules/admin/promociones/store/cartStore";
-import { useUser } from "@/modules/user/hooks/useUser";
-import ThemeToggle from "@/modules/user/shared/components/Themetoggle";
-import { cn } from "@/lib/utils";
+import { cn } from '@/lib/utils';
+import { useCartStore } from '@/modules/cart/store/cartStore';
+import { useUser } from '@/modules/user/hooks/useUser';
+import ThemeToggle from '@/modules/user/shared/components/Themetoggle';
+import { AnimatePresence, motion } from 'framer-motion';
+import {
+  ChefHat,
+  ChevronDown,
+  LayoutDashboard,
+  LogOut,
+  Menu,
+  ShieldAlert,
+  ShoppingCart,
+  User,
+  X,
+} from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 
 const NAV_LINKS = [
-  { href: "/", label: "Inicio" },
-  { href: "/menu", label: "Menú" },
-  { href: "/reservas", label: "Reservas" },
+  { href: '/', label: 'Inicio' },
+  { href: '/menu', label: 'Menú' },
+  { href: '/reservas', label: 'Reservas' },
 ] as const;
 
 const EASE = [0.16, 1, 0.3, 1] as const;
@@ -23,12 +31,13 @@ export function PublicNavbar() {
   const [mounted, setMounted] = useState(false);
   const [dropdown, setDropdown] = useState(false);
   const [mobile, setMobile] = useState(false);
-  const [path, setPath] = useState("");
+  const [path, setPath] = useState('');
   const [scrolled, setScrolled] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const cartTotal = cart.reduce((acc, item) => acc + item.quantity, 0);
-  const isActive = (href: string) => (href === "/" ? path === "/" : path.startsWith(href));
+  const isActive = (href: string) =>
+    href === '/' ? path === '/' : path.startsWith(href);
 
   // Mount + scroll + navigation tracking
   useEffect(() => {
@@ -36,19 +45,19 @@ export function PublicNavbar() {
     setPath(window.location.pathname);
     const onScroll = () => setScrolled(window.scrollY > 15);
     onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener('scroll', onScroll, { passive: true });
 
     // Listen for Astro page transitions so active pill follows navigation
     const updatePath = () => setPath(window.location.pathname);
-    document.addEventListener("astro:page-load", updatePath);
-    document.addEventListener("astro:after-swap", updatePath);
-    window.addEventListener("popstate", updatePath);
+    document.addEventListener('astro:page-load', updatePath);
+    document.addEventListener('astro:after-swap', updatePath);
+    window.addEventListener('popstate', updatePath);
 
     return () => {
-      window.removeEventListener("scroll", onScroll);
-      document.removeEventListener("astro:page-load", updatePath);
-      document.removeEventListener("astro:after-swap", updatePath);
-      window.removeEventListener("popstate", updatePath);
+      window.removeEventListener('scroll', onScroll);
+      document.removeEventListener('astro:page-load', updatePath);
+      document.removeEventListener('astro:after-swap', updatePath);
+      window.removeEventListener('popstate', updatePath);
     };
   }, []);
 
@@ -56,23 +65,31 @@ export function PublicNavbar() {
   useEffect(() => {
     if (!dropdown) return;
     const close = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) setDropdown(false);
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      )
+        setDropdown(false);
     };
-    document.addEventListener("mousedown", close);
-    return () => document.removeEventListener("mousedown", close);
+    document.addEventListener('mousedown', close);
+    return () => document.removeEventListener('mousedown', close);
   }, [dropdown]);
 
   return (
     <>
       <motion.div
-        className={cn("navbar-wrapper", scrolled && "scrolled")}
+        className={cn('navbar-wrapper', scrolled && 'scrolled')}
         initial={{ y: -80, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.7, ease: EASE }}
       >
         <nav className="navbar-capsule-glass">
           {/* Logo */}
-          <a href="/" data-astro-prefetch="hover" className="relative z-10 flex shrink-0 select-none items-center gap-2.5 group">
+          <a
+            href="/"
+            data-astro-prefetch="hover"
+            className="relative z-10 flex shrink-0 select-none items-center gap-2.5 group"
+          >
             <div className="logo-icon-box-glass">
               <ChefHat className="text-ember w-[17px] h-[17px] transition-transform duration-500 ease-out group-hover:-rotate-6 group-hover:scale-110" />
             </div>
@@ -96,8 +113,8 @@ export function PublicNavbar() {
                   href={link.href}
                   data-astro-prefetch="hover"
                   className={cn(
-                    "nav-link-item-glass",
-                    active && "font-bold !text-zinc-950"
+                    'nav-link-item-glass',
+                    active && 'font-bold !text-zinc-950',
                   )}
                   onClick={() => setPath(link.href)}
                 >
@@ -106,7 +123,12 @@ export function PublicNavbar() {
                     <motion.div
                       layoutId="activePill"
                       className="nav-pill-active"
-                      transition={{ type: "spring", stiffness: 420, damping: 34, mass: 0.6 }}
+                      transition={{
+                        type: 'spring',
+                        stiffness: 420,
+                        damping: 34,
+                        mass: 0.6,
+                      }}
                     />
                   )}
                 </a>
@@ -123,10 +145,21 @@ export function PublicNavbar() {
               <div className="hidden md:block w-24 h-8 bg-muted/40 animate-pulse rounded-full" />
             ) : user ? (
               <div className="relative hidden md:block" ref={dropdownRef}>
-                <button onClick={() => setDropdown(!dropdown)} className="user-dropdown-btn-glass">
+                <button
+                  onClick={() => setDropdown(!dropdown)}
+                  className="user-dropdown-btn-glass"
+                >
                   <User size={14} className="text-ember shrink-0" />
-                  <span className="truncate text-xs font-bold">{user.name || user.email || "Mi Cuenta"}</span>
-                  <ChevronDown size={12} className={cn("transition-transform duration-300 ease-out", dropdown && "rotate-180")} />
+                  <span className="truncate text-xs font-bold">
+                    {user.name || user.email || 'Mi Cuenta'}
+                  </span>
+                  <ChevronDown
+                    size={12}
+                    className={cn(
+                      'transition-transform duration-300 ease-out',
+                      dropdown && 'rotate-180',
+                    )}
+                  />
                 </button>
 
                 <AnimatePresence>
@@ -142,10 +175,17 @@ export function PublicNavbar() {
                         <p className="text-[9px] text-muted-foreground uppercase tracking-widest font-bold opacity-80">
                           Sesión activa
                         </p>
-                        <p className="text-xs font-bold text-foreground truncate mt-0.5">{user.name || "Usuario"}</p>
+                        <p className="text-xs font-bold text-foreground truncate mt-0.5">
+                          {user.name || 'Usuario'}
+                        </p>
                       </div>
 
-                      <a href="/user/profile" data-astro-prefetch="hover" onClick={() => setDropdown(false)} className="dropdown-link-glass">
+                      <a
+                        href="/user/profile"
+                        data-astro-prefetch="hover"
+                        onClick={() => setDropdown(false)}
+                        className="dropdown-link-glass"
+                      >
                         <User size={14} /> Mi Perfil
                       </a>
 
@@ -156,12 +196,18 @@ export function PublicNavbar() {
                           onClick={() => setDropdown(false)}
                           className="dropdown-link-glass text-purple-400 font-semibold hover:!text-purple-300"
                         >
-                          <ShieldAlert size={14} className="text-purple-400" /> Panel Maestro
+                          <ShieldAlert size={14} className="text-purple-400" />{' '}
+                          Panel Maestro
                         </a>
                       )}
 
                       {isAdmin && (
-                        <a href="/admin/dashboard" data-astro-prefetch="hover" onClick={() => setDropdown(false)} className="dropdown-link-glass">
+                        <a
+                          href="/admin/dashboard"
+                          data-astro-prefetch="hover"
+                          onClick={() => setDropdown(false)}
+                          className="dropdown-link-glass"
+                        >
                           <LayoutDashboard size={14} /> Dashboard Admin
                         </a>
                       )}
@@ -169,7 +215,10 @@ export function PublicNavbar() {
                       <div className="h-[1px] bg-border my-1" />
 
                       <button
-                        onClick={() => { logout(); setDropdown(false); }}
+                        onClick={() => {
+                          logout();
+                          setDropdown(false);
+                        }}
                         className="dropdown-link-glass text-red-500 dark:text-red-400 hover:!bg-red-500/10 hover:!text-red-500"
                       >
                         <LogOut size={14} /> Cerrar Sesión
@@ -179,11 +228,21 @@ export function PublicNavbar() {
                 </AnimatePresence>
               </div>
             ) : (
-              <a href="/login" data-astro-prefetch="hover" className="login-nav-btn-glass">Ingresar</a>
+              <a
+                href="/login"
+                data-astro-prefetch="hover"
+                className="login-nav-btn-glass"
+              >
+                Ingresar
+              </a>
             )}
 
             {/* Carrito */}
-            <a href="/cart" data-astro-prefetch="hover" className="cart-nav-icon-glass group">
+            <a
+              href="/cart"
+              data-astro-prefetch="hover"
+              className="cart-nav-icon-glass group"
+            >
               <ShoppingCart className="w-[17px] h-[17px] transition-transform duration-300 ease-out group-hover:scale-110" />
               <AnimatePresence>
                 {mounted && cartTotal > 0 && (
@@ -192,7 +251,7 @@ export function PublicNavbar() {
                     initial={{ scale: 0.4, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     exit={{ scale: 0.4, opacity: 0 }}
-                    transition={{ type: "spring", stiffness: 500, damping: 20 }}
+                    transition={{ type: 'spring', stiffness: 500, damping: 20 }}
                     className="cart-badge-glass"
                   >
                     {cartTotal}
@@ -209,7 +268,7 @@ export function PublicNavbar() {
             >
               <AnimatePresence mode="wait" initial={false}>
                 <motion.span
-                  key={mobile ? "close" : "open"}
+                  key={mobile ? 'close' : 'open'}
                   initial={{ rotate: -90, opacity: 0 }}
                   animate={{ rotate: 0, opacity: 1 }}
                   exit={{ rotate: 90, opacity: 0 }}
@@ -239,7 +298,10 @@ export function PublicNavbar() {
                 className="px-4 py-4 space-y-1 relative z-10"
                 initial="hidden"
                 animate="show"
-                variants={{ hidden: {}, show: { transition: { staggerChildren: 0.05 } } }}
+                variants={{
+                  hidden: {},
+                  show: { transition: { staggerChildren: 0.05 } },
+                }}
               >
                 {NAV_LINKS.map((link) => {
                   const active = isActive(link.href);
@@ -248,11 +310,18 @@ export function PublicNavbar() {
                       key={link.href}
                       href={link.href}
                       data-astro-prefetch="hover"
-                      onClick={() => { setPath(link.href); setMobile(false); }}
-                      variants={{ hidden: { opacity: 0, x: -12 }, show: { opacity: 1, x: 0 } }}
+                      onClick={() => {
+                        setPath(link.href);
+                        setMobile(false);
+                      }}
+                      variants={{
+                        hidden: { opacity: 0, x: -12 },
+                        show: { opacity: 1, x: 0 },
+                      }}
                       className={cn(
-                        "mobile-link-glass-item",
-                        active && "active-mobile !bg-ember !text-zinc-950 font-bold"
+                        'mobile-link-glass-item',
+                        active &&
+                          'active-mobile !bg-ember !text-zinc-950 font-bold',
                       )}
                     >
                       {link.label}
@@ -268,21 +337,39 @@ export function PublicNavbar() {
                     <p className="text-[10px] text-muted-foreground px-4 uppercase tracking-wider font-bold opacity-80">
                       Conectado como: {user.email}
                     </p>
-                    <a href="/user/profile" data-astro-prefetch="hover" onClick={() => setMobile(false)} className="mobile-sublink-glass">
+                    <a
+                      href="/user/profile"
+                      data-astro-prefetch="hover"
+                      onClick={() => setMobile(false)}
+                      className="mobile-sublink-glass"
+                    >
                       Mi Perfil
                     </a>
                     {isSuperAdmin && (
-                      <a href="/superadmin/dashboard" data-astro-prefetch="hover" onClick={() => setMobile(false)} className="mobile-sublink-glass text-purple-400 font-semibold">
+                      <a
+                        href="/superadmin/dashboard"
+                        data-astro-prefetch="hover"
+                        onClick={() => setMobile(false)}
+                        className="mobile-sublink-glass text-purple-400 font-semibold"
+                      >
                         Panel Maestro Superadmin
                       </a>
                     )}
                     {isAdmin && (
-                      <a href="/admin/dashboard" data-astro-prefetch="hover" onClick={() => setMobile(false)} className="mobile-sublink-glass">
+                      <a
+                        href="/admin/dashboard"
+                        data-astro-prefetch="hover"
+                        onClick={() => setMobile(false)}
+                        className="mobile-sublink-glass"
+                      >
                         Dashboard Admin
                       </a>
                     )}
                     <button
-                      onClick={() => { logout(); setMobile(false); }}
+                      onClick={() => {
+                        logout();
+                        setMobile(false);
+                      }}
                       className="mobile-sublink-glass !text-red-500 dark:!text-red-400 font-bold hover:!bg-red-500/10"
                     >
                       Salir
@@ -290,7 +377,10 @@ export function PublicNavbar() {
                   </motion.div>
                 ) : mounted && !user ? (
                   <motion.a
-                    variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0 } }}
+                    variants={{
+                      hidden: { opacity: 0, y: 8 },
+                      show: { opacity: 1, y: 0 },
+                    }}
                     href="/login"
                     data-astro-prefetch="hover"
                     onClick={() => setMobile(false)}

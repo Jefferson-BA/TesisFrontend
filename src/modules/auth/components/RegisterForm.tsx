@@ -1,44 +1,76 @@
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { registerSchema, type RegisterFormData } from "../schemas/auth.schema";
-import { useSignup } from "../hooks/useSignup";
-import { Loader2, Mail, Lock, User, Phone, UserPlus, ChefHat, Flame, Star, Clock, MapPin, Eye, EyeOff } from "lucide-react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { toast } from "sonner";
-import { useState, useRef, useEffect } from "react";
-import "../../../styles/globals.css";
-import { LegalCheckboxes, type LegalCheckboxesValue } from "@/modules/shared/legal/LegalCheckboxes";
+import { QueryProvider } from '@/components/shared/QueryProvider';
+import { zodResolver } from '@hookform/resolvers/zod';
+import {
+  ChefHat,
+  Clock,
+  Eye,
+  EyeOff,
+  Flame,
+  Loader2,
+  Lock,
+  Mail,
+  MapPin,
+  Phone,
+  Star,
+  User,
+  UserPlus,
+} from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { useSignup } from '../hooks/useSignup';
+import { registerSchema, type RegisterFormData } from '../schemas/auth.schema';
 
-const queryClient = new QueryClient();
+import {
+  LegalCheckboxes,
+  type LegalCheckboxesValue,
+} from '@/modules/shared/legal/LegalCheckboxes';
+import { useEffect, useRef, useState } from 'react';
+import { toast } from 'sonner';
+import '../../../styles/globals.css';
 
 const CAROUSEL_IMAGES = [
   {
-    url: "https://images.unsplash.com/photo-1544025162-d76694265947?w=1600&q=80",
-    label: "Cortes Premium a la Brasa",
+    url: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=1600&q=80',
+    label: 'Cortes Premium a la Brasa',
   },
   {
-    url: "https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=1600&q=80",
-    label: "Parrilla Tradicional Argentina",
+    url: 'https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=1600&q=80',
+    label: 'Parrilla Tradicional Argentina',
   },
   {
-    url: "https://images.unsplash.com/photo-1558030006-450675393462?w=1600&q=80",
-    label: "Costillas de Cerdo BBQ",
+    url: 'https://images.unsplash.com/photo-1558030006-450675393462?w=1600&q=80',
+    label: 'Costillas de Cerdo BBQ',
   },
   {
-    url: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=1600&q=80",
-    label: "Brochetas Artesanales",
+    url: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=1600&q=80',
+    label: 'Brochetas Artesanales',
   },
   {
-    url: "https://images.unsplash.com/photo-1432139555190-58524dae6a55?w=1600&q=80",
-    label: "Entrañas al Carbón",
+    url: 'https://images.unsplash.com/photo-1432139555190-58524dae6a55?w=1600&q=80',
+    label: 'Entrañas al Carbón',
   },
 ];
 
 const INFO_ITEMS = [
-  { icon: <Flame size={16} />, title: "Desde 1998", desc: "Más de 25 años perfeccionando el arte de la parrilla" },
-  { icon: <Star size={16} />, title: "4.9 ★ Google", desc: "Más de 2,000 reseñas de nuestros clientes satisfechos" },
-  { icon: <Clock size={16} />, title: "Horario", desc: "Lunes a Domingo · 12:00 pm – 11:00 pm" },
-  { icon: <MapPin size={16} />, title: "Ubicación", desc: "Av. Principal 420, San Isidro · Lima, Perú" },
+  {
+    icon: <Flame size={16} />,
+    title: 'Desde 1998',
+    desc: 'Más de 25 años perfeccionando el arte de la parrilla',
+  },
+  {
+    icon: <Star size={16} />,
+    title: '4.9 ★ Google',
+    desc: 'Más de 2,000 reseñas de nuestros clientes satisfechos',
+  },
+  {
+    icon: <Clock size={16} />,
+    title: 'Horario',
+    desc: 'Lunes a Domingo · 12:00 pm – 11:00 pm',
+  },
+  {
+    icon: <MapPin size={16} />,
+    title: 'Ubicación',
+    desc: 'Av. Principal 420, San Isidro · Lima, Perú',
+  },
 ];
 
 function RegisterFormInner() {
@@ -48,8 +80,11 @@ function RegisterFormInner() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [legal, setLegal] = useState<LegalCheckboxesValue>({ acceptedTerms: false, acceptedPrivacy: false });
-  const [legalError, setLegalError] = useState("");
+  const [legal, setLegal] = useState<LegalCheckboxesValue>({
+    acceptedTerms: false,
+    acceptedPrivacy: false,
+  });
+  const [legalError, setLegalError] = useState('');
   const cardRef = useRef<HTMLDivElement>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -70,23 +105,35 @@ function RegisterFormInner() {
     });
   };
 
-  const { register, handleSubmit, formState: { errors } } = useForm<RegisterFormData>({
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
   });
 
-  const nameReg = register("name");
-  const phoneReg = register("phone");
-  const emailReg = register("email");
-  const passReg = register("password");
-  const confirmPassReg = register("confirmPassword");
+  useEffect(() => {
+    setValue('acceptedTerms', legal.acceptedTerms);
+    setValue('acceptedPrivacy', legal.acceptedPrivacy);
+  }, [legal, setValue]);
+
+  const nameReg = register('name');
+  const phoneReg = register('phone');
+  const emailReg = register('email');
+  const passReg = register('password');
+  const confirmPassReg = register('confirmPassword');
 
   const onSubmit = (data: RegisterFormData) => {
     if (!legal.acceptedTerms || !legal.acceptedPrivacy) {
-      setLegalError("Debes aceptar los Términos y Condiciones y la Política de Privacidad para registrarte.");
+      setLegalError(
+        'Debes aceptar los Términos y Condiciones y la Política de Privacidad para registrarte.',
+      );
       return;
     }
-    setLegalError("");
-    
+    setLegalError('');
+
     // Merge legal into data
     const payload = {
       ...data,
@@ -97,12 +144,20 @@ function RegisterFormInner() {
     // 'payload' ya contiene la propiedad 'phone' limpia gracias a react-hook-form y zod
     signup(payload, {
       onSuccess: () =>
-        toast.success("¡Cuenta creada con éxito! 🎉", {
-          style: { background: "#120d0a", color: "#fff", border: "1px solid #4a3824" },
+        toast.success('¡Cuenta creada con éxito! 🎉', {
+          style: {
+            background: '#120d0a',
+            color: '#fff',
+            border: '1px solid #4a3824',
+          },
         }),
       onError: () =>
-        toast.error("Error al registrar usuario", {
-          style: { background: "#120d0a", color: "#fff", border: "1px solid #e11d48" },
+        toast.error('Error al registrar usuario', {
+          style: {
+            background: '#120d0a',
+            color: '#fff',
+            border: '1px solid #e11d48',
+          },
         }),
     });
   };
@@ -122,7 +177,7 @@ function RegisterFormInner() {
         {CAROUSEL_IMAGES.map((img, i) => (
           <div
             key={i}
-            className={`lp-slide${i === currentSlide ? " active" : ""}`}
+            className={`lp-slide${i === currentSlide ? ' active' : ''}`}
             style={{ backgroundImage: `url(${img.url})` }}
           />
         ))}
@@ -131,7 +186,6 @@ function RegisterFormInner() {
 
       {/* ── Main Layout ── */}
       <div className="lp-layout">
-
         {/* ─── Left · Info Panel ─── */}
         <div className="lp-info">
           <div className="lp-brand">
@@ -164,7 +218,7 @@ function RegisterFormInner() {
             {CAROUSEL_IMAGES.map((_, i) => (
               <button
                 key={i}
-                className={`lp-dot${i === currentSlide ? " active" : ""}`}
+                className={`lp-dot${i === currentSlide ? ' active' : ''}`}
                 onClick={() => goToSlide(i)}
                 aria-label={`Slide ${i + 1}`}
               />
@@ -177,7 +231,12 @@ function RegisterFormInner() {
           className="lf-card"
           ref={cardRef}
           onMouseMove={handleMouseMove}
-          style={{ "--mx": `${mousePos.x}%`, "--my": `${mousePos.y}%` } as React.CSSProperties}
+          style={
+            {
+              '--mx': `${mousePos.x}%`,
+              '--my': `${mousePos.y}%`,
+            } as React.CSSProperties
+          }
         >
           <div className="lf-spotlight" />
           <div className="lf-ring lf-ring-1" />
@@ -190,17 +249,22 @@ function RegisterFormInner() {
             </div>
             <div>
               <div className="lf-title">Crear Cuenta</div>
-              <div className="lf-subtitle">Regístrate para acceder al panel administrativo</div>
+              <div className="lf-subtitle">
+                Regístrate para acceder al panel administrativo
+              </div>
             </div>
           </div>
 
           {/* Form */}
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="lf-body">
-
               {/* Full Name */}
-              <div className={`lf-field${focused === "name" ? " focused" : ""}`}>
-                <label className="lf-label" htmlFor="name">Nombre completo</label>
+              <div
+                className={`lf-field${focused === 'name' ? ' focused' : ''}`}
+              >
+                <label className="lf-label" htmlFor="name">
+                  Nombre completo
+                </label>
                 <div className="lf-input-wrap">
                   <User size={17} className="lf-input-icon" />
                   <input
@@ -209,18 +273,27 @@ function RegisterFormInner() {
                     type="text"
                     placeholder="Tu nombre y apellido"
                     className="lf-input"
-                    onFocus={() => setFocused("name")}
-                    onBlur={(e) => { nameReg.onBlur(e); setFocused(null); }}
+                    onFocus={() => setFocused('name')}
+                    onBlur={(e) => {
+                      nameReg.onBlur(e);
+                      setFocused(null);
+                    }}
                     autoComplete="name"
                   />
                   <div className="lf-input-underline" />
                 </div>
-                {errors.name && <span className="lf-error">{errors.name.message}</span>}
+                {errors.name && (
+                  <span className="lf-error">{errors.name.message}</span>
+                )}
               </div>
 
               {/* Phone / Celular */}
-              <div className={`lf-field${focused === "phone" ? " focused" : ""}`}>
-                <label className="lf-label" htmlFor="phone">Número de celular</label>
+              <div
+                className={`lf-field${focused === 'phone' ? ' focused' : ''}`}
+              >
+                <label className="lf-label" htmlFor="phone">
+                  Número de celular
+                </label>
                 <div className="lf-input-wrap">
                   <Phone size={17} className="lf-input-icon" />
                   <input
@@ -229,18 +302,27 @@ function RegisterFormInner() {
                     type="tel"
                     placeholder="Ej: 987654321"
                     className="lf-input"
-                    onFocus={() => setFocused("phone")}
-                    onBlur={(e) => { phoneReg.onBlur(e); setFocused(null); }}
+                    onFocus={() => setFocused('phone')}
+                    onBlur={(e) => {
+                      phoneReg.onBlur(e);
+                      setFocused(null);
+                    }}
                     autoComplete="tel"
                   />
                   <div className="lf-input-underline" />
                 </div>
-                {errors.phone && <span className="lf-error">{errors.phone.message}</span>}
+                {errors.phone && (
+                  <span className="lf-error">{errors.phone.message}</span>
+                )}
               </div>
 
               {/* Email */}
-              <div className={`lf-field${focused === "email" ? " focused" : ""}`}>
-                <label className="lf-label" htmlFor="email">Correo electrónico</label>
+              <div
+                className={`lf-field${focused === 'email' ? ' focused' : ''}`}
+              >
+                <label className="lf-label" htmlFor="email">
+                  Correo electrónico
+                </label>
                 <div className="lf-input-wrap">
                   <Mail size={17} className="lf-input-icon" />
                   <input
@@ -249,75 +331,113 @@ function RegisterFormInner() {
                     type="email"
                     placeholder="usuario@deparraspitz.com"
                     className="lf-input"
-                    onFocus={() => setFocused("email")}
-                    onBlur={(e) => { emailReg.onBlur(e); setFocused(null); }}
+                    onFocus={() => setFocused('email')}
+                    onBlur={(e) => {
+                      emailReg.onBlur(e);
+                      setFocused(null);
+                    }}
                     autoComplete="email"
                   />
                   <div className="lf-input-underline" />
                 </div>
-                {errors.email && <span className="lf-error">{errors.email.message}</span>}
+                {errors.email && (
+                  <span className="lf-error">{errors.email.message}</span>
+                )}
               </div>
 
               {/* Password */}
-              <div className={`lf-field${focused === "pass" ? " focused" : ""}`}>
-                <label className="lf-label" htmlFor="password">Contraseña</label>
+              <div
+                className={`lf-field${focused === 'pass' ? ' focused' : ''}`}
+              >
+                <label className="lf-label" htmlFor="password">
+                  Contraseña
+                </label>
                 <div className="lf-input-wrap">
                   <Lock size={17} className="lf-input-icon" />
                   <input
                     {...passReg}
                     id="password"
-                    type={showPassword ? "text" : "password"}
+                    type={showPassword ? 'text' : 'password'}
                     placeholder="••••••••"
                     className="lf-input pr-10"
-                    onFocus={() => setFocused("pass")}
-                    onBlur={(e) => { passReg.onBlur(e); setFocused(null); }}
+                    onFocus={() => setFocused('pass')}
+                    onBlur={(e) => {
+                      passReg.onBlur(e);
+                      setFocused(null);
+                    }}
                     autoComplete="new-password"
                   />
                   <button
                     type="button"
                     className="lf-toggle-password"
                     onClick={() => setShowPassword((v) => !v)}
-                    aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                    aria-label={
+                      showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'
+                    }
                   >
                     {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
                   <div className="lf-input-underline" />
                 </div>
-                {errors.password && <span className="lf-error">{errors.password.message}</span>}
+                {errors.password && (
+                  <span className="lf-error">{errors.password.message}</span>
+                )}
               </div>
 
               {/* Confirm Password */}
-              <div className={`lf-field${focused === "confirmPass" ? " focused" : ""}`}>
-                <label className="lf-label" htmlFor="confirmPassword">Confirmar contraseña</label>
+              <div
+                className={`lf-field${focused === 'confirmPass' ? ' focused' : ''}`}
+              >
+                <label className="lf-label" htmlFor="confirmPassword">
+                  Confirmar contraseña
+                </label>
                 <div className="lf-input-wrap">
                   <Lock size={17} className="lf-input-icon" />
                   <input
                     {...confirmPassReg}
                     id="confirmPassword"
-                    type={showConfirmPassword ? "text" : "password"}
+                    type={showConfirmPassword ? 'text' : 'password'}
                     placeholder="••••••••"
                     className="lf-input pr-10"
-                    onFocus={() => setFocused("confirmPass")}
-                    onBlur={(e) => { confirmPassReg.onBlur(e); setFocused(null); }}
+                    onFocus={() => setFocused('confirmPass')}
+                    onBlur={(e) => {
+                      confirmPassReg.onBlur(e);
+                      setFocused(null);
+                    }}
                     autoComplete="new-password"
                   />
                   <button
                     type="button"
                     className="lf-toggle-password"
                     onClick={() => setShowConfirmPassword((v) => !v)}
-                    aria-label={showConfirmPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                    aria-label={
+                      showConfirmPassword
+                        ? 'Ocultar contraseña'
+                        : 'Mostrar contraseña'
+                    }
                   >
-                    {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    {showConfirmPassword ? (
+                      <EyeOff size={16} />
+                    ) : (
+                      <Eye size={16} />
+                    )}
                   </button>
                   <div className="lf-input-underline" />
                 </div>
-                {errors.confirmPassword && <span className="lf-error">{errors.confirmPassword.message}</span>}
+                {errors.confirmPassword && (
+                  <span className="lf-error">
+                    {errors.confirmPassword.message}
+                  </span>
+                )}
               </div>
 
               {/* Legal checkboxes */}
               <LegalCheckboxes
                 value={legal}
-                onChange={(v) => { setLegal(v); if (legalError) setLegalError(""); }}
+                onChange={(v) => {
+                  setLegal(v);
+                  if (legalError) setLegalError('');
+                }}
                 error={legalError}
               />
 
@@ -329,8 +449,8 @@ function RegisterFormInner() {
                 onClick={(e) => {
                   if (isPending) return;
                   const btn = e.currentTarget;
-                  const ripple = document.createElement("div");
-                  ripple.className = "lf-submit-ripple";
+                  const ripple = document.createElement('div');
+                  ripple.className = 'lf-submit-ripple';
                   const rect = btn.getBoundingClientRect();
                   ripple.style.left = `${e.clientX - rect.left}px`;
                   ripple.style.top = `${e.clientY - rect.top}px`;
@@ -339,10 +459,14 @@ function RegisterFormInner() {
                 }}
               >
                 <span className="lf-submit-content">
-                  {isPending
-                    ? <Loader2 size={18} className="animate-spin" />
-                    : <><span>Registrarme</span><span className="lf-submit-arrow">→</span></>
-                  }
+                  {isPending ? (
+                    <Loader2 size={18} className="animate-spin" />
+                  ) : (
+                    <>
+                      <span>Registrarme</span>
+                      <span className="lf-submit-arrow">→</span>
+                    </>
+                  )}
                 </span>
               </button>
             </div>
@@ -351,8 +475,10 @@ function RegisterFormInner() {
           {/* Footer */}
           <div className="lf-footer">
             <p className="lf-footer-text">
-              ¿Ya tienes cuenta?{" "}
-              <a href="/login" className="lf-footer-link">Inicia sesión</a>
+              ¿Ya tienes cuenta?{' '}
+              <a href="/login" className="lf-footer-link">
+                Inicia sesión
+              </a>
             </p>
             <div className="lf-security">
               <div className="lf-security-dot" />
@@ -367,8 +493,8 @@ function RegisterFormInner() {
 
 export function RegisterForm() {
   return (
-    <QueryClientProvider client={queryClient}>
+    <QueryProvider>
       <RegisterFormInner />
-    </QueryClientProvider>
+    </QueryProvider>
   );
 }

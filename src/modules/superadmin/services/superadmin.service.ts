@@ -1,26 +1,33 @@
+import type { Order } from '@/modules/orders/interfaces/order.interface';
 // src/modules/superadmin/services/superadmin.service.ts
 
 import { api } from '@/api/axios';
+import { z } from 'zod';
 import type {
-  SuperadminUser,
-  UsersResponse,
-  UserQueryFilters,
-  UpdateRoleDto,
-  UpdateUserStatusDto,
-  UpdateUserProfileDto,
-  FinancialReportResponse,
-  FinancialQueryFilters,
-  ForceCancelOrderDto,
-  RefundOrderDto,
   AdjustAmountDto,
   AuditLog,
   AuditLogsResponse,
   AuditQueryFilters,
-  SystemConfig,
-  UpdateSystemConfigDto,
-  ToggleMaintenanceDto,
+  FinancialQueryFilters,
+  FinancialReportResponse,
+  ForceCancelOrderDto,
   MaintenanceStatusResponse,
+  RefundOrderDto,
+  SuperadminUser,
+  SystemConfig,
+  ToggleMaintenanceDto,
+  UpdateRoleDto,
+  UpdateSystemConfigDto,
+  UpdateUserProfileDto,
+  UpdateUserStatusDto,
+  UserQueryFilters,
+  UsersResponse,
 } from '../types/superadmin.types';
+
+const maintenanceStatusSchema = z.object({
+  inMaintenance: z.boolean(),
+  message: z.string(),
+});
 
 export const superadminService = {
   // ==========================================
@@ -34,43 +41,49 @@ export const superadminService = {
     return data;
   },
 
-  async getUserById(id: number): Promise<{ user: SuperadminUser; ordersCount: number }> {
-    const { data } = await api.get<{ user: SuperadminUser; ordersCount: number }>(
-      `/superadmin/users/${id}`
-    );
+  async getUserById(
+    id: number,
+  ): Promise<{ user: SuperadminUser; ordersCount: number }> {
+    const { data } = await api.get<{
+      user: SuperadminUser;
+      ordersCount: number;
+    }>(`/superadmin/users/${id}`);
     return data;
   },
 
   async updateUserRole(
     id: number,
-    dto: UpdateRoleDto
+    dto: UpdateRoleDto,
   ): Promise<{ success: boolean; message: string; user: SuperadminUser }> {
-    const { data } = await api.patch<{ success: boolean; message: string; user: SuperadminUser }>(
-      `/superadmin/users/${id}/role`,
-      dto
-    );
+    const { data } = await api.patch<{
+      success: boolean;
+      message: string;
+      user: SuperadminUser;
+    }>(`/superadmin/users/${id}/role`, dto);
     return data;
   },
 
   async updateUserStatus(
     id: number,
-    dto: UpdateUserStatusDto
+    dto: UpdateUserStatusDto,
   ): Promise<{ success: boolean; message: string; user: SuperadminUser }> {
-    const { data } = await api.patch<{ success: boolean; message: string; user: SuperadminUser }>(
-      `/superadmin/users/${id}/status`,
-      dto
-    );
+    const { data } = await api.patch<{
+      success: boolean;
+      message: string;
+      user: SuperadminUser;
+    }>(`/superadmin/users/${id}/status`, dto);
     return data;
   },
 
   async updateUserProfile(
     id: number,
-    dto: UpdateUserProfileDto
+    dto: UpdateUserProfileDto,
   ): Promise<{ success: boolean; message: string; user: SuperadminUser }> {
-    const { data } = await api.patch<{ success: boolean; message: string; user: SuperadminUser }>(
-      `/superadmin/users/${id}/profile`,
-      dto
-    );
+    const { data } = await api.patch<{
+      success: boolean;
+      message: string;
+      user: SuperadminUser;
+    }>(`/superadmin/users/${id}/profile`, dto);
     return data;
   },
 
@@ -78,46 +91,65 @@ export const superadminService = {
   // 2️⃣ PILAR 2: FINANZAS Y REEMBOLSOS (CULQI)
   // ==========================================
 
-  async getFinancialReports(filters?: FinancialQueryFilters): Promise<FinancialReportResponse> {
-    const { data } = await api.get<FinancialReportResponse>('/superadmin/finance/reports', {
-      params: filters,
-    });
+  async getFinancialReports(
+    filters?: FinancialQueryFilters,
+  ): Promise<FinancialReportResponse> {
+    const { data } = await api.get<FinancialReportResponse>(
+      '/superadmin/finance/reports',
+      {
+        params: filters,
+      },
+    );
     return data;
   },
 
   async forceCancelOrder(
     orderId: number,
-    dto: ForceCancelOrderDto
-  ): Promise<{ success: boolean; message: string; order: any; refund?: any }> {
-    const { data } = await api.post<{ success: boolean; message: string; order: any; refund?: any }>(
-      `/superadmin/finance/orders/${orderId}/force-cancel`,
-      dto
-    );
+    dto: ForceCancelOrderDto,
+  ): Promise<{
+    success: boolean;
+    message: string;
+    order: Order;
+    refund?: unknown;
+  }> {
+    const { data } = await api.post<{
+      success: boolean;
+      message: string;
+      order: Order;
+      refund?: unknown;
+    }>(`/superadmin/finance/orders/${orderId}/force-cancel`, dto);
     return data;
   },
 
   async refundCulqiOrder(
     orderId: number,
-    dto: RefundOrderDto
-  ): Promise<{ success: boolean; message: string; refundId: string; isFullRefund: boolean; culqiData: any }> {
+    dto: RefundOrderDto,
+  ): Promise<{
+    success: boolean;
+    message: string;
+    refundId: string;
+    isFullRefund: boolean;
+    culqiData: unknown;
+  }> {
     const { data } = await api.post<{
       success: boolean;
       message: string;
       refundId: string;
       isFullRefund: boolean;
-      culqiData: any;
+      culqiData: unknown;
     }>(`/superadmin/finance/orders/${orderId}/refund`, dto);
     return data;
   },
 
   async adjustOrderAmount(
     orderId: number,
-    dto: AdjustAmountDto
-  ): Promise<{ success: boolean; message: string; order: any }> {
-    const { data } = await api.patch<{ success: boolean; message: string; order: any }>(
-      `/superadmin/finance/orders/${orderId}/adjust-amount`,
-      dto
-    );
+    dto: AdjustAmountDto,
+  ): Promise<{ success: boolean; message: string; order: Order }> {
+    const { data } = await api.patch<{
+      success: boolean;
+      message: string;
+      order: Order;
+    }>(`/superadmin/finance/orders/${orderId}/adjust-amount`, dto);
     return data;
   },
 
@@ -131,9 +163,12 @@ export const superadminService = {
   },
 
   async getAuditLogs(filters?: AuditQueryFilters): Promise<AuditLogsResponse> {
-    const { data } = await api.get<AuditLogsResponse>('/superadmin/audit/logs', {
-      params: filters,
-    });
+    const { data } = await api.get<AuditLogsResponse>(
+      '/superadmin/audit/logs',
+      {
+        params: filters,
+      },
+    );
     return data;
   },
 
@@ -147,10 +182,14 @@ export const superadminService = {
   // ==========================================
 
   async getMaintenanceStatus(): Promise<MaintenanceStatusResponse> {
-    const { data } = await api.get<MaintenanceStatusResponse>(
-      '/superadmin/config/maintenance-mode/status'
+    const { data } = await api.get<unknown>(
+      '/superadmin/config/maintenance-mode/status',
     );
-    return data;
+    const status = maintenanceStatusSchema.parse(data);
+    return {
+      maintenanceMode: status.inMaintenance,
+      customMessage: status.message,
+    };
   },
 
   async getSystemConfigs(): Promise<SystemConfig[]> {
@@ -165,18 +204,22 @@ export const superadminService = {
 
   async updateSystemConfig(
     key: string,
-    dto: UpdateSystemConfigDto
+    dto: UpdateSystemConfigDto,
   ): Promise<{ success: boolean; message: string; config: SystemConfig }> {
-    const { data } = await api.patch<{ success: boolean; message: string; config: SystemConfig }>(
-      `/superadmin/config/${key}`,
-      dto
-    );
+    const { data } = await api.patch<{
+      success: boolean;
+      message: string;
+      config: SystemConfig;
+    }>(`/superadmin/config/${key}`, dto);
     return data;
   },
 
-  async toggleMaintenanceMode(
-    dto: ToggleMaintenanceDto
-  ): Promise<{ success: boolean; message: string; maintenanceMode: boolean; customMessage?: string }> {
+  async toggleMaintenanceMode(dto: ToggleMaintenanceDto): Promise<{
+    success: boolean;
+    message: string;
+    maintenanceMode: boolean;
+    customMessage?: string;
+  }> {
     const { data } = await api.post<{
       success: boolean;
       message: string;

@@ -1,17 +1,20 @@
+import { getErrorMessage } from '@/lib/errors';
 // src/modules/superadmin/hooks/useSuperadminUsers.ts
 
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { superadminService } from '../services/superadmin.service';
 import type {
-  UserQueryFilters,
   UpdateRoleDto,
-  UpdateUserStatusDto,
   UpdateUserProfileDto,
+  UpdateUserStatusDto,
+  UserQueryFilters,
 } from '../types/superadmin.types';
 
-export function useSuperadminUsers(initialFilters: UserQueryFilters = { limit: 10, offset: 0 }) {
+export function useSuperadminUsers(
+  initialFilters: UserQueryFilters = { limit: 10, offset: 0 },
+) {
   const queryClient = useQueryClient();
   const [filters, setFilters] = useState<UserQueryFilters>(initialFilters);
 
@@ -30,10 +33,8 @@ export function useSuperadminUsers(initialFilters: UserQueryFilters = { limit: 1
       queryClient.invalidateQueries({ queryKey: ['superadmin-users'] });
       queryClient.invalidateQueries({ queryKey: ['superadmin-audit-logs'] });
     },
-    onError: (error: any) => {
-      const msg = error.response?.data?.message || 'Error al actualizar el rol';
-      toast.error(msg);
-    },
+    onError: (error: unknown) =>
+      toast.error(getErrorMessage(error, 'Error al actualizar el rol')),
   });
 
   // 3. Mutación para cambiar Estado (Activo / Suspendido)
@@ -45,10 +46,8 @@ export function useSuperadminUsers(initialFilters: UserQueryFilters = { limit: 1
       queryClient.invalidateQueries({ queryKey: ['superadmin-users'] });
       queryClient.invalidateQueries({ queryKey: ['superadmin-audit-logs'] });
     },
-    onError: (error: any) => {
-      const msg = error.response?.data?.message || 'Error al cambiar estado';
-      toast.error(msg);
-    },
+    onError: (error: unknown) =>
+      toast.error(getErrorMessage(error, 'Error al cambiar estado')),
   });
 
   // 4. Mutación para editar datos personales del usuario
@@ -59,10 +58,8 @@ export function useSuperadminUsers(initialFilters: UserQueryFilters = { limit: 1
       toast.success(data.message || 'Perfil de usuario actualizado');
       queryClient.invalidateQueries({ queryKey: ['superadmin-users'] });
     },
-    onError: (error: any) => {
-      const msg = error.response?.data?.message || 'Error al editar perfil';
-      toast.error(msg);
-    },
+    onError: (error: unknown) =>
+      toast.error(getErrorMessage(error, 'Error al editar perfil')),
   });
 
   return {

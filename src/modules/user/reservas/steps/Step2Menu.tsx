@@ -1,12 +1,17 @@
+import { getImageUrl } from '@/lib/assets';
 // src/modules/user/reservas/steps/Step2Menu.tsx
 
-import { Utensils, Loader2, Minus, Plus, Flame } from "lucide-react";
-import { StepHeader } from "../components/WizardUI";
-import { useCartStore } from "@/modules/admin/promociones/store/cartStore";
-import { findPromoForProduct, calcDiscountedPrice, getPromoLabel } from "@/modules/admin/promociones/utils/promoUtils";
-import type { Product } from "@/modules/user/menu/interfaces/product.interface";
-import type { Promotion } from "@/modules/admin/promociones/interfaces/promotion.interface";
-import { cn } from "@/lib/utils";
+import { cn } from '@/lib/utils';
+import { useCartStore } from '@/modules/cart/store/cartStore';
+import type { Product } from '@/modules/catalog/interfaces/product.interface';
+import type { Promotion } from '@/modules/promotions/interfaces/promotion.interface';
+import {
+  calcDiscountedPrice,
+  findPromoForProduct,
+  getPromoLabel,
+} from '@/modules/promotions/utils/promoUtils';
+import { Flame, Loader2, Minus, Utensils } from 'lucide-react';
+import { StepHeader } from '../components/WizardUI';
 
 export const Step2Menu = ({
   products,
@@ -19,43 +24,52 @@ export const Step2Menu = ({
 }) => {
   const { cart, addToCart, removeFromCart, updateQuantity } = useCartStore();
 
-  if (isLoading) return (
-    <div className="flex flex-col items-center justify-center py-20 text-ember">
-      <Loader2 className="w-8 h-8 animate-spin mb-4" />
-      <p className="text-xs uppercase tracking-widest font-bold animate-pulse">Cargando carta...</p>
-    </div>
-  );
+  if (isLoading)
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-ember">
+        <Loader2 className="w-8 h-8 animate-spin mb-4" />
+        <p className="text-xs uppercase tracking-widest font-bold animate-pulse">
+          Cargando carta...
+        </p>
+      </div>
+    );
 
   return (
     <div className="space-y-4">
-      <StepHeader icon={<Utensils className="w-4 h-4" />} title="Menú Premium" sub="Seleccione los servicios gastronómicos." />
+      <StepHeader
+        icon={<Utensils className="w-4 h-4" />}
+        title="Menú Premium"
+        sub="Seleccione los servicios gastronómicos."
+      />
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
         {products.map((p) => {
           const inCart = cart.find((i) => String(i.id) === String(p.id));
-          const imgSrc = (p as any).imageUrl || (p as any).image;
+          const imgSrc = getImageUrl(p.imageUrl || p.image);
           // Asumimos isAvailable false solo si viene explícitamente como false o si aún usa stock y es 0
-          const isAvailable = p.isAvailable !== false && (p as any).stock !== 0;
+          const isAvailable = p.isAvailable !== false && p.stock !== 0;
 
           const categoryId: string | undefined =
             p.categoryId ??
-            (typeof p.category === "object" && p.category !== null
-              ? (p.category as any).id
+            (typeof p.category === 'object' && p.category !== null
+              ? p.category.id
               : undefined);
 
           const promo = findPromoForProduct(activePromos, p.id, categoryId);
           const originalPrice = Number(p.price);
-          const discountedPrice = promo ? calcDiscountedPrice(originalPrice, promo, 1) : null;
+          const discountedPrice = promo
+            ? calcDiscountedPrice(originalPrice, promo, 1)
+            : null;
           const promoLabel = promo ? getPromoLabel(promo) : null;
 
           return (
             <div
               key={p.id}
               className={cn(
-                "rounded-xl overflow-hidden border transition-colors relative",
-                !isAvailable && "opacity-60 grayscale pointer-events-none",
+                'rounded-xl overflow-hidden border transition-colors relative',
+                !isAvailable && 'opacity-60 grayscale pointer-events-none',
                 inCart
-                  ? "border-ember bg-ember/5 dark:bg-zinc-900"
-                  : "border-border bg-card dark:bg-zinc-900/50 dark:border-zinc-800"
+                  ? 'border-ember bg-ember/5 dark:bg-zinc-900'
+                  : 'border-border bg-card dark:bg-zinc-900/50 dark:border-zinc-800',
               )}
             >
               {!isAvailable && (
@@ -73,7 +87,11 @@ export const Step2Menu = ({
 
               {imgSrc && (
                 <div className="h-32 overflow-hidden relative">
-                  <img src={imgSrc} alt={p.name} className="w-full h-full object-cover opacity-80" />
+                  <img
+                    src={imgSrc}
+                    alt={p.name}
+                    className="w-full h-full object-cover opacity-80"
+                  />
                   <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/80 text-xs font-bold rounded flex items-center gap-1.5">
                     {discountedPrice !== null ? (
                       <>
@@ -85,23 +103,33 @@ export const Step2Menu = ({
                         </span>
                       </>
                     ) : (
-                      <span className="text-ember font-mono">S/ {originalPrice.toFixed(2)}</span>
+                      <span className="text-ember font-mono">
+                        S/ {originalPrice.toFixed(2)}
+                      </span>
                     )}
                   </div>
                 </div>
               )}
               <div className="p-4 flex flex-col gap-2">
-                <h4 className="text-sm font-serif text-foreground truncate">{p.name}</h4>
-                <p className="text-[10px] text-muted-foreground line-clamp-2">{p.description}</p>
+                <h4 className="text-sm font-serif text-foreground truncate">
+                  {p.name}
+                </h4>
+                <p className="text-[10px] text-muted-foreground line-clamp-2">
+                  {p.description}
+                </p>
                 <div className="mt-2 pt-3 border-t border-border dark:border-zinc-800/50">
                   {inCart ? (
                     <div className="flex items-center justify-between">
-                      <button type="button" onClick={() => removeFromCart(p.id)} className="p-1.5 rounded-md bg-destructive/10 text-destructive hover:bg-destructive/20 dark:bg-zinc-800">
+                      <button
+                        type="button"
+                        onClick={() => removeFromCart(p.id)}
+                        className="p-1.5 rounded-md bg-destructive/10 text-destructive hover:bg-destructive/20 dark:bg-zinc-800"
+                      >
                         <Minus className="w-4 h-4" />
                       </button>
-                      <input 
-                        type="number" 
-                        min="1" 
+                      <input
+                        type="number"
+                        min="1"
                         className="w-16 h-8 text-center text-sm font-bold bg-muted border border-border rounded-md text-ember focus:outline-none focus:ring-1 focus:ring-ember"
                         value={inCart.quantity}
                         onChange={(e) => {
@@ -109,7 +137,7 @@ export const Step2Menu = ({
                           if (!isNaN(val) && val > 0) {
                             updateQuantity(p.id, val);
                           } else if (e.target.value === '') {
-                             // Allow empty temporary state before they type
+                            // Allow empty temporary state before they type
                           }
                         }}
                         onBlur={(e) => {
@@ -119,7 +147,9 @@ export const Step2Menu = ({
                           }
                         }}
                       />
-                      <span className="text-xs text-muted-foreground font-medium w-6 text-center">uds</span>
+                      <span className="text-xs text-muted-foreground font-medium w-6 text-center">
+                        uds
+                      </span>
                     </div>
                   ) : (
                     <button
@@ -129,24 +159,30 @@ export const Step2Menu = ({
                         addToCart({
                           id: p.id,
                           name: p.name,
-                          price: discountedPrice !== null ? discountedPrice : originalPrice,
+                          price:
+                            discountedPrice !== null
+                              ? discountedPrice
+                              : originalPrice,
                           originalPrice,
                           discountType: promo?.discountType,
-                          discountValue: promo ? Number(promo.discountValue) : undefined,
+                          discountValue: promo
+                            ? Number(promo.discountValue)
+                            : undefined,
                           minQuantity: promo?.minQuantity,
                           promoLabel: promoLabel || undefined,
                           promoTitle: promo?.title,
                           imageUrl: imgSrc,
                           category:
-                            typeof (p as any).category === "object" && (p as any).category !== null
-                              ? (p as any).category?.name
-                              : (p as any).category || "Criollo",
+                            typeof p.category === 'object' &&
+                            p.category !== null
+                              ? p.category?.name
+                              : p.category || 'Criollo',
                           categoryId,
                         })
                       }
                       className="w-full py-2 rounded-lg text-xs font-bold uppercase tracking-widest border border-ember/30 text-ember hover:bg-ember hover:text-char-deep transition-colors disabled:opacity-50"
                     >
-                      {isAvailable ? "Agregar" : "Agotado"}
+                      {isAvailable ? 'Agregar' : 'Agotado'}
                     </button>
                   )}
                 </div>

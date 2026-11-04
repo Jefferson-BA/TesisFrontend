@@ -1,152 +1,148 @@
-import { useState, useEffect } from "react";
-import { toast } from "sonner";
-import { getProducts } from "@/modules/admin/productos/services/product.service";
-import { createReservation } from "@/modules/admin/pedidos/services/order.service"; // 🗑️ Quitamos createOrder
-import { getActivePromotions } from "@/modules/admin/promociones/services/promotion.service";
-import { useCartStore } from "@/modules/admin/promociones/store/cartStore";
-import type { Product } from "@/modules/user/menu/interfaces/product.interface";
-import type { Promotion } from "@/modules/admin/promociones/interfaces/promotion.interface";
+import { getErrorMessage } from '@/lib/errors';
+import { useCartStore } from '@/modules/cart/store/cartStore';
+import { useCatalog } from '@/modules/catalog/hooks/useCatalog';
+import type { ReservationFormData } from '@/modules/reservations/interfaces/reservation.interface';
+import {
+  buildReservationPayload,
+  contactSchema,
+  logisticsSchema,
+  reservationSchema,
+} from '@/modules/reservations/schemas/reservation.schema';
+import { createReservation } from '@/modules/reservations/services/reservation.service';
+import { useUser } from '@/modules/user/hooks/useUser';
+import { useEffect, useRef, useState, type ChangeEvent } from 'react';
+import { toast } from 'sonner';
 
 export const useReservationWizard = () => {
-    const [currentStep, setCurrentStep] = useState<number>(1);
-    const [products, setProducts] = useState<Product[]>([]);
-    const [activePromos, setActivePromos] = useState<Promotion[]>([]);
-    const [isLoadingProducts, setIsLoadingProducts] = useState<boolean>(true);
-    
-    // Solo necesitamos el estado de carga
-    const [isLoadingSubmit, setIsLoadingSubmit] = useState<boolean>(false);
-
-    const cart = useCartStore((state) => state.cart);
-    const clearCart = useCartStore((state) => state.clearCart);
-    const syncPromotions = useCartStore((state) => state.syncPromotions);
-
-    const [formData, setFormData] = useState({
-        name: "",
-        email: "",
-        phone: "",
-        city: "",
-        address: "",
-        date: "",
-        time: "",
-        guests: "",
-        eventType: "Boda",
-        notes: "",
-        paymentMethod: "card",
-        acceptedTerms: false,
-        acceptedPrivacy: false,
-    });
-
-    const cartTotal = cart.reduce(
-        (acc, item) => acc + (Number(item.price) || 0) * (Number(item.quantity) || 1),
-        0
-    );
-
-    useEffect(() => {
-        const fetchMenuAndPromos = async () => {
-            try {
-                const [resProducts, resPromos] = await Promise.allSettled([
-                    getProducts(),
-                    getActivePromotions(),
-                ]);
-
-                if (resProducts.status === "fulfilled") {
-                    const res = resProducts.value;
-                    const data = Array.isArray(res) ? res : (res as any).data || [];
-                    setProducts(data);
-                }
-
-                if (resPromos.status === "fulfilled") {
-                    const promos = Array.isArray(resPromos.value) ? resPromos.value : [];
-                    setActivePromos(promos);
-                    syncPromotions(promos);
-                }
-            } catch (error) {
-                console.error("Error cargando productos o promociones:", error);
-                toast.error("Error al cargar la carta y promociones.");
-            } finally {
-                setIsLoadingProducts(false);
-            }
-        };
-        fetchMenuAndPromos();
-    }, [syncPromotions]);
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
-
-    const nextStep = () => setCurrentStep((prev) => Math.min(prev + 1, 4));
-    const prevStep = () => setCurrentStep((prev) => Math.max(prev - 1, 1));
-
-    const submitReservation = async () => {
-        if (cart.length === 0) {
-            toast.error("Tu carrito está vacío. Agrega buffets o parrillas en el Paso 2.");
-            setCurrentStep(2);
-            return;
-        }
-
-        if (!formData.date) {
-            toast.error("Por favor completa la fecha del evento en el Paso 3.");
-            setCurrentStep(3);
-            return;
-        }
-
-        const items = cart.map((item) => ({
-            productId: String(item.id),
-            quantity: Number(item.quantity),
-        }));
-
-        setIsLoadingSubmit(true);
-
-        try {
-            // 1️⃣ Solo armamos y enviamos la reserva
-            const reservationPayload = {
-                eventDate: formData.date,
-                serviceStartTime: formData.time || "12:00",
-                guestsCount: Number(formData.guests) || 1,
-                venueAddress: formData.address || "Dirección pendiente",
-                city: formData.city || "Ciudad pendiente",
-                additionalNotes: formData.notes || "",
-                items: items,
-                acceptedTerms: (formData as any).acceptedTerms ?? true,
-                acceptedPrivacy: (formData as any).acceptedPrivacy ?? true,
-            };
-
-            await createReservation(reservationPayload);
-
-            // 2️⃣ Éxito: Limpiamos y redirigimos
-            toast.success("¡Reserva creada con éxito! Esperando aprobación del administrador para proceder al pago.");
-            
-            clearCart(); 
-
-            // Redirigir al usuario al perfil
-            setTimeout(() => {
-                window.location.href = "/user/profile"; 
-            }, 2000);
-
-        } catch (error: any) {
-            console.error("Error al procesar reserva:", error);
-            const backendMessage = error.response?.data?.message;
-            const alertMessage = Array.isArray(backendMessage) ? backendMessage.join(", ") : backendMessage;
-            toast.error(alertMessage || "Error al enviar la reserva");
-        } finally {
-            setIsLoadingSubmit(false);
-        }
-    };
-
-    return {
-        currentStep,
-        setCurrentStep,
-        formData,
-        products,
-        activePromos,
-        isLoadingProducts,
-        isLoadingSubmit,
-        cart,
-        cartTotal,
-        handleChange,
-        setFormData,
-        nextStep,
-        prevStep,
-        submitReservation,
-    };
+  const [currentStep, setCurrentStep] = useState(1);
+  const [isLoadingSubmit, setIsLoadingSubmit] = useState(false);
+  const submitting = useRef(false);
+  const { user, loadingUser } = useUser();
+  const { products: productsQuery, promotions: promosQuery } = useCatalog();
+  const cart = useCartStore((state) => state.cart);
+  const clearCart = useCartStore((state) => state.clearCart);
+  const syncPromotions = useCartStore((state) => state.syncPromotions);
+  const [formData, setFormData] = useState<ReservationFormData>({
+    name: '',
+    email: '',
+    phone: '',
+    city: '',
+    address: '',
+    date: '',
+    time: '',
+    guests: '',
+    eventType: 'Boda',
+    notes: '',
+    paymentMethod: 'card',
+    acceptedTerms: false,
+    acceptedPrivacy: false,
+  });
+  useEffect(() => {
+    if (user)
+      setFormData((previous) => ({
+        ...previous,
+        name: previous.name || user.name || '',
+        email: previous.email || user.email,
+        phone: previous.phone || user.phone || '',
+        address: previous.address || user.address || '',
+      }));
+  }, [user]);
+  useEffect(() => {
+    if (promosQuery.data) syncPromotions(promosQuery.data);
+  }, [promosQuery.data, syncPromotions]);
+  const handleChange = (
+    event: ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >,
+  ) => {
+    const { name, value } = event.target;
+    setFormData((previous) => ({ ...previous, [name]: value }));
+  };
+  const nextStep = () => {
+    const result =
+      currentStep === 1
+        ? contactSchema.safeParse(formData)
+        : currentStep === 3
+          ? logisticsSchema.safeParse(formData)
+          : null;
+    if (result && !result.success) {
+      toast.error(result.error.issues[0].message);
+      return;
+    }
+    if (
+      currentStep === 2 &&
+      (!cart.length || productsQuery.isError || promosQuery.isError)
+    ) {
+      toast.error(
+        cart.length
+          ? 'Actualiza el catálogo antes de continuar'
+          : 'Agrega productos al carrito',
+      );
+      return;
+    }
+    setCurrentStep((previous) => Math.min(previous + 1, 4));
+  };
+  const prevStep = () =>
+    setCurrentStep((previous) => Math.max(previous - 1, 1));
+  const submitReservation = async () => {
+    if (submitting.current) return;
+    if (loadingUser) return;
+    if (!user) {
+      toast.error('Inicia sesión para reservar');
+      window.location.assign('/login');
+      return;
+    }
+    const result = reservationSchema.safeParse(formData);
+    if (!result.success) {
+      toast.error(result.error.issues[0].message);
+      return;
+    }
+    if (!cart.length) {
+      toast.error('Agrega productos al carrito');
+      setCurrentStep(2);
+      return;
+    }
+    if (promosQuery.isError || productsQuery.isError) {
+      toast.error('Actualiza el catálogo antes de reservar');
+      return;
+    }
+    submitting.current = true;
+    setIsLoadingSubmit(true);
+    try {
+      await createReservation(buildReservationPayload(formData, cart));
+      clearCart();
+      toast.success('Reserva creada. Podr?s pagar cuando sea aprobada.');
+      window.location.assign('/user/profile');
+    } catch (error) {
+      toast.error(getErrorMessage(error, 'No se pudo enviar la reserva'));
+    } finally {
+      submitting.current = false;
+      setIsLoadingSubmit(false);
+    }
+  };
+  return {
+    currentStep,
+    setCurrentStep,
+    formData,
+    setFormData,
+    products: productsQuery.data ?? [],
+    activePromos: promosQuery.data ?? [],
+    isLoadingProducts: productsQuery.isPending || promosQuery.isPending,
+    isLoadingSubmit,
+    cart,
+    cartTotal:
+      cart.reduce(
+        (total, item) => total + Math.round(item.price * 100) * item.quantity,
+        0,
+      ) / 100,
+    catalogError: productsQuery.isError || promosQuery.isError,
+    retryCatalog: () => {
+      void productsQuery.refetch();
+      void promosQuery.refetch();
+    },
+    handleChange,
+    nextStep,
+    prevStep,
+    submitReservation,
+  };
 };

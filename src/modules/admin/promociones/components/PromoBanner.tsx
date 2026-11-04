@@ -1,10 +1,13 @@
 // src/modules/admin/promociones/components/PromoBanner.tsx
 
+import type { Promotion } from '@/modules/promotions/interfaces/promotion.interface';
+import { getActivePromotions } from '@/modules/promotions/services/promotion.service';
+import {
+  formatPromoDates,
+  getPromoLabel,
+} from '@/modules/promotions/utils/promoUtils';
+import { ArrowRight, Calendar, Flame, Tag } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { Flame, ArrowRight, Calendar, Tag } from 'lucide-react';
-import { getActivePromotions } from '../services/promotion.service';
-import type { Promotion } from '../interfaces/promotion.interface';
-import { getPromoLabel, formatPromoDates } from '../utils/promoUtils';
 
 /* ─── SINGLE CARD ─── */
 function PromoCard({ promo, index }: { promo: Promotion; index: number }) {
@@ -106,18 +109,21 @@ export default function PromoBanner() {
             Promociones Especiales
           </h2>
           <p className="text-muted-foreground mt-3 max-w-lg mx-auto">
-            Descuentos y beneficios disponibles por tiempo limitado. ¡No te los pierdas!
+            Descuentos y beneficios disponibles por tiempo limitado. ¡No te los
+            pierdas!
           </p>
         </div>
 
         {/* Grid */}
-        <div className={`grid gap-6 ${
-          promos.length === 1
-            ? 'grid-cols-1 max-w-xl mx-auto'
-            : promos.length === 2
-              ? 'grid-cols-1 sm:grid-cols-2 max-w-3xl mx-auto'
-              : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
-        }`}>
+        <div
+          className={`grid gap-6 ${
+            promos.length === 1
+              ? 'grid-cols-1 max-w-xl mx-auto'
+              : promos.length === 2
+                ? 'grid-cols-1 sm:grid-cols-2 max-w-3xl mx-auto'
+                : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+          }`}
+        >
           {promos.map((promo, i) => (
             <PromoCard key={promo.id} promo={promo} index={i} />
           ))}

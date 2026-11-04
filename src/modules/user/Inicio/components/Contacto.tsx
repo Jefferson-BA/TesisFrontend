@@ -1,11 +1,8 @@
 // src/modules/user/Inicio/components/Contacto.tsx
 
-"use client";
-
-import { PhoneIcon } from "@/modules/user/shared/icons/PhoneIcon";
-import { MailIcon } from "@/modules/user/shared/icons/MailIcon";
-import { MapPinIcon } from "@/modules/user/shared/icons/MapPinIcon";
-import { cn } from "@/lib/utils";
+import { MailIcon } from '@/modules/user/shared/icons/MailIcon';
+import { MapPinIcon } from '@/modules/user/shared/icons/MapPinIcon';
+import { PhoneIcon } from '@/modules/user/shared/icons/PhoneIcon';
 
 interface ContactItem {
   icon: typeof PhoneIcon;
@@ -17,52 +14,20 @@ interface ContactItem {
 const CONTACTO: ContactItem[] = [
   {
     icon: PhoneIcon,
-    titulo: "Teléfono",
-    valor: "+51 987 654 321",
-    href: "tel:+51987654321",
+    titulo: 'Teléfono',
+    valor: '+51 987 654 321',
+    href: 'tel:+51987654321',
   },
   {
     icon: MailIcon,
-    titulo: "Email",
-    valor: "contacto@deparraspitz.com",
-    href: "mailto:contacto@deparraspitz.com",
+    titulo: 'Email',
+    valor: 'contacto@deparraspitz.com',
+    href: 'mailto:contacto@deparraspitz.com',
   },
   {
     icon: MapPinIcon,
-    titulo: "Ubicación",
-    valor: "Av. Principal 123, Lima, Perú",
-  },
-];
-
-const SOCIAL_LINKS = [
-  {
-    label: "Facebook",
-    href: "#",
-    icon: (props: React.SVGProps<SVGSVGElement>) => (
-      <svg {...props} viewBox="0 0 24 24">
-        <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
-      </svg>
-    ),
-  },
-  {
-    label: "Instagram",
-    href: "#",
-    icon: (props: React.SVGProps<SVGSVGElement>) => (
-      <svg {...props} viewBox="0 0 24 24">
-        <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
-        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-        <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
-      </svg>
-    ),
-  },
-  {
-    label: "Twitter",
-    href: "#",
-    icon: (props: React.SVGProps<SVGSVGElement>) => (
-      <svg {...props} viewBox="0 0 24 24">
-        <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z" />
-      </svg>
-    ),
+    titulo: 'Ubicación',
+    valor: 'Av. Principal 123, Lima, Perú',
   },
 ];
 
@@ -104,7 +69,7 @@ export const Contacto = () => {
               <h3 className="text-xl font-bold text-foreground mb-3 tracking-wide font-serif">
                 {item.titulo}
               </h3>
-              {"href" in item && item.href ? (
+              {'href' in item && item.href ? (
                 <a
                   href={item.href}
                   className="text-muted-foreground hover:text-ember text-base font-light transition-colors"
@@ -218,9 +183,7 @@ export const Contacto = () => {
               </div>
             </div>
           </div>
-
-        
-          </div>
+        </div>
 
         {/* Copyright */}
         <div className="border-t border-border py-8">

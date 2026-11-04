@@ -1,18 +1,26 @@
-"use client";
+import type { Variants } from 'framer-motion';
 
-import { useState, useEffect, useRef, useCallback } from "react";
 import {
-  motion,
   AnimatePresence,
+  motion,
   useMotionValue,
   useSpring,
   useTransform,
-} from "framer-motion";
+} from 'framer-motion';
+import { useCallback, useEffect, useRef, useState } from 'react';
 // Importamos los nuevos iconos de comida/estilo aquí 👇
-import { ChevronRight, Calendar, Sparkles, Quote, Flame, UtensilsCrossed, Compass } from "lucide-react";
-import { HeroButton } from "./HeroButton";
-import { CounterNumber } from "./CounterNumber";
-import { cn } from "@/lib/utils";
+import { cn } from '@/lib/utils';
+import {
+  Calendar,
+  ChevronRight,
+  Compass,
+  Flame,
+  Quote,
+  Sparkles,
+  UtensilsCrossed,
+} from 'lucide-react';
+import { CounterNumber } from './CounterNumber';
+import { HeroButton } from './HeroButton';
 
 // ─────────────────────────────────────────────────────────
 // CONFIG — todo el contenido vive aquí, nada hardcodeado en el JSX
@@ -20,111 +28,111 @@ import { cn } from "@/lib/utils";
 
 const BACKGROUND_IMAGES = [
   {
-    src: "/imageLanding/parrilla.avif",
+    src: '/imageLanding/parrilla.avif',
     // Cambiamos 'thumb' por una referencia al componente del Icono 👇
     icon: Flame,
-    alt: "Parrilla premium",
-    label: "Parrilla",
-    kicker: "Sabor al fuego",
-    title1: "Parrilla",
-    title2: "Premium",
+    alt: 'Parrilla premium',
+    label: 'Parrilla',
+    kicker: 'Sabor al fuego',
+    title1: 'Parrilla',
+    title2: 'Premium',
     description:
-      "Cortes seleccionados y brasa lenta para eventos que se recuerdan por el sabor.",
-    quote: "La brasa perfecta no se apura, se domina.",
-    ctaLabel: "Ver menú de parrilla",
-    ctaHref: "/menu?estilo=parrilla",
+      'Cortes seleccionados y brasa lenta para eventos que se recuerdan por el sabor.',
+    quote: 'La brasa perfecta no se apura, se domina.',
+    ctaLabel: 'Ver menú de parrilla',
+    ctaHref: '/menu?estilo=parrilla',
   },
   {
-    src: "/imageLanding/criollo.avif",
+    src: '/imageLanding/criollo.avif',
     icon: UtensilsCrossed,
-    alt: "Cocina criolla",
-    label: "Criollo",
-    kicker: "Tradición peruana",
-    title1: "Cocina",
-    title2: "Criolla",
+    alt: 'Cocina criolla',
+    label: 'Criollo',
+    kicker: 'Tradición peruana',
+    title1: 'Cocina',
+    title2: 'Criolla',
     description:
-      "Recetas de siempre, reinventadas para tu evento con la calidez de casa.",
-    quote: "Cada receta, una historia de familia.",
-    ctaLabel: "Ver menú criollo",
-    ctaHref: "/menu?estilo=criollo",
+      'Recetas de siempre, reinventadas para tu evento con la calidez de casa.',
+    quote: 'Cada receta, una historia de familia.',
+    ctaLabel: 'Ver menú criollo',
+    ctaHref: '/menu?estilo=criollo',
   },
   {
-    src: "/imageLanding/arabe.avif",
+    src: '/imageLanding/arabe.avif',
     icon: Compass, // Ideal para simular la ruta de las especias / oriente
-    alt: "Cocina árabe",
-    label: "Árabe",
-    kicker: "Especias de oriente",
-    title1: "Cocina",
-    title2: "Árabe",
+    alt: 'Cocina árabe',
+    label: 'Árabe',
+    kicker: 'Especias de oriente',
+    title1: 'Cocina',
+    title2: 'Árabe',
     description:
-      "Un viaje de especias y texturas para sorprender a tus invitados.",
-    quote: "Donde cada especia cuenta una ruta distinta.",
-    ctaLabel: "Ver menú árabe",
-    ctaHref: "/menu?estilo=arabe",
+      'Un viaje de especias y texturas para sorprender a tus invitados.',
+    quote: 'Donde cada especia cuenta una ruta distinta.',
+    ctaLabel: 'Ver menú árabe',
+    ctaHref: '/menu?estilo=arabe',
   },
 ] as const;
 
 const SLIDE_DURATION = 8000;
 
 const STATS = [
-  { value: 500, prefix: "+", label: "Eventos Atendidos" },
-  { value: 3, prefix: "", label: "Estilos de Cocina" },
+  { value: 500, prefix: '+', label: 'Eventos Atendidos' },
+  { value: 3, prefix: '', label: 'Estilos de Cocina' },
 ] as const;
 
-const EXTRA_STAT = { value: "100%", label: "A tu Medida" };
+const EXTRA_STAT = { value: '100%', label: 'A tu Medida' };
 
 const CTAS = [
   {
-    href: "/menu",
-    variant: "primary" as const,
-    label: "Ver Menú",
+    href: '/menu',
+    variant: 'primary' as const,
+    label: 'Ver Menú',
     icon: ChevronRight,
-    iconClassName: "transition-transform group-hover:translate-x-1",
+    iconClassName: 'transition-transform group-hover:translate-x-1',
   },
   {
-    href: "/reservas",
-    variant: "secondary" as const,
-    label: "Cotizar ahora",
+    href: '/reservas',
+    variant: 'secondary' as const,
+    label: 'Cotizar ahora',
     icon: Calendar,
-    iconClassName: "",
+    iconClassName: '',
   },
 ];
 
-// Cambiamos : Variants por : Record<string, any>
-const textContainerVariants: Record<string, any> = {
+// Cambiamos : Variants por : Variants
+const textContainerVariants: Variants = {
   enter: {},
   center: { transition: { staggerChildren: 0.09, delayChildren: 0.05 } },
   exit: {},
 };
 
-const textItemVariants: Record<string, any> = {
-  enter: { opacity: 0, y: 22, filter: "blur(6px)" },
+const textItemVariants: Variants = {
+  enter: { opacity: 0, y: 22, filter: 'blur(6px)' },
   center: {
     opacity: 1,
     y: 0,
-    filter: "blur(0px)",
+    filter: 'blur(0px)',
     transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
   },
-  exit: { opacity: 0, y: -14, filter: "blur(4px)" },
+  exit: { opacity: 0, y: -14, filter: 'blur(4px)' },
 };
 
-const imageVariants: Record<string, any> = {
-  enter: { opacity: 0, scale: 1.1, clipPath: "circle(0% at 50% 45%)" },
+const imageVariants: Variants = {
+  enter: { opacity: 0, scale: 1.1, clipPath: 'circle(0% at 50% 45%)' },
   center: {
     opacity: 1,
     scale: 1,
-    clipPath: "circle(75% at 50% 45%)",
+    clipPath: 'circle(75% at 50% 45%)',
     transition: { duration: 1.1, ease: [0.22, 1, 0.36, 1] },
   },
   exit: {
     opacity: 1,
     scale: 1.03,
-    clipPath: "circle(75% at 50% 45%)",
-    transition: { duration: 0.4, ease: "easeIn" },
+    clipPath: 'circle(75% at 50% 45%)',
+    transition: { duration: 0.4, ease: 'easeIn' },
   },
 };
 
-const quoteVariants: Record<string, any> = {
+const quoteVariants: Variants = {
   enter: { opacity: 0, y: 16 },
   center: { opacity: 1, y: 0, transition: { duration: 0.5, delay: 0.45 } },
   exit: { opacity: 0, y: -10, transition: { duration: 0.25 } },
@@ -173,8 +181,8 @@ export const Hero = () => {
         const fr = frameRef.current.getBoundingClientRect();
         const px = ((e.clientX - fr.left) / fr.width) * 100;
         const py = ((e.clientY - fr.top) / fr.height) * 100;
-        frameRef.current.style.setProperty("--mx", `${px}%`);
-        frameRef.current.style.setProperty("--my", `${py}%`);
+        frameRef.current.style.setProperty('--mx', `${px}%`);
+        frameRef.current.style.setProperty('--my', `${py}%`);
       }
     },
     [mvX, mvY],
@@ -229,7 +237,10 @@ export const Hero = () => {
               exit="exit"
               className="mt-6"
             >
-              <motion.span variants={textItemVariants} className="hero-kicker block">
+              <motion.span
+                variants={textItemVariants}
+                className="hero-kicker block"
+              >
                 {current.kicker}
               </motion.span>
               <motion.h1
@@ -262,7 +273,8 @@ export const Hero = () => {
               return (
                 <a key={cta.href} href={cta.href} className="group">
                   <HeroButton variant={cta.variant}>
-                    {cta.label} <Icon className={cn("w-4 h-4", cta.iconClassName)} />
+                    {cta.label}{' '}
+                    <Icon className={cn('w-4 h-4', cta.iconClassName)} />
                   </HeroButton>
                 </a>
               );
@@ -301,7 +313,7 @@ export const Hero = () => {
               <div
                 key={`stack-${i}`}
                 className="hero-stack-card"
-                style={{ "--stack-i": i + 1 } as React.CSSProperties}
+                style={{ '--stack-i': i + 1 } as React.CSSProperties}
                 aria-hidden="true"
               />
             ))}
@@ -319,7 +331,7 @@ export const Hero = () => {
                   key={current.src}
                   src={current.src}
                   alt={current.alt}
-                  loading={currentSlide === 0 ? "eager" : "lazy"}
+                  loading={currentSlide === 0 ? 'eager' : 'lazy'}
                   variants={imageVariants}
                   initial="enter"
                   animate="center"
@@ -339,7 +351,7 @@ export const Hero = () => {
                   initial="enter"
                   animate="center"
                   exit="exit"
-                  style={{ transform: "translateZ(40px)" }}
+                  style={{ transform: 'translateZ(40px)' }}
                 >
                   <Quote className="w-4 h-4 hero-quote-icon" />
                   <p>{current.quote}</p>
@@ -366,23 +378,25 @@ export const Hero = () => {
                   onClick={() => goToSlide(i)}
                   aria-label={`Ver estilo ${img.label}`}
                   aria-pressed={isActive}
-                  className={cn("hero-thumb", isActive && "hero-thumb-active")}
+                  className={cn('hero-thumb', isActive && 'hero-thumb-active')}
                 >
                   {/* Contenedor del Icono reemplazando el <img> roto */}
                   <span className="hero-thumb-image-wrap flex items-center justify-center bg-black/40 backdrop-blur-md rounded-lg border border-white/10">
-                    <ThumbIcon 
+                    <ThumbIcon
                       className={cn(
-                        "w-5 h-5 transition-transform duration-300", 
-                        isActive ? "text-amber-400 scale-110" : "text-zinc-400"
-                      )} 
+                        'w-5 h-5 transition-transform duration-300',
+                        isActive ? 'text-amber-400 scale-110' : 'text-zinc-400',
+                      )}
                     />
                     <span className="hero-thumb-shine" />
                   </span>
                   <span className="hero-thumb-meta">
-                    <span className={cn(
-                      "hero-thumb-label truncate font-medium transition-colors",
-                      isActive ? "text-amber-400" : "text-zinc-300"
-                    )}>
+                    <span
+                      className={cn(
+                        'hero-thumb-label truncate font-medium transition-colors',
+                        isActive ? 'text-amber-400' : 'text-zinc-300',
+                      )}
+                    >
                       {img.label}
                     </span>
                     <span className="hero-progress-track">
@@ -390,11 +404,11 @@ export const Hero = () => {
                         <motion.span
                           key={`${i}-${isPaused}`}
                           className="hero-progress-fill"
-                          initial={{ width: "0%" }}
-                          animate={{ width: isPaused ? "0%" : "100%" }}
+                          initial={{ width: '0%' }}
+                          animate={{ width: isPaused ? '0%' : '100%' }}
                           transition={{
                             duration: isPaused ? 0 : SLIDE_DURATION / 1000,
-                            ease: "linear",
+                            ease: 'linear',
                           }}
                         />
                       )}
@@ -420,8 +434,8 @@ export const Hero = () => {
         <span className="relative h-8 w-px bg-border overflow-hidden">
           <motion.span
             className="absolute inset-x-0 top-0 h-1/2 bg-ember"
-            animate={{ y: ["-100%", "200%"] }}
-            transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+            animate={{ y: ['-100%', '200%'] }}
+            transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
           />
         </span>
       </motion.div>

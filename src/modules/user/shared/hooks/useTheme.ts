@@ -1,1 +1,1 @@
-export { useThemeStore as useTheme } from "../store/themeStore";
+export { useThemeStore as useTheme } from '../store/themeStore';

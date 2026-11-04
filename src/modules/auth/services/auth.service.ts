@@ -1,22 +1,26 @@
-// src/modules/auth/services/auth.service.ts
 import { api } from '@/api/axios';
+import axios from 'axios';
+import type { LoginFormData, RegisterFormData } from '../schemas/auth.schema';
+import type { SessionResponse } from '../types/auth.types';
 
+export type SignupPayload = Omit<RegisterFormData, 'confirmPassword'>;
 export const authService = {
-  login: async (data: any) => {
-    // Ya no necesitamos poner la URL completa, el interceptor sabe que es localhost:3000
-    const response = await api.post('/auth/login', data);
+  login: async (data: LoginFormData): Promise<SessionResponse> => {
+    const response = await axios.post<SessionResponse>('/api/session', data, {
+      timeout: 35000,
+    });
+    if (!response.data.user)
+      throw new Error('El servidor no devolvi? una sesión válida');
     return response.data;
   },
-
-  signup: async (data: any) => {
-    const response = await api.post('/auth/signup', data);
+  signup: async (data: SignupPayload) => {
+    const response = await api.post<{ message: string }>('/auth/signup', data);
     return response.data;
   },
-
-  // Ejemplo futuro: Obtener el perfil. 
-  // Fíjate que NO le pasamos el token, el interceptor lo hará por nosotros.
-  getProfile: async () => {
-    const response = await api.get('/auth/profile');
-    return response.data;
-  }
+  getProfile: async (): Promise<SessionResponse> => {
+    const { data } = await axios.get<SessionResponse>('/api/session', {
+      timeout: 35000,
+    });
+    return data;
+  },
 };

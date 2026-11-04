@@ -1,35 +1,36 @@
-import React, { useEffect, useState } from "react";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/shared/AppSidebar";
-import { CustomTrigger } from "@/components/shared/CustomTrigger";
-import { QueryProvider } from "@/components/shared/QueryProvider";
-import ThemeToggle from "@/modules/user/shared/components/Themetoggle";
-import { Toaster } from "sonner";
-import { ShieldAlert } from "lucide-react";
+import { AppSidebar } from '@/components/shared/AppSidebar';
+import { CustomTrigger } from '@/components/shared/CustomTrigger';
+import { SidebarProvider } from '@/components/ui/sidebar';
+import ThemeToggle from '@/modules/user/shared/components/Themetoggle';
+import { ShieldAlert } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Toaster } from 'sonner';
 
 export default function AdminLayoutReact({
   children,
   role,
 }: {
   children: React.ReactNode;
-  role?: "admin" | "superadmin";
+  role?: 'admin' | 'superadmin';
 }) {
-  const [currentRole, setCurrentRole] = useState<"admin" | "superadmin">(role || "admin");
+  const [currentRole, setCurrentRole] = useState<'admin' | 'superadmin'>(
+    role || 'admin',
+  );
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      if (window.location.pathname.startsWith("/superadmin")) {
-        setCurrentRole("superadmin");
+    if (typeof window !== 'undefined') {
+      if (window.location.pathname.startsWith('/superadmin')) {
+        setCurrentRole('superadmin');
       } else {
-        setCurrentRole("admin");
+        setCurrentRole('admin');
       }
     }
   }, [role]);
 
-  const isSuperadmin = currentRole === "superadmin";
+  const isSuperadmin = currentRole === 'superadmin';
 
   return (
-    <QueryProvider>
+    <>
       <SidebarProvider>
         <AppSidebar role={currentRole} />
 
@@ -40,8 +41,8 @@ export default function AdminLayoutReact({
               <div className="ml-4 flex items-center gap-2">
                 <h1 className="font-bold text-foreground text-lg tracking-tight">
                   {isSuperadmin
-                    ? "Panel Maestro del Sistema"
-                    : "Dashboard Administrativo"}
+                    ? 'Panel Maestro del Sistema'
+                    : 'Dashboard Administrativo'}
                 </h1>
                 {isSuperadmin && (
                   <span className="hidden sm:inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-500/10 text-red-400 border border-red-500/30">
@@ -65,6 +66,6 @@ export default function AdminLayoutReact({
         {/* Notificaciones Toast adaptables al tema */}
         <Toaster richColors position="top-right" closeButton />
       </SidebarProvider>
-    </QueryProvider>
+    </>
   );
 }

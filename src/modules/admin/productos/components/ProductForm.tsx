@@ -1,28 +1,34 @@
-import { useState } from "react";
-import { PlusCircle, Loader2, CheckCircle2, XCircle } from "lucide-react";
-import { toast } from "sonner";
-import { createProduct } from "@/modules/admin/productos/services/product.service";
+import type { Category } from '@/modules/catalog/interfaces/category.interface';
+import { createProduct } from '@/modules/catalog/services/product.service';
+import { CheckCircle2, Loader2, PlusCircle, XCircle } from 'lucide-react';
+import { useState } from 'react';
+import { toast } from 'sonner';
 
 interface ProductFormProps {
   onProductCreated: () => void;
   /** Categorías precargadas desde el Dashboard – evita doble fetch */
-  categories: any[];
+  categories: Category[];
 }
 
-export const ProductForm = ({ onProductCreated, categories }: ProductFormProps) => {
+export const ProductForm = ({
+  onProductCreated,
+  categories,
+}: ProductFormProps) => {
   const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
-    name: "",
-    description: "",
-    price: "",
-    categoryId: "",
-    imageUrl: "",
+    name: '',
+    description: '',
+    price: '',
+    categoryId: '',
+    imageUrl: '',
     isAvailable: true,
   });
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >,
   ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -30,7 +36,7 @@ export const ProductForm = ({ onProductCreated, categories }: ProductFormProps) 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name || !formData.price || !formData.categoryId) {
-      toast.error("Por favor completa los campos obligatorios (*)");
+      toast.error('Por favor completa los campos obligatorios (*)');
       return;
     }
 
@@ -41,12 +47,19 @@ export const ProductForm = ({ onProductCreated, categories }: ProductFormProps) 
         price: Number(formData.price),
       });
 
-      toast.success("Producto creado exitosamente ✓");
-      setFormData({ name: "", description: "", price: "", categoryId: "", imageUrl: "", isAvailable: true });
+      toast.success('Producto creado exitosamente ✓');
+      setFormData({
+        name: '',
+        description: '',
+        price: '',
+        categoryId: '',
+        imageUrl: '',
+        isAvailable: true,
+      });
       onProductCreated();
     } catch (error) {
       console.error(error);
-      toast.error("Error al guardar el producto");
+      toast.error('Error al guardar el producto');
     } finally {
       setLoading(false);
     }
@@ -63,10 +76,12 @@ export const ProductForm = ({ onProductCreated, categories }: ProductFormProps) 
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
           {/* Nombre */}
           <div className="flex flex-col gap-2">
-            <label htmlFor="prod-name" className="text-foreground text-sm font-semibold">
+            <label
+              htmlFor="prod-name"
+              className="text-foreground text-sm font-semibold"
+            >
               Nombre del Producto <span className="text-primary">*</span>
             </label>
             <input
@@ -83,7 +98,10 @@ export const ProductForm = ({ onProductCreated, categories }: ProductFormProps) 
 
           {/* Categoría */}
           <div className="flex flex-col gap-2">
-            <label htmlFor="prod-categoryId" className="text-foreground text-sm font-semibold">
+            <label
+              htmlFor="prod-categoryId"
+              className="text-foreground text-sm font-semibold"
+            >
               Categoría <span className="text-primary">*</span>
             </label>
             <select
@@ -96,7 +114,7 @@ export const ProductForm = ({ onProductCreated, categories }: ProductFormProps) 
             >
               <option value="">Selecciona una categoría</option>
               {categories.map((cat) => (
-                <option key={cat.id || cat._id} value={cat.id || cat._id}>
+                <option key={cat.id} value={cat.id}>
                   {cat.name}
                 </option>
               ))}
@@ -105,7 +123,10 @@ export const ProductForm = ({ onProductCreated, categories }: ProductFormProps) 
 
           {/* Precio */}
           <div className="flex flex-col gap-2">
-            <label htmlFor="prod-price" className="text-foreground text-sm font-semibold">
+            <label
+              htmlFor="prod-price"
+              className="text-foreground text-sm font-semibold"
+            >
               Precio (S/) <span className="text-primary">*</span>
             </label>
             <input
@@ -124,18 +145,20 @@ export const ProductForm = ({ onProductCreated, categories }: ProductFormProps) 
 
           {/* Disponibilidad – radio buttons estilizados */}
           <div className="flex flex-col gap-2">
-            <span className="text-foreground text-sm font-semibold">Disponibilidad</span>
+            <span className="text-foreground text-sm font-semibold">
+              Disponibilidad
+            </span>
             <div className="flex gap-3 h-11 items-center">
-
               {/* Disponible */}
               <button
                 type="button"
                 onClick={() => setFormData({ ...formData, isAvailable: true })}
                 className={`
                   flex items-center gap-2 px-4 h-full rounded-lg border font-semibold text-sm transition-all
-                  ${formData.isAvailable
-                    ? "bg-emerald-500/15 border-emerald-500/50 text-emerald-600 dark:text-emerald-400 ring-1 ring-emerald-500/30"
-                    : "bg-background border-input text-muted-foreground hover:border-emerald-400/40"
+                  ${
+                    formData.isAvailable
+                      ? 'bg-emerald-500/15 border-emerald-500/50 text-emerald-600 dark:text-emerald-400 ring-1 ring-emerald-500/30'
+                      : 'bg-background border-input text-muted-foreground hover:border-emerald-400/40'
                   }
                 `}
               >
@@ -149,22 +172,25 @@ export const ProductForm = ({ onProductCreated, categories }: ProductFormProps) 
                 onClick={() => setFormData({ ...formData, isAvailable: false })}
                 className={`
                   flex items-center gap-2 px-4 h-full rounded-lg border font-semibold text-sm transition-all
-                  ${!formData.isAvailable
-                    ? "bg-red-500/15 border-red-500/50 text-red-600 dark:text-red-400 ring-1 ring-red-500/30"
-                    : "bg-background border-input text-muted-foreground hover:border-red-400/40"
+                  ${
+                    !formData.isAvailable
+                      ? 'bg-red-500/15 border-red-500/50 text-red-600 dark:text-red-400 ring-1 ring-red-500/30'
+                      : 'bg-background border-input text-muted-foreground hover:border-red-400/40'
                   }
                 `}
               >
                 <XCircle className="w-4 h-4" />
                 No disponible
               </button>
-
             </div>
           </div>
 
           {/* URL imagen */}
           <div className="md:col-span-2 flex flex-col gap-2">
-            <label htmlFor="prod-imageUrl" className="text-foreground text-sm font-semibold">
+            <label
+              htmlFor="prod-imageUrl"
+              className="text-foreground text-sm font-semibold"
+            >
               URL de la Imagen
             </label>
             <input
@@ -180,7 +206,10 @@ export const ProductForm = ({ onProductCreated, categories }: ProductFormProps) 
 
           {/* Descripción */}
           <div className="md:col-span-2 flex flex-col gap-2">
-            <label htmlFor="prod-description" className="text-foreground text-sm font-semibold">
+            <label
+              htmlFor="prod-description"
+              className="text-foreground text-sm font-semibold"
+            >
               Descripción del Plato
             </label>
             <textarea
@@ -193,7 +222,6 @@ export const ProductForm = ({ onProductCreated, categories }: ProductFormProps) 
               className="p-3 bg-background border border-input text-foreground rounded-lg placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring resize-none"
             />
           </div>
-
         </div>
 
         <button
@@ -202,12 +230,16 @@ export const ProductForm = ({ onProductCreated, categories }: ProductFormProps) 
           className="w-full h-11 bg-primary hover:bg-primary/90 disabled:opacity-50 text-primary-foreground font-bold rounded-lg flex items-center justify-center gap-2 transition-colors duration-200"
         >
           {loading ? (
-            <><Loader2 className="h-5 w-5 animate-spin" /> Guardando...</>
+            <>
+              <Loader2 className="h-5 w-5 animate-spin" /> Guardando...
+            </>
           ) : (
-            <><PlusCircle className="h-5 w-5" /> Crear Producto</>
+            <>
+              <PlusCircle className="h-5 w-5" /> Crear Producto
+            </>
           )}
         </button>
       </form>
     </section>
   );
-};
+};

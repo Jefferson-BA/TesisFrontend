@@ -1,12 +1,10 @@
-"use client";
-
-import { useEffect, useMemo, useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { toast } from "sonner";
-import { updateOwnProfile } from "@/modules/user/services/user.service";
-import { useUser } from "@/modules/user/hooks/useUser";
-import { X, User, Mail, Save, Loader2, Phone, MapPin } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from '@/lib/utils';
+import { useUser } from '@/modules/user/hooks/useUser';
+import { updateOwnProfile } from '@/modules/user/services/user.service';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Loader2, Mail, MapPin, Phone, Save, User, X } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { toast } from 'sonner';
 
 interface EditProfileModalProps {
   open: boolean;
@@ -21,7 +19,12 @@ type ProfileFields = {
   address: string;
 };
 
-const EMPTY_FORM: ProfileFields = { name: "", email: "", phone: "", address: "" };
+const EMPTY_FORM: ProfileFields = {
+  name: '',
+  email: '',
+  phone: '',
+  address: '',
+};
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_REGEX = /^\d{9}$/;
@@ -34,10 +37,20 @@ const FORM_FIELDS: Array<{
   placeholder?: string;
   required?: boolean;
 }> = [
-  { key: "name", label: "Nombre", icon: User, required: true },
-  { key: "email", label: "Email", icon: Mail, type: "email", required: true },
-  { key: "phone", label: "Número de Celular", icon: Phone, placeholder: "Ej: 986218081" },
-  { key: "address", label: "Dirección", icon: MapPin, placeholder: "Tu dirección de entrega" },
+  { key: 'name', label: 'Nombre', icon: User, required: true },
+  { key: 'email', label: 'Email', icon: Mail, type: 'email', required: true },
+  {
+    key: 'phone',
+    label: 'Número de Celular',
+    icon: Phone,
+    placeholder: 'Ej: 986218081',
+  },
+  {
+    key: 'address',
+    label: 'Dirección',
+    icon: MapPin,
+    placeholder: 'Tu dirección de entrega',
+  },
 ];
 
 export const EditProfileModal = ({ open, onClose }: EditProfileModalProps) => {
@@ -52,10 +65,10 @@ export const EditProfileModal = ({ open, onClose }: EditProfileModalProps) => {
     if (!user || !open) return;
     const profile = user as Partial<ProfileFields> & { id?: string | number };
     setForm({
-      name: profile.name || "",
-      email: profile.email || "",
-      phone: profile.phone || "",
-      address: profile.address || "",
+      name: profile.name || '',
+      email: profile.email || '',
+      phone: profile.phone || '',
+      address: profile.address || '',
     });
   }, [user, open]);
 
@@ -65,26 +78,27 @@ export const EditProfileModal = ({ open, onClose }: EditProfileModalProps) => {
 
     lastFocusedRef.current = document.activeElement as HTMLElement;
     const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    document.body.style.overflow = 'hidden';
     closeButtonRef.current?.focus();
 
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === 'Escape') onClose();
     };
-    window.addEventListener("keydown", onKeyDown);
+    window.addEventListener('keydown', onKeyDown);
 
     return () => {
       document.body.style.overflow = previousOverflow;
-      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener('keydown', onKeyDown);
       lastFocusedRef.current?.focus?.();
     };
   }, [open, onClose]);
 
   const errors = useMemo(() => {
     const e: Partial<Record<keyof ProfileFields, string>> = {};
-    if (!form.name.trim()) e.name = "El nombre es obligatorio";
-    if (!EMAIL_REGEX.test(form.email)) e.email = "Ingresa un correo válido";
-    if (form.phone && !PHONE_REGEX.test(form.phone)) e.phone = "Debe tener 9 dígitos";
+    if (!form.name.trim()) e.name = 'El nombre es obligatorio';
+    if (!EMAIL_REGEX.test(form.email)) e.email = 'Ingresa un correo válido';
+    if (form.phone && !PHONE_REGEX.test(form.phone))
+      e.phone = 'Debe tener 9 dígitos';
     return e;
   }, [form]);
 
@@ -99,11 +113,11 @@ export const EditProfileModal = ({ open, onClose }: EditProfileModalProps) => {
 
     const userId = (user as { id?: string | number } | null)?.id;
     if (!userId) {
-      toast.error("Usuario no encontrado");
+      toast.error('Usuario no encontrado');
       return;
     }
     if (!isValid) {
-      toast.error("Revisa los campos marcados antes de guardar");
+      toast.error('Revisa los campos marcados antes de guardar');
       return;
     }
 
@@ -112,14 +126,14 @@ export const EditProfileModal = ({ open, onClose }: EditProfileModalProps) => {
       const updatedUser = await updateOwnProfile(form);
       updateLocalUser({ ...user, ...updatedUser, ...form });
 
-      toast.success("Perfil actualizado correctamente");
+      toast.success('Perfil actualizado correctamente');
       onClose();
 
       // Sincronización visual: refresca Astro para reflejar los cambios del layout
       setTimeout(() => window.location.reload(), 800);
     } catch (error) {
       const err = error as { response?: { data?: { message?: string } } };
-      toast.error(err.response?.data?.message || "No se pudo actualizar");
+      toast.error(err.response?.data?.message || 'No se pudo actualizar');
     } finally {
       setIsSubmitting(false);
     }
@@ -147,8 +161,8 @@ export const EditProfileModal = ({ open, onClose }: EditProfileModalProps) => {
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ duration: 0.2 }}
             className={cn(
-              "relative w-full max-w-md rounded-2xl border shadow-2xl p-8 z-10",
-              "bg-[#fffdf9] border-[#e0d5c5] dark:bg-char-deep dark:border-char",
+              'relative w-full max-w-md rounded-2xl border shadow-2xl p-8 z-10',
+              'bg-[#fffdf9] border-[#e0d5c5] dark:bg-char-deep dark:border-char',
             )}
           >
             <button
@@ -160,7 +174,10 @@ export const EditProfileModal = ({ open, onClose }: EditProfileModalProps) => {
               <X size={14} />
             </button>
 
-            <h2 id="edit-profile-modal-titulo" className="text-xl font-bold font-display text-foreground mb-6">
+            <h2
+              id="edit-profile-modal-titulo"
+              className="text-xl font-bold font-display text-foreground mb-6"
+            >
               Editar Perfil
             </h2>
 
@@ -182,21 +199,30 @@ export const EditProfileModal = ({ open, onClose }: EditProfileModalProps) => {
                       <input
                         id={inputId}
                         name={field.key}
-                        type={field.type || "text"}
+                        type={field.type || 'text'}
                         placeholder={field.placeholder}
                         value={form[field.key]}
-                        onChange={(e) => handleFieldChange(field.key, e.target.value)}
+                        onChange={(e) =>
+                          handleFieldChange(field.key, e.target.value)
+                        }
                         aria-invalid={Boolean(fieldError)}
-                        aria-describedby={fieldError ? `${inputId}-error` : undefined}
+                        aria-describedby={
+                          fieldError ? `${inputId}-error` : undefined
+                        }
                         className={cn(
-                          "w-full pl-10 pr-4 h-11 rounded-xl bg-muted border text-foreground text-sm outline-none transition-colors",
-                          fieldError ? "border-rose-500/60 focus:border-rose-500/60" : "border-border focus:border-ember/50",
+                          'w-full pl-10 pr-4 h-11 rounded-xl bg-muted border text-foreground text-sm outline-none transition-colors',
+                          fieldError
+                            ? 'border-rose-500/60 focus:border-rose-500/60'
+                            : 'border-border focus:border-ember/50',
                         )}
                         required={field.required}
                       />
                     </div>
                     {fieldError && (
-                      <p id={`${inputId}-error`} className="text-[11px] text-rose-400">
+                      <p
+                        id={`${inputId}-error`}
+                        className="text-[11px] text-rose-400"
+                      >
                         {fieldError}
                       </p>
                     )}
@@ -209,7 +235,11 @@ export const EditProfileModal = ({ open, onClose }: EditProfileModalProps) => {
                 disabled={isSubmitting || !isValid}
                 className="w-full h-11 bg-ember hover:brightness-110 text-char-deep font-bold rounded-xl text-sm flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                {isSubmitting ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Save className="w-4 h-4" />
+                )}
                 Guardar cambios
               </button>
             </form>

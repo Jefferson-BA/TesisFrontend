@@ -1,11 +1,13 @@
 // src/modules/superadmin/hooks/useSuperadminAudit.ts
 
-import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 import { superadminService } from '../services/superadmin.service';
 import type { AuditQueryFilters } from '../types/superadmin.types';
 
-export function useSuperadminAudit(initialFilters: AuditQueryFilters = { limit: 20, offset: 0 }) {
+export function useSuperadminAudit(
+  initialFilters: AuditQueryFilters = { limit: 20, offset: 0 },
+) {
   const [filters, setFilters] = useState<AuditQueryFilters>(initialFilters);
 
   // 1. Bitácora de auditoría

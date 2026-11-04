@@ -1,11 +1,11 @@
 ---
 // src/pages/checkout.astro
-export const prerender = true;
-import UserLayout from "@/layouts/UserLayout.astro";
-import CheckoutPage from "@/modules/user/checkout/components/CheckoutPage";
+export const prerender = false;
+import UserLayout from '@/layouts/UserLayout.astro';
+import CheckoutPage from '@/modules/user/checkout/components/CheckoutPage';
 ---
 
-<UserLayout 
+<UserLayout
   title="Checkout | DeParraSpitz"
   description="Completa tu pedido de catering de forma segura con Culqi."
 >

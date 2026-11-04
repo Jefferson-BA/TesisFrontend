@@ -1,13 +1,13 @@
 ---
 // src/layouts/AdminLayout.astro
-import "@/styles/globals.css";
-import AdminLayoutReact from "./AdminLayoutReact";
+import '@/styles/globals.css';
+import AdminLayoutReact from './AdminLayoutReact';
 
 interface Props {
   title?: string;
 }
 
-const { title = "Panel Administrativo | DeParraSpitz" } = Astro.props;
+const { title = 'Panel Administrativo | DeParraSpitz' } = Astro.props;
 ---
 
 <html lang="es">
@@ -18,44 +18,49 @@ const { title = "Panel Administrativo | DeParraSpitz" } = Astro.props;
 
     <!-- Tema inicial y sincronización en Admin / Superadmin -->
     <script is:inline>
-      (function() {
+      (function () {
         function resolveTheme() {
           try {
-            const rawZustand = localStorage.getItem("deparraspitz-theme");
+            const rawZustand = localStorage.getItem('deparraspitz-theme');
             if (rawZustand) {
               const parsed = JSON.parse(rawZustand);
-              if (parsed?.state?.theme === "light" || parsed?.state?.theme === "dark") {
+              if (
+                parsed?.state?.theme === 'light' ||
+                parsed?.state?.theme === 'dark'
+              ) {
                 return parsed.state.theme;
               }
             }
-            const rawSimple = localStorage.getItem("theme");
-            if (rawSimple === "light" || rawSimple === "dark") {
+            const rawSimple = localStorage.getItem('theme');
+            if (rawSimple === 'light' || rawSimple === 'dark') {
               return rawSimple;
             }
           } catch (e) {}
-          return window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+          return window.matchMedia('(prefers-color-scheme: light)').matches
+            ? 'light'
+            : 'dark';
         }
 
         function applyTheme(theme) {
-          const isDark = theme === "dark";
+          const isDark = theme === 'dark';
           if (isDark) {
-            document.documentElement.classList.add("dark");
-            document.documentElement.style.colorScheme = "dark";
+            document.documentElement.classList.add('dark');
+            document.documentElement.style.colorScheme = 'dark';
           } else {
-            document.documentElement.classList.remove("dark");
-            document.documentElement.style.colorScheme = "light";
+            document.documentElement.classList.remove('dark');
+            document.documentElement.style.colorScheme = 'light';
           }
         }
 
         const currentTheme = resolveTheme();
         applyTheme(currentTheme);
 
-        document.addEventListener("astro:after-swap", function() {
+        document.addEventListener('astro:after-swap', function () {
           applyTheme(resolveTheme());
         });
 
-        window.addEventListener("storage", function(e) {
-          if (e.key === "deparraspitz-theme" || e.key === "theme") {
+        window.addEventListener('storage', function (e) {
+          if (e.key === 'deparraspitz-theme' || e.key === 'theme') {
             applyTheme(resolveTheme());
           }
         });

@@ -1,28 +1,33 @@
+import type { CartItem } from '@/modules/cart/store/cartStore';
+import type { ReservationFormData } from '@/modules/reservations/interfaces/reservation.interface';
 // src/modules/user/reservas/steps/Step4Payment.tsx
 
-import React from "react";
+import { cn } from '@/lib/utils';
 import {
-  CreditCard,
-  Smartphone,
+  LegalCheckboxes,
+  type LegalCheckboxesValue,
+} from '@/modules/shared/legal/LegalCheckboxes';
+import {
   AlertCircle,
   Calendar,
   Clock,
+  CreditCard,
+  Edit2,
   MapPin,
+  ShieldCheck,
+  Smartphone,
+  Sparkles,
   Users,
   Utensils,
-  Edit2,
-  ShieldCheck,
-  Sparkles,
-} from "lucide-react";
-import { StepHeader } from "../components/WizardUI";
-import { cn } from "@/lib/utils";
-import { LegalCheckboxes, type LegalCheckboxesValue } from "@/modules/shared/legal/LegalCheckboxes";
+} from 'lucide-react';
+import React from 'react';
+import { StepHeader } from '../components/WizardUI';
 
 interface Step4PaymentProps {
-  formData: any;
-  setFormData: (data: any) => void;
+  formData: ReservationFormData;
+  setFormData: React.Dispatch<React.SetStateAction<ReservationFormData>>;
   cartTotal?: number;
-  cart?: any[];
+  cart?: CartItem[];
   goToStep?: (step: number) => void;
   /** Callback para propagar si los checkboxes legales son válidos */
   onLegalChange?: (valid: boolean) => void;
@@ -38,22 +43,23 @@ export const Step4Payment = ({
 }: Step4PaymentProps) => {
   const methods = [
     {
-      id: "card",
-      label: "Tarjeta de Crédito / Débito",
-      desc: "Procesamiento seguro vía Culqi",
+      id: 'card',
+      label: 'Tarjeta de Crédito / Débito',
+      desc: 'Procesamiento seguro vía Culqi',
       icon: CreditCard,
-      badge: "Recomendado",
+      badge: 'Recomendado',
     },
     {
-      id: "yape",
-      label: "Yape / Transferencia",
-      desc: "Billetera digital BCP y banca móvil",
+      id: 'yape',
+      label: 'Yape / Transferencia',
+      desc: 'Billetera digital BCP y banca móvil',
       icon: Smartphone,
-      badge: "Rápido",
+      badge: 'Rápido',
     },
   ];
 
-  const safeTotal = typeof cartTotal === "number" && !isNaN(cartTotal) ? cartTotal : 0;
+  const safeTotal =
+    typeof cartTotal === 'number' && !isNaN(cartTotal) ? cartTotal : 0;
 
   const legal: LegalCheckboxesValue = {
     acceptedTerms: !!formData.acceptedTerms,
@@ -73,16 +79,20 @@ export const Step4Payment = ({
 
   // Formato amigable de fecha
   const formattedDate = React.useMemo(() => {
-    if (!formData.date) return "Fecha no especificada";
+    if (!formData.date) return 'Fecha no especificada';
     try {
-      const parts = formData.date.split("-");
+      const parts = formData.date.split('-');
       if (parts.length === 3) {
-        const d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
-        return d.toLocaleDateString("es-PE", {
-          weekday: "long",
-          year: "numeric",
-          month: "long",
-          day: "numeric",
+        const d = new Date(
+          Number(parts[0]),
+          Number(parts[1]) - 1,
+          Number(parts[2]),
+        );
+        return d.toLocaleDateString('es-PE', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
         });
       }
       return formData.date;
@@ -125,33 +135,52 @@ export const Step4Payment = ({
               <div className="flex items-start gap-2.5">
                 <Calendar className="w-4 h-4 text-ember shrink-0 mt-0.5" />
                 <div>
-                  <span className="text-muted-foreground block text-[10px] uppercase font-bold">Fecha</span>
-                  <span className="capitalize font-medium">{formattedDate}</span>
+                  <span className="text-muted-foreground block text-[10px] uppercase font-bold">
+                    Fecha
+                  </span>
+                  <span className="capitalize font-medium">
+                    {formattedDate}
+                  </span>
                 </div>
               </div>
 
               <div className="flex items-start gap-2.5">
                 <Clock className="w-4 h-4 text-ember shrink-0 mt-0.5" />
                 <div>
-                  <span className="text-muted-foreground block text-[10px] uppercase font-bold">Hora</span>
-                  <span className="font-medium">{formData.time || "12:00 PM"}</span>
+                  <span className="text-muted-foreground block text-[10px] uppercase font-bold">
+                    Hora
+                  </span>
+                  <span className="font-medium">
+                    {formData.time || '12:00 PM'}
+                  </span>
                 </div>
               </div>
 
               <div className="flex items-start gap-2.5">
                 <Users className="w-4 h-4 text-ember shrink-0 mt-0.5" />
                 <div>
-                  <span className="text-muted-foreground block text-[10px] uppercase font-bold">Invitados</span>
-                  <span className="font-medium">{formData.guests ? `${formData.guests} personas` : "No especificado"} ({formData.eventType || "Boda"})</span>
+                  <span className="text-muted-foreground block text-[10px] uppercase font-bold">
+                    Invitados
+                  </span>
+                  <span className="font-medium">
+                    {formData.guests
+                      ? `${formData.guests} personas`
+                      : 'No especificado'}{' '}
+                    ({formData.eventType || 'Boda'})
+                  </span>
                 </div>
               </div>
 
               <div className="flex items-start gap-2.5">
                 <MapPin className="w-4 h-4 text-ember shrink-0 mt-0.5" />
                 <div>
-                  <span className="text-muted-foreground block text-[10px] uppercase font-bold">Lugar</span>
+                  <span className="text-muted-foreground block text-[10px] uppercase font-bold">
+                    Lugar
+                  </span>
                   <span className="font-medium">
-                    {formData.address ? `${formData.address}${formData.city ? `, ${formData.city}` : ""}` : "Por definir"}
+                    {formData.address
+                      ? `${formData.address}${formData.city ? `, ${formData.city}` : ''}`
+                      : 'Por definir'}
                   </span>
                 </div>
               </div>
@@ -194,16 +223,26 @@ export const Step4Payment = ({
             ) : (
               <div className="max-h-48 overflow-y-auto space-y-2 pr-1 custom-scrollbar">
                 {cart.map((item) => {
-                  const hasDiscount = !!(item.originalPrice && item.originalPrice > item.price);
-                  const unitOriginal = item.originalPrice !== undefined ? Number(item.originalPrice) : Number(item.price || 0);
+                  const hasDiscount = !!(
+                    item.originalPrice && item.originalPrice > item.price
+                  );
+                  const unitOriginal =
+                    item.originalPrice !== undefined
+                      ? Number(item.originalPrice)
+                      : Number(item.price || 0);
                   const unitFinal = Number(item.price || 0);
                   const qty = Number(item.quantity || 1);
 
                   return (
-                    <div key={item.id} className="flex items-center justify-between text-xs py-1.5 border-b border-border/40 last:border-none">
+                    <div
+                      key={item.id}
+                      className="flex items-center justify-between text-xs py-1.5 border-b border-border/40 last:border-none"
+                    >
                       <div className="flex-1 truncate mr-2">
                         <div className="flex items-center gap-1.5">
-                          <span className="font-medium text-foreground truncate">{item.name}</span>
+                          <span className="font-medium text-foreground truncate">
+                            {item.name}
+                          </span>
                           {item.promoLabel && (
                             <span className="inline-flex items-center text-[9px] font-black bg-amber-500 text-black px-1.5 py-0.2 rounded-full uppercase shrink-0">
                               {item.promoLabel}
@@ -222,7 +261,9 @@ export const Step4Payment = ({
                               </span>
                             </>
                           ) : (
-                            <span className="font-mono">S/ {unitFinal.toFixed(2)} c/u</span>
+                            <span className="font-mono">
+                              S/ {unitFinal.toFixed(2)} c/u
+                            </span>
                           )}
                         </div>
                       </div>
@@ -232,7 +273,12 @@ export const Step4Payment = ({
                             S/ {(unitOriginal * qty).toFixed(2)}
                           </span>
                         )}
-                        <span className={cn("font-mono font-bold", hasDiscount ? "text-amber-500" : "text-foreground")}>
+                        <span
+                          className={cn(
+                            'font-mono font-bold',
+                            hasDiscount ? 'text-amber-500' : 'text-foreground',
+                          )}
+                        >
                           S/ {(unitFinal * qty).toFixed(2)}
                         </span>
                       </div>
@@ -245,7 +291,10 @@ export const Step4Payment = ({
 
           {(() => {
             const rawTotal = cart.reduce((acc, item) => {
-              const base = item.originalPrice !== undefined ? Number(item.originalPrice) : Number(item.price || 0);
+              const base =
+                item.originalPrice !== undefined
+                  ? Number(item.originalPrice)
+                  : Number(item.price || 0);
               return acc + base * Number(item.quantity || 1);
             }, 0);
             const savings = Math.max(0, rawTotal - safeTotal);
@@ -256,18 +305,25 @@ export const Step4Payment = ({
                   <>
                     <div className="flex items-center justify-between text-xs text-muted-foreground">
                       <span>Subtotal regular</span>
-                      <span className="font-mono line-through text-muted-foreground/70">S/ {rawTotal.toFixed(2)}</span>
+                      <span className="font-mono line-through text-muted-foreground/70">
+                        S/ {rawTotal.toFixed(2)}
+                      </span>
                     </div>
                     <div className="flex items-center justify-between text-xs text-emerald-600 dark:text-emerald-400 font-medium">
                       <span className="flex items-center gap-1">
-                        <Sparkles className="w-3.5 h-3.5 text-ember" /> Descuento aplicado
+                        <Sparkles className="w-3.5 h-3.5 text-ember" />{' '}
+                        Descuento aplicado
                       </span>
-                      <span className="font-mono font-bold">- S/ {savings.toFixed(2)}</span>
+                      <span className="font-mono font-bold">
+                        - S/ {savings.toFixed(2)}
+                      </span>
                     </div>
                   </>
                 )}
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-muted-foreground">Total Estimado</span>
+                  <span className="text-xs font-bold text-muted-foreground">
+                    Total Estimado
+                  </span>
                   <span className="text-lg font-bold font-serif text-ember">
                     S/ {safeTotal.toFixed(2)}
                   </span>
@@ -285,34 +341,45 @@ export const Step4Payment = ({
         </label>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-xl mx-auto w-full">
           {methods.map(({ id, label, desc, icon: Icon, badge }) => {
-            const isSelected = formData.paymentMethod === id || (!formData.paymentMethod && id === "card");
+            const isSelected =
+              formData.paymentMethod === id ||
+              (!formData.paymentMethod && id === 'card');
             return (
               <button
                 key={id}
                 type="button"
                 onClick={() => setFormData({ ...formData, paymentMethod: id })}
                 className={cn(
-                  "p-4 rounded-xl flex items-center gap-3.5 text-left transition-all border relative",
+                  'p-4 rounded-xl flex items-center gap-3.5 text-left transition-all border relative',
                   isSelected
-                    ? "bg-ember/10 border-ember shadow-[0_0_15px_rgba(245,158,11,0.15)]"
-                    : "bg-card border-border hover:border-ember/40 dark:bg-zinc-900/60"
+                    ? 'bg-ember/10 border-ember shadow-[0_0_15px_rgba(245,158,11,0.15)]'
+                    : 'bg-card border-border hover:border-ember/40 dark:bg-zinc-900/60',
                 )}
               >
                 <div
                   className={cn(
-                    "p-2.5 rounded-lg shrink-0 transition-colors",
-                    isSelected ? "bg-ember text-char-deep" : "bg-muted text-muted-foreground"
+                    'p-2.5 rounded-lg shrink-0 transition-colors',
+                    isSelected
+                      ? 'bg-ember text-char-deep'
+                      : 'bg-muted text-muted-foreground',
                   )}
                 >
                   <Icon className="w-5 h-5" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className={cn("block text-xs font-bold truncate", isSelected ? "text-ember" : "text-foreground")}>
+                    <span
+                      className={cn(
+                        'block text-xs font-bold truncate',
+                        isSelected ? 'text-ember' : 'text-foreground',
+                      )}
+                    >
                       {label}
                     </span>
                   </div>
-                  <span className="block text-[11px] text-muted-foreground truncate">{desc}</span>
+                  <span className="block text-[11px] text-muted-foreground truncate">
+                    {desc}
+                  </span>
                 </div>
                 {badge && (
                   <span className="absolute top-2 right-2 text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-muted text-muted-foreground border border-border">
@@ -329,8 +396,12 @@ export const Step4Payment = ({
       <div className="max-w-xl mx-auto w-full p-4 rounded-xl bg-muted/40 border border-border/80 flex items-start gap-3">
         <ShieldCheck className="w-5 h-5 text-ember shrink-0 mt-0.5" />
         <div className="text-xs text-muted-foreground leading-relaxed">
-          <p className="font-semibold text-foreground mb-0.5">Compromiso DeParraSpitz</p>
-          Tu reserva pasará a una breve revisión técnica de agenda y logística por nuestro equipo. Una vez validada, te notificaremos para formalizar la garantía y asegurar tu fecha en el calendario.
+          <p className="font-semibold text-foreground mb-0.5">
+            Compromiso DeParraSpitz
+          </p>
+          Tu reserva pasará a una breve revisión técnica de agenda y logística
+          por nuestro equipo. Una vez validada, te notificaremos para formalizar
+          la garantía y asegurar tu fecha en el calendario.
         </div>
       </div>
 
@@ -338,22 +409,22 @@ export const Step4Payment = ({
       <div className="max-w-xl mx-auto w-full">
         <div className="flex items-center gap-3 my-2">
           <div className="flex-1 h-px bg-border" />
-          <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Términos del Servicio</span>
+          <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">
+            Términos del Servicio
+          </span>
           <div className="flex-1 h-px bg-border" />
         </div>
 
         {/* Legal checkboxes */}
-        <LegalCheckboxes
-          value={legal}
-          onChange={handleLegalChange}
-        />
+        <LegalCheckboxes value={legal} onChange={handleLegalChange} />
 
         {/* Alerta si aún no se han aceptado los términos */}
         {!bothAccepted && (
           <div className="mt-3 flex items-start gap-2 p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl">
             <AlertCircle size={14} className="text-amber-500 shrink-0 mt-0.5" />
             <p className="text-xs text-amber-700 dark:text-amber-400">
-              Debes aceptar los Términos y Condiciones y la Política de Privacidad para poder confirmar tu reserva.
+              Debes aceptar los Términos y Condiciones y la Política de
+              Privacidad para poder confirmar tu reserva.
             </p>
           </div>
         )}

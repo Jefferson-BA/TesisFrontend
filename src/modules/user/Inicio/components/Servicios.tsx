@@ -1,51 +1,49 @@
 // src/modules/user/Inicio/components/Servicios.tsx
 
-"use client";
-
-import { useEffect, useRef, useState, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Flame, Utensils, ChefHat, ArrowRight, X } from "lucide-react";
-import { TiltCard } from "./TiltCard";
+import { AnimatePresence, motion } from 'framer-motion';
+import { ArrowRight, ChefHat, Flame, Utensils, X } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { TiltCard } from './TiltCard';
 
 const SERVICIOS = [
   {
-    numero: "01",
-    titulo: "Buffet Parrillero",
-    etiqueta: "Más solicitado",
-    idealPara: "Eventos corporativos · Reuniones familiares",
+    numero: '01',
+    titulo: 'Buffet Parrillero',
+    etiqueta: 'Más solicitado',
+    idealPara: 'Eventos corporativos · Reuniones familiares',
     descripcion:
-      "Carnes selectas a la parrilla, anticuchos, chorizo parrillero y guarniciones tradicionales.",
+      'Carnes selectas a la parrilla, anticuchos, chorizo parrillero y guarniciones tradicionales.',
     imagen:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT1dpMgV13LLejk4TtO7GPFAweKMwmBvLYRNgcgPReheueo0_RhLvzDtw8&s=10",
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT1dpMgV13LLejk4TtO7GPFAweKMwmBvLYRNgcgPReheueo0_RhLvzDtw8&s=10',
     icono: Flame,
-    accentColor: "#eab308",
-    glow: "rgba(234,179,8,0.28)",
+    accentColor: '#eab308',
+    glow: 'rgba(234,179,8,0.28)',
   },
   {
-    numero: "02",
-    titulo: "Buffet Árabe",
-    etiqueta: "Experiencia internacional",
-    idealPara: "Bodas · Eventos temáticos",
+    numero: '02',
+    titulo: 'Buffet Árabe',
+    etiqueta: 'Experiencia internacional',
+    idealPara: 'Bodas · Eventos temáticos',
     descripcion:
-      "Shawarma, falafel, hummus, tabule y panes árabes recién horneados.",
+      'Shawarma, falafel, hummus, tabule y panes árabes recién horneados.',
     imagen:
-      "https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=1974&auto=format&fit=crop",
+      'https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=1974&auto=format&fit=crop',
     icono: Utensils,
-    accentColor: "#f59e0b",
-    glow: "rgba(251,191,36,0.22)",
+    accentColor: '#f59e0b',
+    glow: 'rgba(251,191,36,0.22)',
   },
   {
-    numero: "03",
-    titulo: "Buffet Criollo",
-    etiqueta: "Sabor de casa",
-    idealPara: "Cumpleaños · Celebraciones íntimas",
+    numero: '03',
+    titulo: 'Buffet Criollo',
+    etiqueta: 'Sabor de casa',
+    idealPara: 'Cumpleaños · Celebraciones íntimas',
     descripcion:
-      "Ají de gallina, lomo saltado, arroz con pollo y postres tradicionales.",
+      'Ají de gallina, lomo saltado, arroz con pollo y postres tradicionales.',
     imagen:
-      "https://images.unsplash.com/photo-1600891964092-4316c288032e?q=80&w=1974&auto=format&fit=crop",
+      'https://images.unsplash.com/photo-1600891964092-4316c288032e?q=80&w=1974&auto=format&fit=crop',
     icono: ChefHat,
-    accentColor: "#f97316",
-    glow: "rgba(249,115,22,0.22)",
+    accentColor: '#f97316',
+    glow: 'rgba(249,115,22,0.22)',
   },
 ] as const;
 
@@ -53,7 +51,7 @@ type ServicioType = (typeof SERVICIOS)[number];
 
 // Textura de grano sutil (SVG feTurbulence embebido como data-uri)
 const GRAIN_TEXTURE =
-  "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIj48ZmlsdGVyIGlkPSJuIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iMC44IiBudW1PY3RhdmVzPSIzIiBzdGl0Y2hUaWxlcz0ic3RpdGNoIi8+PC9maWx0ZXI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsdGVyPSJ1cmwoI24pIiBvcGFjaXR5PSIwLjkiLz48L3N2Zz4=";
+  'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMDAiIGhlaWdodD0iMjAwIj48ZmlsdGVyIGlkPSJuIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iMC44IiBudW1PY3RhdmVzPSIzIiBzdGl0Y2hUaWxlcz0ic3RpdGNoIi8+PC9maWx0ZXI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsdGVyPSJ1cmwoI24pIiBvcGFjaXR5PSIwLjkiLz48L3N2Zz4=';
 
 function useInView<T extends HTMLElement>(threshold = 0.12) {
   const ref = useRef<T>(null);
@@ -79,14 +77,17 @@ function useInView<T extends HTMLElement>(threshold = 0.12) {
 // Brasas ambientales flotantes — único elemento de movimiento decorativo extra
 function Brasas() {
   const particulas = [
-    { left: "8%", delay: 0, duration: 9, size: 3 },
-    { left: "22%", delay: 2.4, duration: 11, size: 2 },
-    { left: "68%", delay: 1.1, duration: 10, size: 2.5 },
-    { left: "84%", delay: 3.6, duration: 8.5, size: 3 },
-    { left: "45%", delay: 5, duration: 12, size: 2 },
+    { left: '8%', delay: 0, duration: 9, size: 3 },
+    { left: '22%', delay: 2.4, duration: 11, size: 2 },
+    { left: '68%', delay: 1.1, duration: 10, size: 2.5 },
+    { left: '84%', delay: 3.6, duration: 8.5, size: 3 },
+    { left: '45%', delay: 5, duration: 12, size: 2 },
   ];
   return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+    <div
+      className="absolute inset-0 overflow-hidden pointer-events-none"
+      aria-hidden="true"
+    >
       {particulas.map((p, i) => (
         <motion.span
           key={i}
@@ -95,7 +96,7 @@ function Brasas() {
             left: p.left,
             width: p.size,
             height: p.size,
-            boxShadow: "0 0 8px 2px rgba(234,179,8,0.6)",
+            boxShadow: '0 0 8px 2px rgba(234,179,8,0.6)',
           }}
           initial={{ y: 0, opacity: 0 }}
           animate={{ y: -520, opacity: [0, 0.7, 0.7, 0] }}
@@ -103,7 +104,7 @@ function Brasas() {
             duration: p.duration,
             delay: p.delay,
             repeat: Infinity,
-            ease: "easeOut",
+            ease: 'easeOut',
           }}
         />
       ))}
@@ -134,17 +135,17 @@ export const Servicios = () => {
     if (!servicioSeleccionado) return;
 
     const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    document.body.style.overflow = 'hidden';
     closeButtonRef.current?.focus();
 
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") closeServicio();
+      if (e.key === 'Escape') closeServicio();
     };
-    window.addEventListener("keydown", onKeyDown);
+    window.addEventListener('keydown', onKeyDown);
 
     return () => {
       document.body.style.overflow = previousOverflow;
-      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener('keydown', onKeyDown);
     };
   }, [servicioSeleccionado, closeServicio]);
 
@@ -191,7 +192,7 @@ export const Servicios = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={headerIn ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.5, ease: "easeOut" }}
+            transition={{ duration: 0.5, ease: 'easeOut' }}
             className="inline-flex items-center gap-2 mb-5"
           >
             <span className="block h-[1px] w-8 bg-gradient-to-r from-transparent to-ember" />
@@ -204,10 +205,10 @@ export const Servicios = () => {
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             animate={headerIn ? { opacity: 1, y: 0 } : {}}
-            transition={{ delay: 0.1, duration: 0.5, ease: "easeOut" }}
+            transition={{ delay: 0.1, duration: 0.5, ease: 'easeOut' }}
             className="font-display text-4xl sm:text-5xl font-bold tracking-tight text-foreground leading-tight"
           >
-            Servicios de Buffet{" "}
+            Servicios de Buffet{' '}
             <em className="bg-gradient-to-r from-ember to-amber-300 bg-clip-text text-transparent not-italic font-normal">
               Exclusive
             </em>
@@ -218,7 +219,7 @@ export const Servicios = () => {
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={headerIn ? { opacity: 1, y: 0 } : {}}
-            transition={{ delay: 0.22, duration: 0.5, ease: "easeOut" }}
+            transition={{ delay: 0.22, duration: 0.5, ease: 'easeOut' }}
             className="mt-6 text-base sm:text-lg max-w-2xl mx-auto font-light leading-relaxed text-muted-foreground"
           >
             Propuestas culinarias conceptuales y personalizadas para hacer de tu
@@ -232,8 +233,16 @@ export const Servicios = () => {
             const { ref, inView } = cardRefs[index];
             const IconComponent = servicio.icono;
             return (
-              <div key={servicio.titulo} ref={ref} className="flex flex-col h-full">
-                <TiltCard delay={index * 0.13} inView={inView} glowColor={servicio.glow}>
+              <div
+                key={servicio.titulo}
+                ref={ref}
+                className="flex flex-col h-full"
+              >
+                <TiltCard
+                  delay={index * 0.13}
+                  inView={inView}
+                  glowColor={servicio.glow}
+                >
                   <div
                     className="relative h-full flex flex-col rounded-[1.75rem] overflow-hidden border border-border/80 shadow-[0_24px_70px_-20px_rgba(0,0,0,0.7)] transition-shadow duration-500 hover:shadow-[0_32px_90px_-18px_rgba(0,0,0,0.8)]"
                     style={{
@@ -256,7 +265,7 @@ export const Servicios = () => {
                       className="relative h-72 overflow-hidden cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60 focus-visible:ring-offset-2 focus-visible:ring-offset-card"
                       onClick={() => openServicio(servicio)}
                       onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") {
+                        if (e.key === 'Enter' || e.key === ' ') {
                           e.preventDefault();
                           openServicio(servicio);
                         }
@@ -275,7 +284,7 @@ export const Servicios = () => {
                         className="absolute bottom-3 left-4 font-display italic text-6xl font-light select-none pointer-events-none"
                         style={{
                           color: `${servicio.accentColor}35`,
-                          textShadow: "0 2px 12px rgba(0,0,0,0.4)",
+                          textShadow: '0 2px 12px rgba(0,0,0,0.4)',
                         }}
                       >
                         {servicio.numero}
@@ -298,10 +307,14 @@ export const Servicios = () => {
                         style={{
                           borderColor: `${servicio.accentColor}70`,
                           background:
-                            "radial-gradient(circle at 32% 28%, rgba(255,255,255,0.12), rgba(0,0,0,0.55))",
+                            'radial-gradient(circle at 32% 28%, rgba(255,255,255,0.12), rgba(0,0,0,0.55))',
                         }}
                         whileHover={{ scale: 1.1, rotate: 8 }}
-                        transition={{ type: "spring", stiffness: 300, damping: 15 }}
+                        transition={{
+                          type: 'spring',
+                          stiffness: 300,
+                          damping: 15,
+                        }}
                       >
                         <IconComponent
                           className="w-5 h-5"
@@ -316,10 +329,10 @@ export const Servicios = () => {
                       className="relative h-3 bg-card"
                       style={{
                         backgroundImage:
-                          "radial-gradient(circle, var(--background) 3px, transparent 3.3px)",
-                        backgroundSize: "18px 100%",
-                        backgroundRepeat: "repeat-x",
-                        backgroundPosition: "center",
+                          'radial-gradient(circle, var(--background) 3px, transparent 3.3px)',
+                        backgroundSize: '18px 100%',
+                        backgroundRepeat: 'repeat-x',
+                        backgroundPosition: 'center',
                       }}
                     />
 
@@ -371,17 +384,17 @@ export const Servicios = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={headerIn ? { opacity: 1, y: 0 } : {}}
-          transition={{ delay: 0.5, duration: 0.5, ease: "easeOut" }}
+          transition={{ delay: 0.5, duration: 0.5, ease: 'easeOut' }}
           className="text-center mt-20"
         >
           <motion.a
             href="/menu"
             whileHover={{ y: -2 }}
             whileTap={{ scale: 0.98 }}
-            transition={{ type: "spring", stiffness: 400, damping: 20 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 20 }}
             className="inline-flex items-center gap-3 px-8 py-4 rounded-full text-sm font-semibold bg-gradient-to-r from-ember to-amber-600 text-char-deep shadow-[0_8px_32px_color-mix(in_oklch,var(--ember)_30%,transparent)] hover:shadow-[0_16px_40px_color-mix(in_oklch,var(--ember)_45%,transparent)] transition-shadow duration-300 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
-            Ver menú completo{" "}
+            Ver menú completo{' '}
             <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
           </motion.a>
           <p className="mt-4 text-xs text-muted-foreground">
@@ -412,7 +425,7 @@ export const Servicios = () => {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.96, y: 12 }}
-              transition={{ type: "spring", duration: 0.5, bounce: 0.2 }}
+              transition={{ type: 'spring', duration: 0.5, bounce: 0.2 }}
               className="relative w-full max-w-4xl bg-card text-card-foreground rounded-3xl overflow-hidden shadow-2xl border border-border flex flex-col md:flex-row z-10 max-h-[90vh] md:max-h-[600px]"
             >
               <button
@@ -435,7 +448,7 @@ export const Servicios = () => {
                   className="absolute bottom-4 left-5 font-display italic text-7xl font-light select-none pointer-events-none"
                   style={{
                     color: `${servicioSeleccionado.accentColor}40`,
-                    textShadow: "0 2px 12px rgba(0,0,0,0.4)",
+                    textShadow: '0 2px 12px rgba(0,0,0,0.4)',
                   }}
                 >
                   {servicioSeleccionado.numero}

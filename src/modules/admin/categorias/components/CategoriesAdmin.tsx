@@ -1,16 +1,23 @@
-import React, { useEffect, useState } from 'react';
-import { categoryService } from '../services/category.service';
-import type { Category } from '../interfaces/category.interface';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Trash2, Edit } from 'lucide-react';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import type { Category } from '@/modules/catalog/interfaces/category.interface';
+import { categoryService } from '@/modules/catalog/services/category.service';
+import { Edit, Trash2 } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
 
 export const CategoriesAdmin = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
-  
+
   // Estados para el formulario
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -22,7 +29,7 @@ export const CategoriesAdmin = () => {
       const data = await categoryService.getAll();
       setCategories(data);
     } catch (error) {
-      console.error("Error al cargar categorías:", error);
+      console.error('Error al cargar categorías:', error);
     } finally {
       setLoading(false);
     }
@@ -44,22 +51,27 @@ export const CategoriesAdmin = () => {
       setName('');
       setDescription('');
     } catch (error) {
-      console.error("Error al crear categoría:", error);
-      alert("Hubo un error al crear la categoría.");
+      console.error('Error al crear categoría:', error);
+      alert('Hubo un error al crear la categoría.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm('¿Estás seguro de eliminar esta categoría? Esto podría afectar a los productos vinculados.')) return;
-    
+    if (
+      !window.confirm(
+        '¿Estás seguro de eliminar esta categoría? Esto podría afectar a los productos vinculados.',
+      )
+    )
+      return;
+
     try {
       await categoryService.delete(id);
-      setCategories(categories.filter(cat => cat.id !== id));
+      setCategories(categories.filter((cat) => cat.id !== id));
     } catch (error) {
-      console.error("Error al eliminar:", error);
-      alert("No se pudo eliminar la categoría.");
+      console.error('Error al eliminar:', error);
+      alert('No se pudo eliminar la categoría.');
     }
   };
 
@@ -67,23 +79,30 @@ export const CategoriesAdmin = () => {
     <div className="space-y-8 max-w-6xl mx-auto">
       {/* HEADER */}
       <div>
-        <h2 className="text-3xl font-bold tracking-tight text-foreground">Gestión de Categorías</h2>
-        <p className="text-muted-foreground mt-1">Administra las clasificaciones de tu menú.</p>
+        <h2 className="text-3xl font-bold tracking-tight text-foreground">
+          Gestión de Categorías
+        </h2>
+        <p className="text-muted-foreground mt-1">
+          Administra las clasificaciones de tu menú.
+        </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        
         {/* COLUMNA IZQUIERDA: FORMULARIO */}
         <div className="md:col-span-1 space-y-4">
           <div className="p-6 rounded-xl border border-border bg-card shadow-sm">
-            <h3 className="text-xl font-bold text-card-foreground mb-4">Nueva Categoría</h3>
-            
+            <h3 className="text-xl font-bold text-card-foreground mb-4">
+              Nueva Categoría
+            </h3>
+
             <form onSubmit={handleCreate} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name" className="text-foreground">Nombre</Label>
-                <Input 
-                  id="name" 
-                  placeholder="Ejemplo: Criollo, Árabe..." 
+                <Label htmlFor="name" className="text-foreground">
+                  Nombre
+                </Label>
+                <Input
+                  id="name"
+                  placeholder="Ejemplo: Criollo, Árabe..."
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className="bg-background border-input text-foreground placeholder:text-muted-foreground focus-visible:ring-primary"
@@ -92,18 +111,20 @@ export const CategoriesAdmin = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="description" className="text-foreground">Descripción (Opcional)</Label>
-                <Input 
-                  id="description" 
-                  placeholder="Breve descripción..." 
+                <Label htmlFor="description" className="text-foreground">
+                  Descripción (Opcional)
+                </Label>
+                <Input
+                  id="description"
+                  placeholder="Breve descripción..."
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   className="bg-background border-input text-foreground placeholder:text-muted-foreground focus-visible:ring-primary"
                 />
               </div>
 
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 disabled={isSubmitting || !name.trim()}
                 className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold mt-2"
               >
@@ -119,46 +140,65 @@ export const CategoriesAdmin = () => {
             <Table>
               <TableHeader className="bg-muted/50">
                 <TableRow className="border-border hover:bg-transparent">
-                  <TableHead className="text-primary font-semibold w-1/3">Nombre</TableHead>
-                  <TableHead className="text-primary font-semibold w-1/2">Descripción</TableHead>
-                  <TableHead className="text-primary font-semibold text-right">Acciones</TableHead>
+                  <TableHead className="text-primary font-semibold w-1/3">
+                    Nombre
+                  </TableHead>
+                  <TableHead className="text-primary font-semibold w-1/2">
+                    Descripción
+                  </TableHead>
+                  <TableHead className="text-primary font-semibold text-right">
+                    Acciones
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {loading ? (
                   <TableRow>
-                    <TableCell colSpan={3} className="text-center py-8 text-muted-foreground">
+                    <TableCell
+                      colSpan={3}
+                      className="text-center py-8 text-muted-foreground"
+                    >
                       Cargando categorías...
                     </TableCell>
                   </TableRow>
                 ) : categories.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={3} className="text-center py-8 text-muted-foreground">
+                    <TableCell
+                      colSpan={3}
+                      className="text-center py-8 text-muted-foreground"
+                    >
                       No hay categorías registradas.
                     </TableCell>
                   </TableRow>
                 ) : (
                   categories.map((category) => (
-                    <TableRow key={category.id} className="border-border hover:bg-muted/50 transition-colors">
+                    <TableRow
+                      key={category.id}
+                      className="border-border hover:bg-muted/50 transition-colors"
+                    >
                       <TableCell className="font-medium text-foreground">
                         {category.name}
                       </TableCell>
                       <TableCell className="text-muted-foreground text-sm">
-                        {category.description || <span className="italic opacity-50">Sin descripción</span>}
+                        {category.description || (
+                          <span className="italic opacity-50">
+                            Sin descripción
+                          </span>
+                        )}
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
-                          <Button 
-                            variant="outline" 
+                          <Button
+                            variant="outline"
                             size="icon"
                             className="border-border bg-transparent text-muted-foreground hover:bg-accent hover:text-accent-foreground h-8 w-8"
                             title="Editar"
                           >
                             <Edit className="h-4 w-4" />
                           </Button>
-                          <Button 
-                            variant="destructive" 
-                            size="icon" 
+                          <Button
+                            variant="destructive"
+                            size="icon"
                             onClick={() => handleDelete(category.id)}
                             className="bg-destructive/10 text-destructive hover:bg-destructive/20 hover:text-destructive h-8 w-8"
                             title="Eliminar"
@@ -174,7 +214,6 @@ export const CategoriesAdmin = () => {
             </Table>
           </div>
         </div>
-
       </div>
     </div>
   );

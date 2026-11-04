@@ -2,10 +2,10 @@
 // Componente reutilizable para aceptación de T&C y política de privacidad.
 // Úsalo en Login, Register y Step4Payment.
 
+import { ExternalLink, ScrollText, Shield } from 'lucide-react';
 import { useState } from 'react';
-import { Shield, ScrollText, ExternalLink } from 'lucide-react';
-import { TermsModal } from './TermsModal';
 import { PrivacyModal } from './PrivacyModal';
+import { TermsModal } from './TermsModal';
 
 export interface LegalCheckboxesValue {
   acceptedTerms: boolean;
@@ -21,7 +21,12 @@ interface LegalCheckboxesProps {
   className?: string;
 }
 
-export function LegalCheckboxes({ value, onChange, error, className = '' }: LegalCheckboxesProps) {
+export function LegalCheckboxes({
+  value,
+  onChange,
+  error,
+  className = '',
+}: LegalCheckboxesProps) {
   const [showTerms, setShowTerms] = useState(false);
   const [showPrivacy, setShowPrivacy] = useState(false);
 
@@ -51,14 +56,17 @@ export function LegalCheckboxes({ value, onChange, error, className = '' }: Lega
             He leído y acepto los{' '}
             <button
               type="button"
-              onClick={(e) => { e.preventDefault(); setShowTerms(true); }}
+              onClick={(e) => {
+                e.preventDefault();
+                setShowTerms(true);
+              }}
               className="inline-flex items-center gap-1 text-amber-500 hover:text-amber-400 font-semibold underline underline-offset-2 transition-colors"
             >
               <ScrollText size={11} />
               Términos y Condiciones
               <ExternalLink size={10} />
-            </button>
-            {' '}del servicio.
+            </button>{' '}
+            del servicio.
           </span>
         </label>
 
@@ -82,14 +90,17 @@ export function LegalCheckboxes({ value, onChange, error, className = '' }: Lega
             Acepto la{' '}
             <button
               type="button"
-              onClick={(e) => { e.preventDefault(); setShowPrivacy(true); }}
+              onClick={(e) => {
+                e.preventDefault();
+                setShowPrivacy(true);
+              }}
               className="inline-flex items-center gap-1 text-emerald-500 hover:text-emerald-400 font-semibold underline underline-offset-2 transition-colors"
             >
               <Shield size={11} />
               Política de Privacidad
               <ExternalLink size={10} />
-            </button>
-            {' '}y el tratamiento de mis datos personales.
+            </button>{' '}
+            y el tratamiento de mis datos personales.
           </span>
         </label>
 

@@ -1,6 +1,30 @@
 // src/modules/superadmin/components/SuperadminAuditView.tsx
 
-import React, { useState } from 'react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Table,
   TableBody,
@@ -9,57 +33,26 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Skeleton } from '@/components/ui/skeleton';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from '@/components/ui/dialog';
 import {
   Activity,
-  Search,
-  RefreshCw,
-  Eye,
-  ShieldAlert,
-  Calendar,
-  Globe,
-  User,
-  Copy,
+  ArrowRight,
   Check,
   Code2,
-  ArrowRight,
-  Sliders,
-  DollarSign,
-  Lock,
+  Copy,
+  Eye,
+  Globe,
+  RefreshCw,
+  Search,
+  User,
 } from 'lucide-react';
+import React, { useState } from 'react';
 
 import { useSuperadminAudit } from '../hooks/useSuperadminAudit';
-import type { AuditLog, AuditActionType } from '../types/superadmin.types';
+import type { AuditActionType, AuditLog } from '../types/superadmin.types';
 
 export function SuperadminAuditView() {
-  const {
-    filters,
-    setFilters,
-    logs,
-    actions,
-    meta,
-    isLoading,
-    isFetching,
-    refetch,
-  } = useSuperadminAudit({ limit: 25, offset: 0 });
+  const { setFilters, logs, meta, isLoading, isFetching, refetch } =
+    useSuperadminAudit({ limit: 25, offset: 0 });
 
   const [searchInput, setSearchInput] = useState('');
   const [selectedLog, setSelectedLog] = useState<AuditLog | null>(null);
@@ -140,7 +133,7 @@ export function SuperadminAuditView() {
   };
 
   // Helper para detectar diferencias previas vs nuevas en los detalles
-  const renderDiffInspection = (details: Record<string, any>) => {
+  const renderDiffInspection = (details: Record<string, unknown>) => {
     const hasRoleDiff = 'previousRole' in details && 'newRole' in details;
     const hasAmountDiff = 'previousAmount' in details && 'newAmount' in details;
     const hasStatusDiff = 'previousStatus' in details && 'newStatus' in details;
@@ -155,10 +148,13 @@ export function SuperadminAuditView() {
             </span>
             <div className="flex items-center gap-3 text-sm">
               <div className="flex-1 p-2.5 rounded bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-300">
-                <span className="text-[10px] text-muted-foreground block font-mono">VALOR ANTERIOR</span>
+                <span className="text-[10px] text-muted-foreground block font-mono">
+                  VALOR ANTERIOR
+                </span>
                 <span className="font-semibold">
                   {hasRoleDiff && String(details.previousRole)}
-                  {hasAmountDiff && `S/ ${Number(details.previousAmount).toFixed(2)}`}
+                  {hasAmountDiff &&
+                    `S/ ${Number(details.previousAmount).toFixed(2)}`}
                   {hasStatusDiff && String(details.previousStatus)}
                 </span>
               </div>
@@ -166,16 +162,19 @@ export function SuperadminAuditView() {
               <ArrowRight className="h-4 w-4 text-muted-foreground shrink-0" />
 
               <div className="flex-1 p-2.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-300">
-                <span className="text-[10px] text-muted-foreground block font-mono">VALOR ACTUAL</span>
+                <span className="text-[10px] text-muted-foreground block font-mono">
+                  VALOR ACTUAL
+                </span>
                 <span className="font-semibold">
                   {hasRoleDiff && String(details.newRole)}
-                  {hasAmountDiff && `S/ ${Number(details.newAmount).toFixed(2)}`}
+                  {hasAmountDiff &&
+                    `S/ ${Number(details.newAmount).toFixed(2)}`}
                   {hasStatusDiff && String(details.newStatus)}
                 </span>
               </div>
             </div>
 
-            {details.reason && (
+            {typeof details.reason === 'string' && details.reason && (
               <p className="text-xs text-muted-foreground italic pt-1">
                 Motivo: &quot;{details.reason}&quot;
               </p>
@@ -233,26 +232,47 @@ export function SuperadminAuditView() {
                   className="pl-9 bg-background border-input text-foreground placeholder:text-muted-foreground text-sm focus-visible:ring-primary"
                 />
               </div>
-              <Button type="submit" variant="secondary" className="border border-border">
+              <Button
+                type="submit"
+                variant="secondary"
+                className="border border-border"
+              >
                 Buscar
               </Button>
             </form>
 
             <div className="flex items-center gap-2">
               <div className="w-48">
-                <Select defaultValue="all" onValueChange={handleActionFilterChange}>
+                <Select
+                  defaultValue="all"
+                  onValueChange={handleActionFilterChange}
+                >
                   <SelectTrigger className="bg-background border-input text-foreground text-xs">
                     <SelectValue placeholder="Filtrar por Acción" />
                   </SelectTrigger>
                   <SelectContent className="bg-popover border-border text-popover-foreground">
                     <SelectItem value="all">Todas las acciones</SelectItem>
-                    <SelectItem value="USER_ROLE_CHANGED">Cambio de Rol</SelectItem>
-                    <SelectItem value="USER_STATUS_CHANGED">Cambio de Estado</SelectItem>
-                    <SelectItem value="ORDER_FORCE_CANCELLED">Anulación Forzada</SelectItem>
-                    <SelectItem value="CULQI_REFUND_PROCESSED">Reembolso Culqi</SelectItem>
-                    <SelectItem value="ORDER_AMOUNT_ADJUSTED">Reajuste Monto</SelectItem>
-                    <SelectItem value="SYSTEM_CONFIG_UPDATED">Configuración</SelectItem>
-                    <SelectItem value="MAINTENANCE_MODE_TOGGLED">Modo Mantenimiento</SelectItem>
+                    <SelectItem value="USER_ROLE_CHANGED">
+                      Cambio de Rol
+                    </SelectItem>
+                    <SelectItem value="USER_STATUS_CHANGED">
+                      Cambio de Estado
+                    </SelectItem>
+                    <SelectItem value="ORDER_FORCE_CANCELLED">
+                      Anulación Forzada
+                    </SelectItem>
+                    <SelectItem value="CULQI_REFUND_PROCESSED">
+                      Reembolso Culqi
+                    </SelectItem>
+                    <SelectItem value="ORDER_AMOUNT_ADJUSTED">
+                      Reajuste Monto
+                    </SelectItem>
+                    <SelectItem value="SYSTEM_CONFIG_UPDATED">
+                      Configuración
+                    </SelectItem>
+                    <SelectItem value="MAINTENANCE_MODE_TOGGLED">
+                      Modo Mantenimiento
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -265,7 +285,9 @@ export function SuperadminAuditView() {
                 title="Refrescar logs"
                 className="border-border bg-card text-muted-foreground hover:text-foreground"
               >
-                <RefreshCw className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
+                <RefreshCw
+                  className={`h-4 w-4 ${isFetching ? 'animate-spin' : ''}`}
+                />
               </Button>
             </div>
           </div>
@@ -282,11 +304,15 @@ export function SuperadminAuditView() {
                 Bitácora de Auditoría Maestra (Audit Trail)
               </CardTitle>
               <CardDescription className="text-muted-foreground text-xs">
-                Registro inmutable de acciones críticas, dirección IP de origen y cambios realizados.
+                Registro inmutable de acciones críticas, dirección IP de origen
+                y cambios realizados.
               </CardDescription>
             </div>
             <div className="text-xs text-muted-foreground">
-              Eventos totales: <span className="font-semibold text-foreground">{meta?.total ?? 0}</span>
+              Eventos totales:{' '}
+              <span className="font-semibold text-foreground">
+                {meta?.total ?? 0}
+              </span>
             </div>
           </div>
         </CardHeader>
@@ -295,35 +321,66 @@ export function SuperadminAuditView() {
           <Table>
             <TableHeader className="bg-muted/40">
               <TableRow className="border-border">
-                <TableHead className="text-muted-foreground font-semibold">Fecha y Hora</TableHead>
-                <TableHead className="text-muted-foreground font-semibold">Acción</TableHead>
-                <TableHead className="text-muted-foreground font-semibold">Entidad / Recurso</TableHead>
-                <TableHead className="text-muted-foreground font-semibold">Ejecutado Por</TableHead>
-                <TableHead className="text-muted-foreground font-semibold">Dirección IP</TableHead>
-                <TableHead className="text-right text-muted-foreground font-semibold pr-6">Detalles</TableHead>
+                <TableHead className="text-muted-foreground font-semibold">
+                  Fecha y Hora
+                </TableHead>
+                <TableHead className="text-muted-foreground font-semibold">
+                  Acción
+                </TableHead>
+                <TableHead className="text-muted-foreground font-semibold">
+                  Entidad / Recurso
+                </TableHead>
+                <TableHead className="text-muted-foreground font-semibold">
+                  Ejecutado Por
+                </TableHead>
+                <TableHead className="text-muted-foreground font-semibold">
+                  Dirección IP
+                </TableHead>
+                <TableHead className="text-right text-muted-foreground font-semibold pr-6">
+                  Detalles
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
                 Array.from({ length: 6 }).map((_, i) => (
                   <TableRow key={i} className="border-border">
-                    <TableCell><Skeleton className="h-5 w-28 bg-muted" /></TableCell>
-                    <TableCell><Skeleton className="h-5 w-24 bg-muted" /></TableCell>
-                    <TableCell><Skeleton className="h-5 w-20 bg-muted" /></TableCell>
-                    <TableCell><Skeleton className="h-5 w-32 bg-muted" /></TableCell>
-                    <TableCell><Skeleton className="h-5 w-24 bg-muted" /></TableCell>
-                    <TableCell className="text-right"><Skeleton className="h-8 w-20 ml-auto bg-muted" /></TableCell>
+                    <TableCell>
+                      <Skeleton className="h-5 w-28 bg-muted" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-5 w-24 bg-muted" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-5 w-20 bg-muted" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-5 w-32 bg-muted" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-5 w-24 bg-muted" />
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Skeleton className="h-8 w-20 ml-auto bg-muted" />
+                    </TableCell>
                   </TableRow>
                 ))
               ) : logs.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="h-32 text-center text-muted-foreground">
-                    No hay registros de auditoría registrados para este criterio.
+                  <TableCell
+                    colSpan={6}
+                    className="h-32 text-center text-muted-foreground"
+                  >
+                    No hay registros de auditoría registrados para este
+                    criterio.
                   </TableCell>
                 </TableRow>
               ) : (
                 logs.map((log) => (
-                  <TableRow key={log.id} className="border-border/80 hover:bg-muted/40 transition-colors">
+                  <TableRow
+                    key={log.id}
+                    className="border-border/80 hover:bg-muted/40 transition-colors"
+                  >
                     <TableCell>
                       <div className="text-xs text-foreground font-mono">
                         {new Date(log.createdAt).toLocaleString('es-PE')}
@@ -333,7 +390,10 @@ export function SuperadminAuditView() {
                     <TableCell>{getActionBadge(log.action)}</TableCell>
 
                     <TableCell>
-                      <Badge variant="outline" className="border-border text-foreground font-mono text-xs">
+                      <Badge
+                        variant="outline"
+                        className="border-border text-foreground font-mono text-xs"
+                      >
                         {log.entity} #{log.entityId}
                       </Badge>
                     </TableCell>
@@ -344,7 +404,9 @@ export function SuperadminAuditView() {
                           <User className="h-3 w-3 text-primary" />
                           {log.performedByName}
                         </span>
-                        <span className="text-[11px] text-muted-foreground">{log.performedByEmail}</span>
+                        <span className="text-[11px] text-muted-foreground">
+                          {log.performedByEmail}
+                        </span>
                       </div>
                     </TableCell>
 
@@ -376,11 +438,17 @@ export function SuperadminAuditView() {
 
       {/* 🔍 MODAL: Inspección de Diferencias JSON */}
       {selectedLog && (
-        <Dialog open={!!selectedLog} onOpenChange={(open) => !open && setSelectedLog(null)}>
+        <Dialog
+          open={!!selectedLog}
+          onOpenChange={(open) => !open && setSelectedLog(null)}
+        >
           <DialogContent className="sm:max-w-xl bg-card border-border text-foreground shadow-2xl">
             <DialogHeader>
               <div className="flex items-center gap-2">
-                <Badge variant="outline" className="border-primary/40 text-primary bg-primary/10 text-xs">
+                <Badge
+                  variant="outline"
+                  className="border-primary/40 text-primary bg-primary/10 text-xs"
+                >
                   Auditoría #{selectedLog.id}
                 </Badge>
                 {getActionBadge(selectedLog.action)}
@@ -389,7 +457,13 @@ export function SuperadminAuditView() {
                 Inspección de Registro #{selectedLog.id}
               </DialogTitle>
               <DialogDescription className="text-muted-foreground text-xs">
-                Ejecutado por <span className="text-foreground font-medium">{selectedLog.performedByName}</span> ({selectedLog.performedByRole}) el {new Date(selectedLog.createdAt).toLocaleString('es-PE')} desde IP {selectedLog.ipAddress}.
+                Ejecutado por{' '}
+                <span className="text-foreground font-medium">
+                  {selectedLog.performedByName}
+                </span>{' '}
+                ({selectedLog.performedByRole}) el{' '}
+                {new Date(selectedLog.createdAt).toLocaleString('es-PE')} desde
+                IP {selectedLog.ipAddress}.
               </DialogDescription>
             </DialogHeader>
 

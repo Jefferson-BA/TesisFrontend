@@ -1,11 +1,8 @@
 // src/modules/user/Inicio/components/Testimonios.tsx
 
-"use client";
-
-import { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
-import { Star, Quote } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { motion } from 'framer-motion';
+import { Quote, Star } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 
 function useInView<T extends HTMLElement>(threshold = 0.15) {
   const ref = useRef<T>(null);
@@ -29,34 +26,34 @@ function useInView<T extends HTMLElement>(threshold = 0.15) {
 }
 
 const DESTACADO = {
-  nombre: "Lucía Mendoza",
-  cargo: "Organizadora de eventos",
+  nombre: 'Lucía Mendoza',
+  cargo: 'Organizadora de eventos',
   comentario:
-    "El servicio de DeParraSpitz superó todas nuestras expectativas. La calidad de la comida y la atención al detalle fueron excepcionales.",
-  inicial: "L",
+    'El servicio de DeParraSpitz superó todas nuestras expectativas. La calidad de la comida y la atención al detalle fueron excepcionales.',
+  inicial: 'L',
 };
 
 const TESTIMONIOS = [
   {
-    nombre: "Carlos Ramírez",
-    cargo: "Cliente corporativo",
+    nombre: 'Carlos Ramírez',
+    cargo: 'Cliente corporativo',
     comentario:
-      "Contratamos el buffet parrillero para nuestro evento anual y fue un éxito total.",
-    inicial: "C",
+      'Contratamos el buffet parrillero para nuestro evento anual y fue un éxito total.',
+    inicial: 'C',
   },
   {
-    nombre: "Ana Torres",
-    cargo: "Celebración familiar",
+    nombre: 'Ana Torres',
+    cargo: 'Celebración familiar',
     comentario:
-      "Organizamos el cumpleaños de mi madre con el buffet criollo. Todos quedaron encantados.",
-    inicial: "A",
+      'Organizamos el cumpleaños de mi madre con el buffet criollo. Todos quedaron encantados.',
+    inicial: 'A',
   },
   {
-    nombre: "Miguel Ángel Soto",
-    cargo: "Evento empresarial",
+    nombre: 'Miguel Ángel Soto',
+    cargo: 'Evento empresarial',
     comentario:
-      "La variedad del buffet árabe fue increíble. Nuestros invitados quedaron fascinados.",
-    inicial: "M",
+      'La variedad del buffet árabe fue increíble. Nuestros invitados quedaron fascinados.',
+    inicial: 'M',
   },
 ];
 
@@ -85,7 +82,7 @@ export const Testimonios = () => {
             Opiniones Reales
           </span>
           <h2 className="text-4xl sm:text-5xl font-bold text-foreground font-serif tracking-tight">
-            Confianza en Cada{" "}
+            Confianza en Cada{' '}
             <span className="italic font-normal text-ember/90">
               Celebración
             </span>
@@ -131,42 +128,52 @@ export const Testimonios = () => {
 
         {/* Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
-          {TESTIMONIOS.map((t, index) => {
-            const { ref, inView } = useInView<HTMLDivElement>();
-            return (
-              <motion.div
-                key={index}
-                ref={ref}
-                initial={{ opacity: 0, y: 30 }}
-                animate={inView ? { opacity: 1, y: 0 } : {}}
-                transition={{ delay: index * 0.1, duration: 0.5 }}
-                className="relative bg-card border border-border rounded-3xl p-6 sm:p-8 shadow-lg hover:border-ember/20 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between overflow-hidden group"
-              >
-                <Quote className="absolute right-6 top-6 w-20 h-20 text-muted/10 pointer-events-none group-hover:scale-110 transition-transform duration-500" />
-                <div className="relative z-10">
-                  <Stars />
-                  <p className="text-muted-foreground text-base leading-relaxed font-light font-serif italic text-balance mt-5">
-                    "{t.comentario}"
-                  </p>
-                </div>
-                <div className="flex items-center gap-4 mt-8 pt-5 border-t border-border relative z-10">
-                  <div className="w-12 h-12 rounded-xl bg-card border border-border text-ember flex items-center justify-center font-bold text-lg group-hover:border-ember/30 transition-colors">
-                    {t.inicial}
-                  </div>
-                  <div>
-                    <h3 className="text-foreground font-semibold text-base">
-                      {t.nombre}
-                    </h3>
-                    <p className="text-muted-foreground text-xs sm:text-sm mt-0.5">
-                      {t.cargo}
-                    </p>
-                  </div>
-                </div>
-              </motion.div>
-            );
-          })}
+          {TESTIMONIOS.map((t, index) => (
+            <TestimonialCard key={t.nombre} t={t} index={index} />
+          ))}
         </div>
       </div>
     </section>
   );
 };
+
+function TestimonialCard({
+  t,
+  index,
+}: {
+  t: (typeof TESTIMONIOS)[number];
+  index: number;
+}) {
+  const { ref, inView } = useInView<HTMLDivElement>();
+  return (
+    <motion.div
+      key={index}
+      ref={ref}
+      initial={{ opacity: 0, y: 30 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ delay: index * 0.1, duration: 0.5 }}
+      className="relative bg-card border border-border rounded-3xl p-6 sm:p-8 shadow-lg hover:border-ember/20 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between overflow-hidden group"
+    >
+      <Quote className="absolute right-6 top-6 w-20 h-20 text-muted/10 pointer-events-none group-hover:scale-110 transition-transform duration-500" />
+      <div className="relative z-10">
+        <Stars />
+        <p className="text-muted-foreground text-base leading-relaxed font-light font-serif italic text-balance mt-5">
+          "{t.comentario}"
+        </p>
+      </div>
+      <div className="flex items-center gap-4 mt-8 pt-5 border-t border-border relative z-10">
+        <div className="w-12 h-12 rounded-xl bg-card border border-border text-ember flex items-center justify-center font-bold text-lg group-hover:border-ember/30 transition-colors">
+          {t.inicial}
+        </div>
+        <div>
+          <h3 className="text-foreground font-semibold text-base">
+            {t.nombre}
+          </h3>
+          <p className="text-muted-foreground text-xs sm:text-sm mt-0.5">
+            {t.cargo}
+          </p>
+        </div>
+      </div>
+    </motion.div>
+  );
+}

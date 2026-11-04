@@ -6,7 +6,7 @@ import tailwindcss from '@tailwindcss/vite';
 import { fileURLToPath } from 'url';
 
 export default defineConfig({
-  output: "server",
+  output: 'server',
   adapter: vercel(),
 
   integrations: [react()],
@@ -31,24 +31,21 @@ export default defineConfig({
       alias: [
         {
           find: '@',
-          replacement: fileURLToPath(new URL('./src', import.meta.url))
-        }
-      ]
+          replacement: fileURLToPath(new URL('./src', import.meta.url)),
+        },
+      ],
     },
     build: {
       cssMinify: 'lightningcss',
-      rollupOptions: {
-        output: {
-          manualChunks: {
-            'react-vendor': ['react', 'react-dom'],
-            'framer-motion': ['framer-motion'],
-            'tanstack-query': ['@tanstack/react-query'],
-          },
-        },
-      },
     },
     ssr: {
-      noExternal: ['@radix-ui/*', 'lucide-react', 'framer-motion', 'recharts', 'react-is'],
+      noExternal: [
+        '@radix-ui/*',
+        'lucide-react',
+        'framer-motion',
+        'recharts',
+        'react-is',
+      ],
     },
   },
 });

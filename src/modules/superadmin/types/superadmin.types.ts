@@ -73,7 +73,8 @@ export interface UpdateUserProfileDto {
 // 2️⃣ FINANZAS, REEMBOLSOS Y CULQI (PILAR 2)
 // ==========================================
 
-export type OrderStatus = 'pending' | 'paid' | 'cancelled' | 'failed' | 'completed';
+export type OrderStatus =
+  'pending' | 'paid' | 'cancelled' | 'failed' | 'completed';
 export type PaymentMethod = 'card' | 'yape' | 'plin' | 'cash';
 
 export interface FinancialSummary {
@@ -166,7 +167,7 @@ export interface AuditLog {
   performedByRole: string;
   ipAddress: string;
   userAgent?: string;
-  details: Record<string, any>;
+  details: Record<string, unknown>;
   createdAt: string;
 }
 
@@ -194,7 +195,8 @@ export interface AuditLogsResponse {
 // 4️⃣ CONFIGURACIÓN CRÍTICA Y MODO MANTENIMIENTO (PILAR 4)
 // ==========================================
 
-export type ConfigCategory = 'GENERAL' | 'FINANCIAL' | 'INTEGRATIONS' | 'SECURITY';
+export type ConfigCategory =
+  'GENERAL' | 'FINANCIAL' | 'INTEGRATIONS' | 'SECURITY';
 
 export interface SystemConfig {
   id: number;

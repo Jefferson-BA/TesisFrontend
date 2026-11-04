@@ -1,17 +1,20 @@
+import { getErrorMessage } from '@/lib/errors';
 // src/modules/superadmin/hooks/useSuperadminFinance.ts
 
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { superadminService } from '../services/superadmin.service';
 import type {
+  AdjustAmountDto,
   FinancialQueryFilters,
   ForceCancelOrderDto,
   RefundOrderDto,
-  AdjustAmountDto,
 } from '../types/superadmin.types';
 
-export function useSuperadminFinance(initialFilters: FinancialQueryFilters = {}) {
+export function useSuperadminFinance(
+  initialFilters: FinancialQueryFilters = {},
+) {
   const queryClient = useQueryClient();
   const [filters, setFilters] = useState<FinancialQueryFilters>(initialFilters);
 
@@ -23,17 +26,22 @@ export function useSuperadminFinance(initialFilters: FinancialQueryFilters = {})
 
   // 2. Anulación forzada de orden
   const forceCancelMutation = useMutation({
-    mutationFn: ({ orderId, dto }: { orderId: number; dto: ForceCancelOrderDto }) =>
-      superadminService.forceCancelOrder(orderId, dto),
+    mutationFn: ({
+      orderId,
+      dto,
+    }: {
+      orderId: number;
+      dto: ForceCancelOrderDto;
+    }) => superadminService.forceCancelOrder(orderId, dto),
     onSuccess: (data) => {
       toast.success(data.message || 'Orden anulada forzosamente');
-      queryClient.invalidateQueries({ queryKey: ['superadmin-finance-reports'] });
+      queryClient.invalidateQueries({
+        queryKey: ['superadmin-finance-reports'],
+      });
       queryClient.invalidateQueries({ queryKey: ['superadmin-audit-logs'] });
     },
-    onError: (error: any) => {
-      const msg = error.response?.data?.message || 'Error al anular orden';
-      toast.error(msg);
-    },
+    onError: (error: unknown) =>
+      toast.error(getErrorMessage(error, 'Error al anular orden')),
   });
 
   // 3. Reembolso directo en Culqi
@@ -41,14 +49,18 @@ export function useSuperadminFinance(initialFilters: FinancialQueryFilters = {})
     mutationFn: ({ orderId, dto }: { orderId: number; dto: RefundOrderDto }) =>
       superadminService.refundCulqiOrder(orderId, dto),
     onSuccess: (data) => {
-      toast.success(data.message || 'Reembolso procesado en Culqi exitosamente');
-      queryClient.invalidateQueries({ queryKey: ['superadmin-finance-reports'] });
+      toast.success(
+        data.message || 'Reembolso procesado en Culqi exitosamente',
+      );
+      queryClient.invalidateQueries({
+        queryKey: ['superadmin-finance-reports'],
+      });
       queryClient.invalidateQueries({ queryKey: ['superadmin-audit-logs'] });
     },
-    onError: (error: any) => {
-      const msg = error.response?.data?.message || 'Error al procesar reembolso en Culqi';
-      toast.error(msg);
-    },
+    onError: (error: unknown) =>
+      toast.error(
+        getErrorMessage(error, 'Error al procesar reembolso en Culqi'),
+      ),
   });
 
   // 4. Reajuste de monto por reclamo
@@ -57,13 +69,13 @@ export function useSuperadminFinance(initialFilters: FinancialQueryFilters = {})
       superadminService.adjustOrderAmount(orderId, dto),
     onSuccess: (data) => {
       toast.success(data.message || 'Monto reajustado exitosamente');
-      queryClient.invalidateQueries({ queryKey: ['superadmin-finance-reports'] });
+      queryClient.invalidateQueries({
+        queryKey: ['superadmin-finance-reports'],
+      });
       queryClient.invalidateQueries({ queryKey: ['superadmin-audit-logs'] });
     },
-    onError: (error: any) => {
-      const msg = error.response?.data?.message || 'Error al reajustar el monto';
-      toast.error(msg);
-    },
+    onError: (error: unknown) =>
+      toast.error(getErrorMessage(error, 'Error al reajustar el monto')),
   });
 
   return {

@@ -1,15 +1,20 @@
 ---
-import AdminLayout from "@/layouts/AdminLayout.astro";
-import "@/styles/globals.css";
-import PromotionsAdmin from "@/modules/admin/promociones/components/PromoForm";
+import AdminLayout from '@/layouts/AdminLayout.astro';
+import '@/styles/globals.css';
+import PromotionsAdmin from '@/modules/admin/promociones/components/PromotionsAdmin';
 ---
+
 <AdminLayout title="Dashboard | Promociones">
   <div class="space-y-6">
     <div>
-      <h1 class="text-3xl font-bold tracking-tight text-foreground">Promociones</h1>
-      <p class="text-muted-foreground text-sm mt-1">Administra los descuentos del restaurante y publica ofertas activas.</p>
+      <h1 class="text-3xl font-bold tracking-tight text-foreground">
+        Promociones
+      </h1>
+      <p class="text-muted-foreground text-sm mt-1">
+        Administra los descuentos del restaurante y publica ofertas activas.
+      </p>
     </div>
-    
+
     <PromotionsAdmin client:load />
   </div>
 </AdminLayout>

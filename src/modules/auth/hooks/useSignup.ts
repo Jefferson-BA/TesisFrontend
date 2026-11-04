@@ -1,7 +1,8 @@
-import { useMutation } from "@tanstack/react-query";
-import { authService } from "../services/auth.service";
-import { toast } from "sonner"; 
-import type { RegisterFormData } from "../schemas/auth.schema";
+import { getErrorMessage } from '@/lib/errors';
+import { useMutation } from '@tanstack/react-query';
+import { toast } from 'sonner';
+import type { RegisterFormData } from '../schemas/auth.schema';
+import { authService } from '../services/auth.service';
 
 export const useSignup = () => {
   return useMutation({
@@ -11,31 +12,22 @@ export const useSignup = () => {
         name: data.name,
         email: data.email,
         password: data.password,
-        phone: (data as any).phone, // 👈 ¡Súper importante para que viaje por la API!
-        acceptedTerms: data.acceptedTerms ?? true,
-        acceptedPrivacy: data.acceptedPrivacy ?? true,
+        phone: data.phone, // 👈 ¡Súper importante para que viaje por la API!
+        acceptedTerms: data.acceptedTerms,
+        acceptedPrivacy: data.acceptedPrivacy,
       };
       return authService.signup(payload);
     },
     onSuccess: () => {
-      toast.success("¡Cuenta creada con éxito!", {
-        description: "Redirigiendo al inicio de sesión..."
+      toast.success('¡Cuenta creada con éxito!', {
+        description: 'Redirigiendo al inicio de sesión...',
       });
-      
+
       setTimeout(() => {
-        window.location.href = "/login";
+        window.location.href = '/login';
       }, 1500);
     },
-    onError: (error: any) => {
-      const message = error.response?.data?.message;
-    
-      if (Array.isArray(message)) {
-        toast.error("Error en el formulario", {
-          description: message.join(", ")
-        });
-      } else {
-        toast.error(message || "Hubo un error al crear la cuenta");
-      }
-    }
+    onError: (error: unknown) =>
+      toast.error(getErrorMessage(error, 'No se pudo crear la cuenta')),
   });
 };

@@ -1,30 +1,30 @@
 // src/modules/superadmin/components/SuperadminSettingsView.tsx
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
-  Settings,
-  Power,
-  Key,
-  ShieldCheck,
-  ShieldAlert,
   Edit3,
-  Lock,
-  RefreshCw,
-  AlertTriangle,
-  Server,
-  Database,
-  Cpu,
+  Key,
   Layers,
+  Lock,
+  Power,
+  RefreshCw,
+  Server,
 } from 'lucide-react';
+import { useState } from 'react';
 
 import { useSuperadminConfig } from '../hooks/useSuperadminConfig';
-import { SuperadminPasswordModal } from './SuperadminPasswordModal';
 import type { SystemConfig } from '../types/superadmin.types';
+import { SuperadminPasswordModal } from './SuperadminPasswordModal';
 
 export function SuperadminSettingsView() {
   const {
@@ -33,6 +33,7 @@ export function SuperadminSettingsView() {
     refetchConfigs,
     maintenance,
     isLoadingMaintenance,
+    isErrorMaintenance,
     refetchMaintenance,
     updateConfig,
     isUpdatingConfig,
@@ -43,7 +44,7 @@ export function SuperadminSettingsView() {
   // Estados para Modal de Mantenimiento
   const [showMaintenanceModal, setShowMaintenanceModal] = useState(false);
   const [maintenanceCustomMessage, setMaintenanceCustomMessage] = useState(
-    'El sistema se encuentra en mantenimiento programado. Volveremos pronto.'
+    'El sistema se encuentra en mantenimiento programado. Volveremos pronto.',
   );
 
   // Estados para Edición de Configuración o Llave Secreta
@@ -51,12 +52,14 @@ export function SuperadminSettingsView() {
   const [newConfigValue, setNewConfigValue] = useState('');
   const [newConfigDescription, setNewConfigDescription] = useState('');
 
+  const isMaintenanceKnown =
+    !isLoadingMaintenance && !isErrorMaintenance && !!maintenance;
   const isMaintenanceActive = maintenance?.maintenanceMode ?? false;
 
   const handleOpenMaintenanceModal = () => {
     setMaintenanceCustomMessage(
       maintenance?.customMessage ||
-        'El sistema se encuentra en mantenimiento programado. Volveremos pronto.'
+        'El sistema se encuentra en mantenimiento programado. Volveremos pronto.',
     );
     setShowMaintenanceModal(true);
   };
@@ -83,7 +86,7 @@ export function SuperadminSettingsView() {
 
   const handleConfirmEditConfig = async ({
     superadminPassword,
-    reason,
+    reason: _reason,
   }: {
     superadminPassword: string;
     reason: string;
@@ -103,7 +106,9 @@ export function SuperadminSettingsView() {
   // Agrupar configuraciones por categoría
   const generalConfigs = configs.filter((c) => c.category === 'GENERAL');
   const financialConfigs = configs.filter((c) => c.category === 'FINANCIAL');
-  const integrationConfigs = configs.filter((c) => c.category === 'INTEGRATIONS' || c.isSecret);
+  const integrationConfigs = configs.filter(
+    (c) => c.category === 'INTEGRATIONS' || c.isSecret,
+  );
 
   return (
     <div className="space-y-6">
@@ -133,7 +138,9 @@ export function SuperadminSettingsView() {
                   <h3 className="text-xl font-bold text-foreground">
                     Modo Mantenimiento de la Plataforma
                   </h3>
-                  {isMaintenanceActive ? (
+                  {!isMaintenanceKnown ? (
+                    <Badge variant="outline">Estado sin confirmar</Badge>
+                  ) : isMaintenanceActive ? (
                     <Badge className="bg-rose-500/20 text-rose-600 dark:text-rose-300 border border-rose-500/40">
                       ACTIVO
                     </Badge>
@@ -145,11 +152,27 @@ export function SuperadminSettingsView() {
                 </div>
 
                 <p className="text-muted-foreground text-sm mt-1 max-w-2xl">
-                  {isMaintenanceActive
-                    ? 'El acceso a clientes y comensales está bloqueado actualmente. Solo el rol Superadmin puede acceder al sistema.'
-                    : 'La plataforma está completamente disponible y recibiendo pedidos y reservas en tiempo real.'}
+                  {!isMaintenanceKnown
+                    ? 'No se ha podido confirmar el estado de la plataforma.'
+                    : isMaintenanceActive
+                      ? 'El acceso a clientes y comensales está bloqueado actualmente. Solo el rol Superadmin puede acceder al sistema.'
+                      : 'La plataforma está completamente disponible y recibiendo pedidos y reservas en tiempo real.'}
                 </p>
 
+                {isMaintenanceActive && (
+                  <p className="text-muted-foreground text-sm mt-2">
+                    Permanece activo hasta que lo desactives manualmente; no
+                    tiene vencimiento automático.
+                  </p>
+                )}
+                {isErrorMaintenance && (
+                  <Button
+                    variant="outline"
+                    onClick={() => void refetchMaintenance()}
+                  >
+                    Reintentar consulta de mantenimiento
+                  </Button>
+                )}
                 {isMaintenanceActive && maintenance?.customMessage && (
                   <div className="mt-3 p-2.5 rounded-lg bg-muted/40 border border-border text-xs text-rose-600 dark:text-rose-400 font-mono">
                     Mensaje mostrado: &quot;{maintenance.customMessage}&quot;
@@ -160,7 +183,7 @@ export function SuperadminSettingsView() {
 
             <Button
               onClick={handleOpenMaintenanceModal}
-              disabled={isLoadingMaintenance}
+              disabled={!isMaintenanceKnown || isTogglingMaintenance}
               className={`h-11 px-5 font-semibold text-sm gap-2 shrink-0 ${
                 isMaintenanceActive
                   ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg'
@@ -168,7 +191,9 @@ export function SuperadminSettingsView() {
               }`}
             >
               <Power className="h-4 w-4" />
-              {isMaintenanceActive ? 'Desactivar Mantenimiento' : 'Activar Mantenimiento'}
+              {isMaintenanceActive
+                ? 'Desactivar Mantenimiento'
+                : 'Activar Mantenimiento'}
             </Button>
           </div>
         </CardContent>
@@ -184,7 +209,8 @@ export function SuperadminSettingsView() {
                 Llaves API y Credenciales Enmascaradas
               </CardTitle>
               <CardDescription className="text-muted-foreground text-xs">
-                Tokens y secretos protegidos. La edición exige reautenticación estricta con contraseña de Superadmin.
+                Tokens y secretos protegidos. La edición exige reautenticación
+                estricta con contraseña de Superadmin.
               </CardDescription>
             </div>
             <Button
@@ -227,12 +253,17 @@ export function SuperadminSettingsView() {
                     <span className="font-mono text-sm font-bold text-foreground">
                       {config.key}
                     </span>
-                    <Badge variant="outline" className="border-amber-500/40 text-amber-600 dark:text-amber-400 text-[10px] gap-1">
+                    <Badge
+                      variant="outline"
+                      className="border-amber-500/40 text-amber-600 dark:text-amber-400 text-[10px] gap-1"
+                    >
                       <Lock className="h-2.5 w-2.5" />
                       SECRETO
                     </Badge>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-0.5">{config.description}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {config.description}
+                  </p>
                   <div className="mt-2 inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-muted/40 border border-border font-mono text-xs text-foreground">
                     <Lock className="h-3 w-3 text-muted-foreground" />
                     <span>{config.value}</span>
@@ -266,15 +297,22 @@ export function SuperadminSettingsView() {
           </CardHeader>
           <CardContent className="p-4 space-y-4">
             {financialConfigs.length === 0 ? (
-              <p className="text-xs text-muted-foreground italic">No hay parámetros financieros registrados.</p>
+              <p className="text-xs text-muted-foreground italic">
+                No hay parámetros financieros registrados.
+              </p>
             ) : (
               financialConfigs.map((cfg) => (
-                <div key={cfg.id} className="p-3 rounded-lg bg-muted/40 border border-border flex items-center justify-between">
+                <div
+                  key={cfg.id}
+                  className="p-3 rounded-lg bg-muted/40 border border-border flex items-center justify-between"
+                >
                   <div>
                     <span className="font-mono text-xs font-semibold text-foreground block">
                       {cfg.key}
                     </span>
-                    <span className="text-xs text-muted-foreground">{cfg.description}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {cfg.description}
+                    </span>
                     <div className="text-sm font-bold text-emerald-600 dark:text-emerald-400 mt-1">
                       {cfg.value}
                     </div>
@@ -303,15 +341,22 @@ export function SuperadminSettingsView() {
           </CardHeader>
           <CardContent className="p-4 space-y-4">
             {generalConfigs.length === 0 ? (
-              <p className="text-xs text-muted-foreground italic">No hay parámetros generales registrados.</p>
+              <p className="text-xs text-muted-foreground italic">
+                No hay parámetros generales registrados.
+              </p>
             ) : (
               generalConfigs.map((cfg) => (
-                <div key={cfg.id} className="p-3 rounded-lg bg-muted/40 border border-border flex items-center justify-between">
+                <div
+                  key={cfg.id}
+                  className="p-3 rounded-lg bg-muted/40 border border-border flex items-center justify-between"
+                >
                   <div>
                     <span className="font-mono text-xs font-semibold text-foreground block">
                       {cfg.key}
                     </span>
-                    <span className="text-xs text-muted-foreground">{cfg.description}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {cfg.description}
+                    </span>
                     <div className="text-sm font-medium text-foreground mt-1">
                       {cfg.value}
                     </div>
@@ -335,14 +380,20 @@ export function SuperadminSettingsView() {
       <SuperadminPasswordModal
         open={showMaintenanceModal}
         onOpenChange={setShowMaintenanceModal}
-        title={isMaintenanceActive ? 'Desactivar Modo Mantenimiento' : 'Activar Modo Mantenimiento'}
+        title={
+          isMaintenanceActive
+            ? 'Desactivar Modo Mantenimiento'
+            : 'Activar Modo Mantenimiento'
+        }
         description={
           isMaintenanceActive
             ? 'Se reactivará el acceso público inmediatamente a comensales y administradores.'
             : 'Se restringirá el acceso a todos los usuarios salvo superadministradores.'
         }
         badgeText="Operación Crítica"
-        actionLabel={isMaintenanceActive ? 'Reabrir Plataforma' : 'Bloquear Plataforma'}
+        actionLabel={
+          isMaintenanceActive ? 'Reabrir Plataforma' : 'Bloquear Plataforma'
+        }
         variant={isMaintenanceActive ? 'amber' : 'destructive'}
         requireReason={false}
         isLoading={isTogglingMaintenance}
@@ -374,7 +425,11 @@ export function SuperadminSettingsView() {
               ? 'Esta llave es crítica. El nuevo valor reemplazará las credenciales activas del sistema.'
               : 'Se modificará el comportamiento del parámetro global seleccionado.'
           }
-          badgeText={editingConfig.isSecret ? 'Llave Secreta API' : 'Configuración del Sistema'}
+          badgeText={
+            editingConfig.isSecret
+              ? 'Llave Secreta API'
+              : 'Configuración del Sistema'
+          }
           actionLabel="Guardar Nuevo Valor"
           variant="amber"
           isLoading={isUpdatingConfig}
@@ -383,7 +438,8 @@ export function SuperadminSettingsView() {
           <div className="space-y-3">
             <div className="space-y-1">
               <label className="text-xs font-medium text-foreground">
-                Nuevo Valor para {editingConfig.key} <span className="text-red-500">*</span>
+                Nuevo Valor para {editingConfig.key}{' '}
+                <span className="text-red-500">*</span>
               </label>
               <Input
                 value={newConfigValue}

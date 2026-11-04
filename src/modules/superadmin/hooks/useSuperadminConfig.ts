@@ -1,11 +1,12 @@
+import { getErrorMessage } from '@/lib/errors';
 // src/modules/superadmin/hooks/useSuperadminConfig.ts
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { superadminService } from '../services/superadmin.service';
 import type {
-  UpdateSystemConfigDto,
   ToggleMaintenanceDto,
+  UpdateSystemConfigDto,
 } from '../types/superadmin.types';
 
 export function useSuperadminConfig() {
@@ -29,13 +30,14 @@ export function useSuperadminConfig() {
       superadminService.updateSystemConfig(key, dto),
     onSuccess: (data) => {
       toast.success(data.message || 'Configuración actualizada');
+      queryClient.invalidateQueries({
+        queryKey: ['superadmin-maintenance-status'],
+      });
       queryClient.invalidateQueries({ queryKey: ['superadmin-configs'] });
       queryClient.invalidateQueries({ queryKey: ['superadmin-audit-logs'] });
     },
-    onError: (error: any) => {
-      const msg = error.response?.data?.message || 'Error al actualizar configuración';
-      toast.error(msg);
-    },
+    onError: (error: unknown) =>
+      toast.error(getErrorMessage(error, 'Error al actualizar configuración')),
   });
 
   // 4. Mutación para activar/desactivar modo mantenimiento
@@ -43,15 +45,21 @@ export function useSuperadminConfig() {
     mutationFn: (dto: ToggleMaintenanceDto) =>
       superadminService.toggleMaintenanceMode(dto),
     onSuccess: (data) => {
+      queryClient.setQueryData(['superadmin-maintenance-status'], {
+        maintenanceMode: data.maintenanceMode,
+        customMessage: data.customMessage,
+      });
       toast.success(data.message || 'Modo mantenimiento actualizado');
-      queryClient.invalidateQueries({ queryKey: ['superadmin-maintenance-status'] });
+      queryClient.invalidateQueries({
+        queryKey: ['superadmin-maintenance-status'],
+      });
       queryClient.invalidateQueries({ queryKey: ['superadmin-configs'] });
       queryClient.invalidateQueries({ queryKey: ['superadmin-audit-logs'] });
     },
-    onError: (error: any) => {
-      const msg = error.response?.data?.message || 'Error al cambiar modo mantenimiento';
-      toast.error(msg);
-    },
+    onError: (error: unknown) =>
+      toast.error(
+        getErrorMessage(error, 'Error al cambiar modo mantenimiento'),
+      ),
   });
 
   return {
@@ -62,6 +70,7 @@ export function useSuperadminConfig() {
 
     maintenance: maintenanceQuery.data,
     isLoadingMaintenance: maintenanceQuery.isLoading,
+    isErrorMaintenance: maintenanceQuery.isError,
     refetchMaintenance: maintenanceQuery.refetch,
 
     updateConfig: updateConfigMutation.mutateAsync,

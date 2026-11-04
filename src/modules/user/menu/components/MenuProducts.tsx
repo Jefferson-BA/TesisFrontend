@@ -1,58 +1,61 @@
+import { QueryProvider } from '@/components/shared/QueryProvider';
+import { useCatalog } from '@/modules/catalog/hooks/useCatalog';
+import { getCategoryName } from '@/modules/catalog/utils/product';
 // src/modules/user/menu/components/MenuProducts.tsx
 
-"use client";
+import { useCartStore } from '@/modules/cart/store/cartStore';
+import type { Product } from '@/modules/catalog/interfaces/product.interface';
+import {
+  calcDiscountedPrice,
+  findPromoForProduct,
+  getPromoLabel,
+} from '@/modules/promotions/utils/promoUtils';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { toast } from 'sonner';
+import { MenuFilter } from './MenuFilter';
+import { MenuHero } from './MenuHero';
+import { MenuModal } from './MenuModal';
+import { ProductCard } from './ProductCard';
+import { WhatsAppButton } from './WhatsAppButton';
 
-import { useEffect, useState, useMemo, useCallback } from "react";
-import { toast } from "sonner";
-import { getProducts } from "@/modules/admin/productos/services/product.service";
-import { getActivePromotions } from "@/modules/admin/promociones/services/promotion.service";
-import { useCartStore } from "@/modules/admin/promociones/store/cartStore";
-import { findPromoForProduct, calcDiscountedPrice, getPromoLabel } from "@/modules/admin/promociones/utils/promoUtils";
-import type { Product } from "../interfaces/product.interface";
-import type { Promotion } from "@/modules/admin/promociones/interfaces/promotion.interface";
-import { MenuHero } from "./MenuHero";
-import { MenuFilter } from "./MenuFilter";
-import { ProductCard } from "./ProductCard";
-import { MenuModal } from "./MenuModal";
-import { WhatsAppButton } from "./WhatsAppButton";
-
-export const MenuProducts = () => {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+const MenuProductsContent = () => {
+  const { products: productsQuery, promotions: promosQuery } = useCatalog();
+  const products = useMemo(
+    () => productsQuery.data ?? [],
+    [productsQuery.data],
+  );
+  const activePromos = useMemo(
+    () => promosQuery.data ?? [],
+    [promosQuery.data],
+  );
+  const loading = productsQuery.isPending;
   const [selected, setSelected] = useState<Product | null>(null);
-  const [category, setCategory] = useState("Todos");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [sortOrder, setSortOrder] = useState<"default" | "asc" | "desc">("default");
+  const [category, setCategory] = useState('Todos');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortOrder, setSortOrder] = useState<'default' | 'asc' | 'desc'>(
+    'default',
+  );
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 500]);
-  const [activePromos, setActivePromos] = useState<Promotion[]>([]);
   const addToCart = useCartStore((s) => s.addToCart);
   const syncPromotions = useCartStore((s) => s.syncPromotions);
 
   useEffect(() => {
-    getProducts()
-      .then((r) => setProducts(Array.isArray(r) ? r : r.data || []))
-      .finally(() => setLoading(false));
-
-    // Load active promotions silently (no blocking spinner)
-    getActivePromotions()
-      .then((data) => {
-        const promos = Array.isArray(data) ? data : [];
-        setActivePromos(promos);
-        syncPromotions(promos);
-      })
-      .catch(() => setActivePromos([]));
-  }, [syncPromotions]);
+    if (promosQuery.data) syncPromotions(promosQuery.data);
+  }, [promosQuery.data, syncPromotions]);
 
   const categories = useMemo(() => {
-    return ["Todos", ...new Set(products.map((p) => (p as any).category?.name || (p as any).category || "Criollo"))];
+    return [
+      'Todos',
+      ...new Set(products.map((p) => getCategoryName(p, 'Criollo'))),
+    ];
   }, [products]);
 
   const filtered = useMemo(() => {
     let result = [...products];
 
     // Filtrar por categoría
-    if (category !== "Todos") {
-      result = result.filter((p) => ((p as any).category?.name || (p as any).category || "Criollo") === category);
+    if (category !== 'Todos') {
+      result = result.filter((p) => getCategoryName(p, 'Criollo') === category);
     }
 
     // Filtrar por búsqueda
@@ -61,7 +64,7 @@ export const MenuProducts = () => {
       result = result.filter(
         (p) =>
           p.name.toLowerCase().includes(q) ||
-          (p.description && p.description.toLowerCase().includes(q))
+          (p.description && p.description.toLowerCase().includes(q)),
       );
     }
 
@@ -69,9 +72,9 @@ export const MenuProducts = () => {
     result = result.filter((p) => Number(p.price) <= priceRange[1]);
 
     // Ordenar
-    if (sortOrder === "asc") {
+    if (sortOrder === 'asc') {
       result.sort((a, b) => Number(a.price) - Number(b.price));
-    } else if (sortOrder === "desc") {
+    } else if (sortOrder === 'desc') {
       result.sort((a, b) => Number(b.price) - Number(a.price));
     }
 
@@ -82,8 +85,8 @@ export const MenuProducts = () => {
     (p: Product) => {
       const categoryId: string | undefined =
         p.categoryId ??
-        (typeof p.category === "object" && p.category !== null
-          ? (p.category as any).id
+        (typeof p.category === 'object' && p.category !== null
+          ? p.category.id
           : undefined);
 
       const promo = findPromoForProduct(activePromos, p.id, categoryId);
@@ -102,24 +105,39 @@ export const MenuProducts = () => {
         minQuantity: promo?.minQuantity,
         promoLabel: promo ? getPromoLabel(promo) : undefined,
         promoTitle: promo?.title,
-        imageUrl: (p as any).imageUrl || (p as any).image,
-        category:
-          typeof (p as any).category === "object" && (p as any).category !== null
-            ? (p as any).category?.name
-            : (p as any).category || "Criollo",
+        imageUrl: p.imageUrl || p.image,
+        category: getCategoryName(p, 'Criollo'),
         categoryId,
       });
 
       toast.success(`${p.name} añadido`, {
-        style: { background: "var(--card)", color: "var(--foreground)", border: "1px solid var(--ember)" },
+        style: {
+          background: 'var(--card)',
+          color: 'var(--foreground)',
+          border: '1px solid var(--ember)',
+        },
       });
     },
-    [addToCart, activePromos]
+    [addToCart, activePromos],
   );
 
   return (
     <div className="w-full bg-background text-foreground min-h-screen overflow-hidden">
       <MenuHero />
+      {(productsQuery.isError || promosQuery.isError) && (
+        <div role="alert" className="max-w-7xl mx-auto p-4 text-destructive">
+          No se pudo actualizar el catálogo o las promociones.{' '}
+          <button
+            onClick={() => {
+              void productsQuery.refetch();
+              void promosQuery.refetch();
+            }}
+            className="underline"
+          >
+            Reintentar
+          </button>
+        </div>
+      )}
 
       <main className="max-w-7xl mx-auto space-y-8 pb-32 pt-16 px-4 sm:px-6 lg:px-8 relative z-30">
         <MenuFilter
@@ -138,7 +156,10 @@ export const MenuProducts = () => {
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="h-96 rounded-2xl bg-muted border border-border overflow-hidden animate-pulse">
+              <div
+                key={i}
+                className="h-96 rounded-2xl bg-muted border border-border overflow-hidden animate-pulse"
+              >
                 <div className="h-48 bg-muted-foreground/10" />
                 <div className="p-5 space-y-3">
                   <div className="h-4 w-3/4 bg-muted-foreground/10 rounded" />
@@ -150,9 +171,17 @@ export const MenuProducts = () => {
           </div>
         ) : filtered.length === 0 ? (
           <div className="text-center py-20">
-            <p className="text-muted-foreground text-lg">No se encontraron productos</p>
-            <button onClick={() => { setCategory("Todos"); setSearchQuery(""); setPriceRange([0, 500]); }}
-              className="mt-4 text-ember hover:underline text-sm font-semibold">
+            <p className="text-muted-foreground text-lg">
+              No se encontraron productos
+            </p>
+            <button
+              onClick={() => {
+                setCategory('Todos');
+                setSearchQuery('');
+                setPriceRange([0, 500]);
+              }}
+              className="mt-4 text-ember hover:underline text-sm font-semibold"
+            >
               Limpiar filtros
             </button>
           </div>
@@ -187,3 +216,8 @@ export const MenuProducts = () => {
     </div>
   );
 };
+export const MenuProducts = () => (
+  <QueryProvider>
+    <MenuProductsContent />
+  </QueryProvider>
+);

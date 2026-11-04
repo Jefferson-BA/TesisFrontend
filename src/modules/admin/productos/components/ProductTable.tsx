@@ -1,50 +1,73 @@
-import { useState } from "react";
-import { toast } from "sonner";
-import { Edit, Trash2, X, CheckCircle2, XCircle, Save } from "lucide-react";
-import { deleteProduct, updateProduct } from "@/modules/admin/productos/services/product.service";
+import type { Category } from '@/modules/catalog/interfaces/category.interface';
+import type { Product } from '@/modules/catalog/interfaces/product.interface';
+import {
+  deleteProduct,
+  updateProduct,
+} from '@/modules/catalog/services/product.service';
+import { CheckCircle2, Edit, Save, Trash2, X, XCircle } from 'lucide-react';
+import { useState } from 'react';
+import { toast } from 'sonner';
 
 interface ProductTableProps {
-  products: any[];
-  categories: any[];
+  products: Product[];
+  categories: Category[];
   onRefresh: () => void | Promise<void>;
 }
 
-export default function ProductTable({ products, categories, onRefresh }: ProductTableProps) {
-  const [editingProduct, setEditingProduct] = useState<any>(null);
+export default function ProductTable({
+  products,
+  categories,
+  onRefresh,
+}: ProductTableProps) {
+  const [editingProduct, setEditingProduct] = useState<
+    (Omit<Product, 'category'> & { categoryId: string }) | null
+  >(null);
 
   const handleDelete = async (id: string) => {
-    if (!confirm("¿Seguro que deseas eliminar este producto?")) return;
+    if (!confirm('¿Seguro que deseas eliminar este producto?')) return;
     try {
       await deleteProduct(id);
-      toast.success("Producto eliminado correctamente");
+      toast.success('Producto eliminado correctamente');
       await onRefresh();
     } catch (error) {
       console.error(error);
-      toast.error("Error al eliminar producto");
+      toast.error('Error al eliminar producto');
     }
   };
 
-  const handleEdit = (product: any) => {
+  const handleEdit = (product: Product) => {
     setEditingProduct({
-      id: product.id || product._id,
-      name: product.name || "",
-      description: product.description || "",
-      price: product.price || "",
-      categoryId: product.categoryId || product.category?.id || "",
-      imageUrl: product.imageUrl || "",
+      id: product.id,
+      name: product.name || '',
+      description: product.description || '',
+      price: product.price || '',
+      categoryId:
+        product.categoryId ||
+        (typeof product.category === 'object' ? product.category.id : '') ||
+        '',
+      imageUrl: product.imageUrl || '',
       // Determinar disponibilidad: priorizar isAvailable, fallback a stock
-      isAvailable: product.isAvailable !== undefined
-        ? Boolean(product.isAvailable)
-        : (product.stock !== undefined ? product.stock > 0 : true),
+      isAvailable:
+        product.isAvailable !== undefined
+          ? Boolean(product.isAvailable)
+          : product.stock !== undefined
+            ? product.stock > 0
+            : true,
     });
   };
 
-  const handleChange = (e: any) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >,
+  ) => {
+    if (!editingProduct) return;
     setEditingProduct({ ...editingProduct, [e.target.name]: e.target.value });
   };
 
-  const handleUpdate = async (e: any) => {
+  const handleUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!editingProduct) return;
     try {
       await updateProduct(editingProduct.id, {
         name: editingProduct.name,
@@ -54,17 +77,17 @@ export default function ProductTable({ products, categories, onRefresh }: Produc
         imageUrl: editingProduct.imageUrl,
         isAvailable: editingProduct.isAvailable,
       });
-      toast.success("Producto actualizado correctamente ✓");
+      toast.success('Producto actualizado correctamente ✓');
       setEditingProduct(null);
       await onRefresh();
     } catch (error) {
       console.error(error);
-      toast.error("Error al actualizar producto");
+      toast.error('Error al actualizar producto');
     }
   };
 
   /** Evalúa si el producto está disponible (compatible con isAvailable o stock) */
-  const isProductAvailable = (product: any): boolean => {
+  const isProductAvailable = (product: Product): boolean => {
     if (product.isAvailable !== undefined) return Boolean(product.isAvailable);
     if (product.stock !== undefined) return product.stock > 0;
     return true;
@@ -77,7 +100,7 @@ export default function ProductTable({ products, categories, onRefresh }: Produc
           Catálogo de Productos
         </h2>
         <span className="text-xs font-semibold text-muted-foreground bg-secondary border border-border px-3 py-1.5 rounded-lg uppercase tracking-wider">
-          {products.length} producto{products.length !== 1 ? "s" : ""}
+          {products.length} producto{products.length !== 1 ? 's' : ''}
         </span>
       </div>
 
@@ -136,7 +159,9 @@ export default function ProductTable({ products, categories, onRefresh }: Produc
 
             {/* Categoría – select con nombres (NO muestra UUID) */}
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-semibold text-foreground">Categoría</label>
+              <label className="text-sm font-semibold text-foreground">
+                Categoría
+              </label>
               <select
                 name="categoryId"
                 value={editingProduct.categoryId}
@@ -145,7 +170,7 @@ export default function ProductTable({ products, categories, onRefresh }: Produc
               >
                 <option value="">Selecciona una categoría</option>
                 {categories.map((cat) => (
-                  <option key={cat.id || cat._id} value={cat.id || cat._id}>
+                  <option key={cat.id} value={cat.id}>
                     {cat.name}
                   </option>
                 ))}
@@ -154,16 +179,21 @@ export default function ProductTable({ products, categories, onRefresh }: Produc
 
             {/* Disponibilidad – radio buttons estilizados */}
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-semibold text-foreground">Disponibilidad</label>
+              <label className="text-sm font-semibold text-foreground">
+                Disponibilidad
+              </label>
               <div className="flex gap-3 h-11 items-center">
                 <button
                   type="button"
-                  onClick={() => setEditingProduct({ ...editingProduct, isAvailable: true })}
+                  onClick={() =>
+                    setEditingProduct({ ...editingProduct, isAvailable: true })
+                  }
                   className={`
                     flex items-center gap-2 px-4 h-full rounded-lg border font-semibold text-sm transition-all
-                    ${editingProduct.isAvailable
-                      ? "bg-emerald-500/15 border-emerald-500/50 text-emerald-600 dark:text-emerald-400 ring-1 ring-emerald-500/30"
-                      : "bg-background border-input text-muted-foreground hover:border-emerald-400/40"
+                    ${
+                      editingProduct.isAvailable
+                        ? 'bg-emerald-500/15 border-emerald-500/50 text-emerald-600 dark:text-emerald-400 ring-1 ring-emerald-500/30'
+                        : 'bg-background border-input text-muted-foreground hover:border-emerald-400/40'
                     }
                   `}
                 >
@@ -173,12 +203,15 @@ export default function ProductTable({ products, categories, onRefresh }: Produc
 
                 <button
                   type="button"
-                  onClick={() => setEditingProduct({ ...editingProduct, isAvailable: false })}
+                  onClick={() =>
+                    setEditingProduct({ ...editingProduct, isAvailable: false })
+                  }
                   className={`
                     flex items-center gap-2 px-4 h-full rounded-lg border font-semibold text-sm transition-all
-                    ${!editingProduct.isAvailable
-                      ? "bg-red-500/15 border-red-500/50 text-red-600 dark:text-red-400 ring-1 ring-red-500/30"
-                      : "bg-background border-input text-muted-foreground hover:border-red-400/40"
+                    ${
+                      !editingProduct.isAvailable
+                        ? 'bg-red-500/15 border-red-500/50 text-red-600 dark:text-red-400 ring-1 ring-red-500/30'
+                        : 'bg-background border-input text-muted-foreground hover:border-red-400/40'
                     }
                   `}
                 >
@@ -190,7 +223,9 @@ export default function ProductTable({ products, categories, onRefresh }: Produc
 
             {/* URL imagen */}
             <div className="md:col-span-2 flex flex-col gap-1.5">
-              <label className="text-sm font-semibold text-foreground">URL de la Imagen</label>
+              <label className="text-sm font-semibold text-foreground">
+                URL de la Imagen
+              </label>
               <input
                 name="imageUrl"
                 value={editingProduct.imageUrl}
@@ -202,7 +237,9 @@ export default function ProductTable({ products, categories, onRefresh }: Produc
 
             {/* Descripción */}
             <div className="md:col-span-2 flex flex-col gap-1.5">
-              <label className="text-sm font-semibold text-foreground">Descripción</label>
+              <label className="text-sm font-semibold text-foreground">
+                Descripción
+              </label>
               <textarea
                 name="description"
                 value={editingProduct.description}
@@ -251,28 +288,39 @@ export default function ProductTable({ products, categories, onRefresh }: Produc
                 const available = isProductAvailable(product);
                 return (
                   <tr
-                    key={product.id || product._id}
+                    key={product.id}
                     className="border-b border-border hover:bg-muted/30 transition-colors group"
                   >
-                    <td className="py-4 font-bold text-foreground">{product.name}</td>
-                    <td className="text-muted-foreground">
-                      {product.category?.name || product.category || "Sin categoría"}
+                    <td className="py-4 font-bold text-foreground">
+                      {product.name}
                     </td>
-                    <td className="font-mono">S/ {Number(product.price).toFixed(2)}</td>
+                    <td className="text-muted-foreground">
+                      {typeof product.category === 'object'
+                        ? product.category.name
+                        : product.category || 'Sin categoría'}
+                    </td>
+                    <td className="font-mono">
+                      S/ {Number(product.price).toFixed(2)}
+                    </td>
                     <td>
                       <span
                         className={`
                           inline-flex items-center gap-1.5 px-3 py-1 rounded-lg font-bold text-xs border
-                          ${available
-                            ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
-                            : "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20"
+                          ${
+                            available
+                              ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
+                              : 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20'
                           }
                         `}
                       >
                         {available ? (
-                          <><CheckCircle2 className="w-3 h-3" /> Disponible</>
+                          <>
+                            <CheckCircle2 className="w-3 h-3" /> Disponible
+                          </>
                         ) : (
-                          <><XCircle className="w-3 h-3" /> No disponible</>
+                          <>
+                            <XCircle className="w-3 h-3" /> No disponible
+                          </>
                         )}
                       </span>
                     </td>
@@ -286,7 +334,7 @@ export default function ProductTable({ products, categories, onRefresh }: Produc
                           <Edit className="w-4 h-4" />
                         </button>
                         <button
-                          onClick={() => handleDelete(product.id || product._id)}
+                          onClick={() => handleDelete(product.id)}
                           title="Eliminar producto"
                           className="p-2 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
                         >
@@ -299,7 +347,10 @@ export default function ProductTable({ products, categories, onRefresh }: Produc
               })
             ) : (
               <tr>
-                <td colSpan={5} className="text-center py-12 text-muted-foreground">
+                <td
+                  colSpan={5}
+                  className="text-center py-12 text-muted-foreground"
+                >
                   No hay productos cargados en el catálogo.
                 </td>
               </tr>
@@ -309,4 +360,4 @@ export default function ProductTable({ products, categories, onRefresh }: Produc
       </div>
     </section>
   );
-}
+}

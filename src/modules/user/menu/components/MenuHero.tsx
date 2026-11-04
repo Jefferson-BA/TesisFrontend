@@ -1,17 +1,17 @@
-"use client";
+import type { Variants } from 'framer-motion';
 
-import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import {
-  motion,
   AnimatePresence,
+  motion,
   useMotionValue,
   useSpring,
   useTransform,
-} from "framer-motion";
+} from 'framer-motion';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 // 🟢 Agregamos UtensilsCrossed y Compass para los tipos de comida adicionales
-import { Flame, Beef, Sparkles, UtensilsCrossed, Compass } from "lucide-react";
-import { CounterNumber } from "./CounterNumber";
-import { cn } from "@/lib/utils";
+import { cn } from '@/lib/utils';
+import { Beef, Compass, Flame, Sparkles, UtensilsCrossed } from 'lucide-react';
+import { CounterNumber } from './CounterNumber';
 
 // ─────────────────────────────────────────────────────────
 // CONFIG — todo el contenido vive aquí, nada hardcodeado en el JSX
@@ -19,60 +19,60 @@ import { cn } from "@/lib/utils";
 
 const SLIDES = [
   {
-    src: "/imageLanding/parrilla.avif",
+    src: '/imageLanding/parrilla.avif',
     // 🟢 Cambiamos la ruta string 'thumb' por la referencia directa del Icono
     icon: Flame,
-    alt: "Parrilla",
-    kicker: "Sabor al fuego",
-    quote: "La brasa perfecta no se apura, se domina.",
+    alt: 'Parrilla',
+    kicker: 'Sabor al fuego',
+    quote: 'La brasa perfecta no se apura, se domina.',
   },
   {
-    src: "/imageLanding/criollo.avif",
+    src: '/imageLanding/criollo.avif',
     icon: UtensilsCrossed,
-    alt: "Criollo",
-    kicker: "Tradición peruana",
-    quote: "Cada receta, una historia de familia.",
+    alt: 'Criollo',
+    kicker: 'Tradición peruana',
+    quote: 'Cada receta, una historia de familia.',
   },
   {
-    src: "/imageLanding/arabe.avif",
+    src: '/imageLanding/arabe.avif',
     icon: Compass,
-    alt: "Árabe",
-    kicker: "Especias de oriente",
-    quote: "Donde cada especia cuenta una ruta distinta.",
+    alt: 'Árabe',
+    kicker: 'Especias de oriente',
+    quote: 'Donde cada especia cuenta una ruta distinta.',
   },
 ] as const;
 
 const SLIDE_DURATION = 7000;
 
 const STATS = [
-  { value: 500, prefix: "+", label: "Eventos", accent: true },
-  { value: 3, prefix: "", label: "Estilos", accent: false },
+  { value: 500, prefix: '+', label: 'Eventos', accent: true },
+  { value: 3, prefix: '', label: 'Estilos', accent: false },
 ] as const;
 
-const EXTRA_STAT = { value: "100%", label: "A tu Medida" };
+const EXTRA_STAT = { value: '100%', label: 'A tu Medida' };
 
 const FLOATING_ICONS = [
-  { icon: Flame, position: "top-1/4 left-[6%]", delay: "0s" },
-  { icon: Beef, position: "bottom-1/4 left-[10%]", delay: "1s" },
+  { icon: Flame, position: 'top-1/4 left-[6%]', delay: '0s' },
+  { icon: Beef, position: 'bottom-1/4 left-[10%]', delay: '1s' },
 ] as const;
 
-const imageVariants: Record<string, any> = {
-  enter: { opacity: 0, scale: 1.1, clipPath: "circle(0% at 50% 45%)" },
+const imageVariants: Variants = {
+  enter: { opacity: 0, scale: 1.1, clipPath: 'circle(0% at 50% 45%)' },
   center: {
     opacity: 1,
     scale: 1,
-    clipPath: "circle(75% at 50% 45%)",
+    clipPath: 'circle(75% at 50% 45%)',
     transition: { duration: 1.05, ease: [0.22, 1, 0.36, 1] },
   },
   exit: {
     opacity: 1,
     scale: 1.03,
-    clipPath: "circle(75% at 50% 45%)",
-    transition: { duration: 0.4, ease: "easeIn" },
+    clipPath: 'circle(75% at 50% 45%)',
+    transition: { duration: 0.4, ease: 'easeIn' },
   },
 };
 
-const contentVariants: Record<string, any> = {
+const contentVariants: Variants = {
   enter: { opacity: 0, y: 16 },
   center: { opacity: 1, y: 0, transition: { duration: 0.5, delay: 0.4 } },
   exit: { opacity: 0, y: -16, transition: { duration: 0.25 } },
@@ -120,8 +120,8 @@ export const MenuHero = () => {
         const fr = frameRef.current.getBoundingClientRect();
         const px = ((e.clientX - fr.left) / fr.width) * 100;
         const py = ((e.clientY - fr.top) / fr.height) * 100;
-        frameRef.current.style.setProperty("--mx", `${px}%`);
-        frameRef.current.style.setProperty("--my", `${py}%`);
+        frameRef.current.style.setProperty('--mx', `${px}%`);
+        frameRef.current.style.setProperty('--my', `${py}%`);
       }
     },
     [mvX, mvY],
@@ -135,7 +135,10 @@ export const MenuHero = () => {
 
   useEffect(() => {
     if (paused) return;
-    const t = setInterval(() => setSlide((p) => (p + 1) % SLIDES.length), SLIDE_DURATION);
+    const t = setInterval(
+      () => setSlide((p) => (p + 1) % SLIDES.length),
+      SLIDE_DURATION,
+    );
     return () => clearInterval(t);
   }, [paused]);
 
@@ -163,7 +166,10 @@ export const MenuHero = () => {
         {FLOATING_ICONS.map(({ icon: Icon, position, delay }, i) => (
           <div
             key={i}
-            className={cn("absolute p-3 rounded-full menu-hero-float-icon hidden md:block animate-bounce-soft", position)}
+            className={cn(
+              'absolute p-3 rounded-full menu-hero-float-icon hidden md:block animate-bounce-soft',
+              position,
+            )}
             style={{ animationDelay: delay }}
           >
             <Icon className="w-7 h-7" />
@@ -176,7 +182,10 @@ export const MenuHero = () => {
 
       <div className="relative z-20 w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[0.85fr_1.15fr] gap-10 lg:gap-14 items-center py-16 lg:py-0">
         {/* ───────────── Columna izquierda: texto ───────────── */}
-        <motion.div style={{ x: parallaxX, y: parallaxY }} className="relative text-center lg:text-left">
+        <motion.div
+          style={{ x: parallaxX, y: parallaxY }}
+          className="relative text-center lg:text-left"
+        >
           <motion.span
             className="menu-hero-badge"
             initial={{ opacity: 0, y: -10 }}
@@ -191,9 +200,13 @@ export const MenuHero = () => {
             <span className="inline-block overflow-hidden align-top">
               <motion.span
                 className="inline-block"
-                initial={{ y: "110%" }}
+                initial={{ y: '110%' }}
                 animate={{ y: 0 }}
-                transition={{ duration: 0.7, delay: revealDelay.title, ease: [0.22, 1, 0.36, 1] }}
+                transition={{
+                  duration: 0.7,
+                  delay: revealDelay.title,
+                  ease: [0.22, 1, 0.36, 1],
+                }}
               >
                 Nuestro
               </motion.span>
@@ -202,7 +215,7 @@ export const MenuHero = () => {
             <span className="inline-block overflow-hidden align-top">
               <motion.span
                 className="inline-block font-display italic font-normal menu-hero-title-accent"
-                initial={{ y: "110%" }}
+                initial={{ y: '110%' }}
                 animate={{ y: 0 }}
                 transition={{
                   duration: 0.7,
@@ -221,7 +234,8 @@ export const MenuHero = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: revealDelay.paragraph }}
           >
-            Sinfonía de sabores exclusivos. Parrilla, cocina criolla y el misticismo de la gastronomía árabe.
+            Sinfonía de sabores exclusivos. Parrilla, cocina criolla y el
+            misticismo de la gastronomía árabe.
           </motion.p>
 
           {/* Stats */}
@@ -233,7 +247,12 @@ export const MenuHero = () => {
           >
             {STATS.map((stat) => (
               <div key={stat.label} className="menu-hero-stat">
-                <h4 className={cn("menu-hero-stat-value", !stat.accent && "menu-hero-stat-value-neutral")}>
+                <h4
+                  className={cn(
+                    'menu-hero-stat-value',
+                    !stat.accent && 'menu-hero-stat-value-neutral',
+                  )}
+                >
                   {stat.prefix}
                   <CounterNumber value={stat.value} />
                 </h4>
@@ -254,14 +273,18 @@ export const MenuHero = () => {
           className="relative h-[400px] sm:h-[500px] lg:h-[calc(100vh-13rem)] lg:max-h-[760px] lg:min-h-[560px]"
           initial={{ opacity: 0, scale: 0.97 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.7, delay: revealDelay.media, ease: [0.22, 1, 0.36, 1] }}
+          transition={{
+            duration: 0.7,
+            delay: revealDelay.media,
+            ease: [0.22, 1, 0.36, 1],
+          }}
         >
           <div className="hero-media-wrap">
             {Array.from({ length: otherStyles }).map((_, i) => (
               <div
                 key={`stack-${i}`}
                 className="hero-stack-card"
-                style={{ "--stack-i": i + 1 } as React.CSSProperties}
+                style={{ '--stack-i': i + 1 } as React.CSSProperties}
                 aria-hidden="true"
               />
             ))}
@@ -279,7 +302,7 @@ export const MenuHero = () => {
                   key={current.src}
                   src={current.src}
                   alt={current.alt}
-                  loading={slide === 0 ? "eager" : "lazy"}
+                  loading={slide === 0 ? 'eager' : 'lazy'}
                   variants={imageVariants}
                   initial="enter"
                   animate="center"
@@ -298,9 +321,11 @@ export const MenuHero = () => {
                   initial="enter"
                   animate="center"
                   exit="exit"
-                  style={{ transform: "translateZ(40px)" }}
+                  style={{ transform: 'translateZ(40px)' }}
                 >
-                  <span className="menu-hero-quote-kicker">{current.kicker}</span>
+                  <span className="menu-hero-quote-kicker">
+                    {current.kicker}
+                  </span>
                   <p>{current.quote}</p>
                 </motion.div>
               </AnimatePresence>
@@ -325,22 +350,27 @@ export const MenuHero = () => {
                   onClick={() => goTo(i)}
                   aria-label={`Ver estilo ${img.alt}`}
                   aria-pressed={isActive}
-                  className={cn("menu-hero-thumb", isActive && "menu-hero-thumb-active")}
+                  className={cn(
+                    'menu-hero-thumb',
+                    isActive && 'menu-hero-thumb-active',
+                  )}
                 >
                   {/* 🟢 Reemplazamos la etiqueta <img> por un contenedor flex para el icono */}
                   <span className="menu-hero-thumb-image-wrap flex items-center justify-center bg-black/50 backdrop-blur-md rounded-lg border border-white/10">
-                    <ThumbIcon 
+                    <ThumbIcon
                       className={cn(
-                        "w-5 h-5 transition-transform duration-300", 
-                        isActive ? "text-amber-500 scale-110" : "text-zinc-400"
-                      )} 
+                        'w-5 h-5 transition-transform duration-300',
+                        isActive ? 'text-amber-500 scale-110' : 'text-zinc-400',
+                      )}
                     />
                   </span>
                   <span className="menu-hero-thumb-meta">
-                    <span className={cn(
-                      "menu-hero-thumb-label truncate font-medium transition-colors",
-                      isActive ? "text-amber-500" : "text-zinc-300"
-                    )}>
+                    <span
+                      className={cn(
+                        'menu-hero-thumb-label truncate font-medium transition-colors',
+                        isActive ? 'text-amber-500' : 'text-zinc-300',
+                      )}
+                    >
                       {img.alt}
                     </span>
                     <span className="menu-hero-progress-track">
@@ -348,11 +378,11 @@ export const MenuHero = () => {
                         <motion.span
                           key={`${i}-${paused}`}
                           className="menu-hero-progress-fill"
-                          initial={{ width: "0%" }}
-                          animate={{ width: paused ? "100%" : "100%" }}
+                          initial={{ width: '0%' }}
+                          animate={{ width: paused ? '100%' : '100%' }}
                           transition={{
                             duration: paused ? 0.4 : SLIDE_DURATION / 1000,
-                            ease: paused ? "easeOut" : "linear",
+                            ease: paused ? 'easeOut' : 'linear',
                           }}
                         />
                       )}
@@ -367,18 +397,22 @@ export const MenuHero = () => {
 
       {/* Scroll indicator */}
       <motion.button
-        onClick={() => window.scrollTo({ top: window.innerHeight, behavior: "smooth" })}
+        onClick={() =>
+          window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })
+        }
         className="absolute bottom-6 left-1/2 -translate-x-1/2 text-muted-foreground z-20 flex flex-col items-center gap-1.5 cursor-pointer bg-transparent border-none outline-none"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.6, delay: 0.9 }}
       >
-        <span className="text-[9px] tracking-[0.3em] uppercase text-ember/40">Explorar</span>
+        <span className="text-[9px] tracking-[0.3em] uppercase text-ember/40">
+          Explorar
+        </span>
         <span className="relative h-8 w-px bg-border overflow-hidden">
           <motion.span
             className="absolute inset-x-0 top-0 h-1/2 bg-ember"
-            animate={{ y: ["-100%", "200%"] }}
-            transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+            animate={{ y: ['-100%', '200%'] }}
+            transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
           />
         </span>
       </motion.button>

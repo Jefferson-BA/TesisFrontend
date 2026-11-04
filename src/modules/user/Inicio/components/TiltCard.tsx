@@ -1,9 +1,7 @@
 // src/modules/user/Inicio/components/TiltCard.tsx
 
-"use client";
-
-import { useRef, useState, useCallback } from "react";
-import { cn } from "@/lib/utils";
+import { cn } from '@/lib/utils';
+import { useCallback, useRef, useState } from 'react';
 
 interface TiltCardProps {
   children: React.ReactNode;
@@ -17,7 +15,7 @@ export function TiltCard({
   children,
   delay = 0,
   inView,
-  glowColor = "rgba(234,179,8,0.25)",
+  glowColor = 'rgba(234,179,8,0.25)',
   className,
 }: TiltCardProps) {
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -34,7 +32,7 @@ export function TiltCard({
     if (innerRef.current) {
       innerRef.current.style.transform = `perspective(900px) rotateX(${-y * 12}deg) rotateY(${x * 12}deg) translateZ(8px)`;
     }
-    const imgEl = el.querySelector<HTMLElement>(".tilt-img");
+    const imgEl = el.querySelector<HTMLElement>('.tilt-img');
     if (imgEl) {
       imgEl.style.transform = `scale(1.1) translate(${x * -14}px, ${y * -14}px)`;
     }
@@ -44,19 +42,16 @@ export function TiltCard({
     setHovered(false);
     if (innerRef.current) {
       innerRef.current.style.transform =
-        "perspective(900px) rotateX(0deg) rotateY(0deg) translateZ(0px)";
+        'perspective(900px) rotateX(0deg) rotateY(0deg) translateZ(0px)';
     }
-    const imgEl = wrapRef.current?.querySelector<HTMLElement>(".tilt-img");
-    if (imgEl) imgEl.style.transform = "scale(1) translate(0, 0)";
+    const imgEl = wrapRef.current?.querySelector<HTMLElement>('.tilt-img');
+    if (imgEl) imgEl.style.transform = 'scale(1) translate(0, 0)';
   }, []);
 
   return (
     <div
       ref={wrapRef}
-      className={cn(
-        "relative",
-        inView ? "animate-fade-in-up" : "opacity-0"
-      )}
+      className={cn('relative', inView ? 'animate-fade-in-up' : 'opacity-0')}
       style={{ animationDelay: `${delay}s` }}
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setHovered(true)}
@@ -76,17 +71,17 @@ export function TiltCard({
       <div
         ref={innerRef}
         className={cn(
-          "relative rounded-3xl overflow-hidden flex flex-col h-full transition-all duration-350",
+          'relative rounded-3xl overflow-hidden flex flex-col h-full transition-all duration-350',
           // Modo claro temático
-          "bg-[#fffdf9] border-[#e0d5c5]",
+          'bg-[#fffdf9] border-[#e0d5c5]',
           // Modo oscuro
-          "dark:bg-card dark:border-border",
+          'dark:bg-card dark:border-border',
           hovered &&
-            "border-ember/35 shadow-[0_30px_70px_rgba(0,0,0,0.1)] dark:shadow-[0_30px_70px_rgba(0,0,0,0.6)]",
-          !hovered && "shadow-lg shadow-amber-900/5 dark:shadow-none",
-          className
+            'border-ember/35 shadow-[0_30px_70px_rgba(0,0,0,0.1)] dark:shadow-[0_30px_70px_rgba(0,0,0,0.6)]',
+          !hovered && 'shadow-lg shadow-amber-900/5 dark:shadow-none',
+          className,
         )}
-        style={{ transformStyle: "preserve-3d" }}
+        style={{ transformStyle: 'preserve-3d' }}
       >
         {children}
       </div>

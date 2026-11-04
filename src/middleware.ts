@@ -1,61 +1,54 @@
-// src/middleware.ts
-import type { APIContext, MiddlewareNext } from "astro";
+import { getDefaultRouteByRole } from '@/lib/auth-utils';
+import { sessionUserSchema } from '@/modules/auth/types/auth.types';
+import { backendFetch, clearSession, SESSION_COOKIE } from '@/server/backend';
+import type { APIContext, MiddlewareNext } from 'astro';
+import { z } from 'zod';
 
-export async function onRequest({ url, cookies, redirect }: APIContext, next: MiddlewareNext) {
-  const pathname = url.pathname;
-  const isAdminPage = pathname.startsWith("/admin");
-  const isSuperAdminPage = pathname.startsWith("/superadmin");
-  const isAuthPage = pathname === "/login" || pathname === "/register";
-
-  // 1. Obtenemos el rol y lo saneamos contra cookies corruptas
-  let userRole = cookies.get("user-role")?.value?.toLowerCase()?.trim();
-
-  if (userRole === "[object object]" || userRole === "undefined" || userRole === "null") {
-    cookies.delete("user-role", { path: "/" });
-    userRole = undefined;
-  }
-
-  // 2. Redirección inteligente si ya está logueado e intenta entrar a /login o /register
-  if (isAuthPage && userRole) {
-    if (userRole === "superadmin") {
-      return redirect("/superadmin/dashboard");
-    }
-    if (userRole === "admin") {
-      return redirect("/admin/dashboard");
-    }
-  }
-
-  // 3. Manejo de URLs base sin sub-ruta (/admin o /admin/ -> /admin/dashboard)
-  if (pathname === "/admin" || pathname === "/admin/") {
-    if (userRole === "admin" || userRole === "superadmin") {
-      return redirect("/admin/dashboard");
-    }
-    return redirect("/login");
-  }
-
-  // 4. Manejo de URLs base sin sub-ruta (/superadmin o /superadmin/ -> /superadmin/dashboard)
-  if (pathname === "/superadmin" || pathname === "/superadmin/") {
-    if (userRole === "superadmin") {
-      return redirect("/superadmin/dashboard");
-    }
-    return userRole === "admin" ? redirect("/admin/dashboard") : redirect("/login");
-  }
-
-  // 5. Protección estricta de rutas Superadmin (/superadmin/*)
-  if (isSuperAdminPage) {
-    if (userRole !== "superadmin") {
-      // Si un Admin intenta entrar al panel de Superadmin, se le redirige a su panel operativo
-      return userRole === "admin" ? redirect("/admin/dashboard") : redirect("/login");
+export async function onRequest(
+  { url, cookies, redirect }: APIContext,
+  next: MiddlewareNext,
+) {
+  const path = url.pathname;
+  const admin = /^\/admin(?:\/|$)/.test(path);
+  const superadmin = /^\/superadmin(?:\/|$)/.test(path);
+  const userPage = /^\/user(?:\/|$)/.test(path) || path === '/checkout';
+  const authPage = path === '/login' || path === '/register';
+  if (!admin && !superadmin && !userPage && !authPage) return next();
+  const token = cookies.get(SESSION_COOKIE)?.value;
+  let role: 'user' | 'admin' | 'superadmin' | undefined;
+  if (token) {
+    try {
+      const response = await backendFetch('auth/profile', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (response.status === 401) clearSession(cookies);
+      else if (!response.ok) throw new Error('No se pudo verificar la sesión');
+      else
+        role = z
+          .object({ user: sessionUserSchema })
+          .parse(await response.json()).user.role;
+    } catch {
+      return new Response(
+        'No se pudo verificar tu sesión. Intenta nuevamente en unos momentos.',
+        {
+          status: 503,
+          headers: {
+            'Cache-Control': 'no-store',
+            'Content-Type': 'text/plain; charset=utf-8',
+          },
+        },
+      );
     }
   }
-
-  // 6. Protección de rutas Admin (/admin/*)
-  // Superadmin tiene acceso maestro también a las operaciones del Admin convencional
-  if (isAdminPage) {
-    if (userRole !== "admin" && userRole !== "superadmin") {
-      return redirect("/login");
-    }
+  if (authPage) return role ? redirect(getDefaultRouteByRole(role)) : next();
+  if (!role) return redirect('/login');
+  if (superadmin && role !== 'superadmin')
+    return redirect(getDefaultRouteByRole(role));
+  if (admin && role === 'user') return redirect('/');
+  if (['/admin', '/admin/', '/superadmin', '/superadmin/'].includes(path)) {
+    return redirect(superadmin ? '/superadmin/dashboard' : '/admin/dashboard');
   }
-
-  return next();
+  const response = await next();
+  response.headers.set('Cache-Control', 'private, no-store');
+  return response;
 }

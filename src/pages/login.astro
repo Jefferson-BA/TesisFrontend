@@ -10,21 +10,21 @@ import { Toaster } from 'sonner';
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Login | Hojas de Parra Spitz</title>
     <script is:inline>
-      (function() {
+      (function () {
         try {
-          const rawZustand = localStorage.getItem("deparraspitz-theme");
-          let theme = "dark";
+          const rawZustand = localStorage.getItem('deparraspitz-theme');
+          let theme = 'dark';
           if (rawZustand) {
             const parsed = JSON.parse(rawZustand);
             if (parsed?.state?.theme) theme = parsed.state.theme;
           } else {
-            const rawSimple = localStorage.getItem("theme");
+            const rawSimple = localStorage.getItem('theme');
             if (rawSimple) theme = rawSimple;
           }
-          if (theme === "dark") {
-            document.documentElement.classList.add("dark");
+          if (theme === 'dark') {
+            document.documentElement.classList.add('dark');
           } else {
-            document.documentElement.classList.remove("dark");
+            document.documentElement.classList.remove('dark');
           }
         } catch (e) {}
       })();
@@ -34,7 +34,7 @@ import { Toaster } from 'sonner';
     <main class="min-h-screen">
       <LoginForm client:only="react" />
     </main>
-    
+
     <Toaster client:only="react" richColors position="top-right" />
   </body>
 </html>

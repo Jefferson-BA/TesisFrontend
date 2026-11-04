@@ -1,361 +1,318 @@
-// src/modules/user/checkout/components/PaymentReservationPage.tsx
-
-"use client";
-
-import { useState, useEffect, useRef } from "react";
-import { useUser } from "@/modules/user/hooks/useUser";
-import { usePayOrder } from "@/modules/payments/hooks/usePayOrder";
-import { createOrder } from "@/modules/admin/pedidos/services/order.service";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { motion, AnimatePresence } from "framer-motion";
-import { ShieldCheck, Loader2, ArrowLeft, ArrowRight, CheckCircle, CreditCard, X, Calendar, Hash } from "lucide-react";
-import { toast } from "sonner";
-import { cn } from "@/lib/utils";
-
-declare global {
-  interface Window {
-    CulqiCheckout: any;
-  }
-}
-
-const queryClient = new QueryClient();
-
+import { useEffect, useRef, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { AnimatePresence, motion } from 'framer-motion';
+import {
+  ArrowLeft,
+  ArrowRight,
+  CheckCircle,
+  CreditCard,
+  Hash,
+  Loader2,
+  ShieldCheck,
+  X,
+  type LucideIcon,
+} from 'lucide-react';
+import { QueryProvider } from '@/components/shared/QueryProvider';
+import { cn } from '@/lib/utils';
+import { getErrorMessage } from '@/lib/errors';
+import { useUser } from '@/modules/user/hooks/useUser';
+import { getUserReservations } from '@/modules/reservations/services/reservation.service';
+import {
+  createOrder,
+  getOrder,
+  getOrders,
+} from '@/modules/orders/services/order.service';
+import type { Order } from '@/modules/orders/interfaces/order.interface';
+import { CulqiPayment } from '@/modules/payments/components/CulqiPayment';
 function PaymentReservationContent() {
   const { user } = useUser();
-  const { mutate: payOrder } = usePayOrder();
-
-  const [step, setStep] = useState<"resumen" | "pago" | "completado">("resumen");
-  const [orderId, setOrderId] = useState("");
-  const [reservationId, setReservationId] = useState("");
-  const [amount, setAmount] = useState(0);
-  const [isCreatingOrder, setIsCreatingOrder] = useState(false);
-  const isCreatingOrderRef = useRef(false);
-  const [isCulqiReady, setIsCulqiReady] = useState(false);
-  const [isBackendProcessing, setIsBackendProcessing] = useState(false);
-  const [isDark, setIsDark] = useState(true);
-
-  const culqiRef = useRef<any>(null);
-  const processingRef = useRef(false);
-  const processedTokensRef = useRef<Set<string>>(new Set());
-  const containerId = useRef(`culqi-${Date.now()}`).current;
-
-  // Detectar tema
+  const [reservationId, setReservationId] = useState('');
+  const [order, setOrder] = useState<Order | null>(null);
+  const [step, setStep] = useState<'resumen' | 'pago' | 'completado'>(
+    'resumen',
+  );
+  const [creating, setCreating] = useState(false);
+  const [error, setError] = useState('');
+  const lock = useRef(false);
   useEffect(() => {
-    const checkTheme = () => setIsDark(document.documentElement.classList.contains("dark"));
-    checkTheme();
-    const observer = new MutationObserver(checkTheme);
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
-    return () => observer.disconnect();
-  }, []);
-
-  // Obtener params
-  useEffect(() => {
-    const p = new URLSearchParams(location.search);
-    if (p.get("reservationId")) setReservationId(p.get("reservationId")!);
-    if (p.get("amount")) setAmount(Number(p.get("amount")));
-  }, []);
-
-  // Script Culqi y limpieza de listeners
-  useEffect(() => {
-    if (document.getElementById("culqi-checkout-js")) {
-      setIsCulqiReady(true);
-    } else {
-      const s = document.createElement("script");
-      s.src = "https://js.culqi.com/checkout-js";
-      s.id = "culqi-checkout-js";
-      s.async = true;
-      s.onload = () => setIsCulqiReady(true);
-      document.body.appendChild(s);
-    }
-
-    return () => {
-      if (typeof window !== "undefined") {
-        window.culqi = () => {};
-        if (window.culqi3ds) window.culqi3ds = () => {};
-        if (window.Culqi) window.Culqi.token = null;
-      }
-      culqiRef.current?.close();
-    };
-  }, []);
-
-  useEffect(() => {
-    if (step === "pago" && orderId && isCulqiReady) {
-      processingRef.current = false;
-      setIsBackendProcessing(false);
-      const timer = setTimeout(openCulqi, 200);
-      return () => clearTimeout(timer);
-    }
-  }, [step, orderId, isCulqiReady]);
-
-  const handleContinuar = async () => {
-    // Candado sincrónico inmediato contra doble clic
-    if (isCreatingOrderRef.current || isCreatingOrder) {
-      console.warn("⚠️ Preparación de orden ya en proceso.");
-      return;
-    }
-
-    try {
-      isCreatingOrderRef.current = true;
-      setIsCreatingOrder(true);
-      toast.loading("Preparando orden...", { id: "order" });
-      const res = await createOrder({ reservationId: Number(reservationId) });
-      const id = res?.id || res?.data?.id || res?.orderId;
-      if (!id) throw new Error("No se generó la orden");
-      toast.success("Orden lista", { id: "order" });
-      setOrderId(String(id));
-      setStep("pago");
-    } catch (e: any) {
-      toast.error(e.response?.data?.message || "Error al preparar la orden", { id: "order" });
-    } finally {
-      setIsCreatingOrder(false);
-      isCreatingOrderRef.current = false;
-    }
-  };
-
-  const handlePayment = (tokenId: string) => {
-    // 1. Candado sincrónico inmediato
-    if (processingRef.current) {
-      console.warn("⚠️ Intento de pago bloqueado: ya hay una transacción en proceso.");
-      return;
-    }
-
-    // 2. Control estricto de unicidad de token Culqi (previene 'Operación denegada')
-    if (!tokenId || processedTokensRef.current.has(tokenId)) {
-      console.warn("⚠️ Token ya consumido o inválido. Evitando reenvío duplicado:", tokenId);
-      return;
-    }
-
-    processingRef.current = true;
-    processedTokensRef.current.add(tokenId);
-    setIsBackendProcessing(true);
-    culqiRef.current?.close();
-
-    toast.loading("Procesando pago de forma segura con Culqi...", { id: "pay", duration: Infinity });
-    payOrder(
-      { orderId, tokenId, email: user?.email || "cliente@email.com", amount },
-      {
-        onSuccess: () => {
-          setTimeout(() => {
-            toast.success("¡Pago exitoso!", { id: "pay" });
-            setIsBackendProcessing(false);
-            setStep("completado");
-            setTimeout(() => location.replace("/user/profile"), 2500);
-          }, 1500);
-        },
-        onError: (e: any) => {
-          toast.error(e.response?.data?.message || "Error al procesar el pago", { id: "pay" });
-          setIsBackendProcessing(false);
-          // Liberamos el candado para permitir un nuevo intento con un NUEVO token
-          processingRef.current = false;
-          // NOTA: processedTokensRef mantiene el tokenId quemado
-        },
-      }
+    setReservationId(
+      new URLSearchParams(window.location.search).get('reservationId') || '',
     );
-  };
-
-  const openCulqi = () => {
-    if (!window.CulqiCheckout || !orderId) return;
-    const pk = import.meta.env.PUBLIC_CULQI_KEY;
-    if (!pk) { toast.error("Falta llave pública"); return setStep("resumen"); }
-
-    // Limpieza de contenedor previo
-    const el = document.getElementById(containerId);
-    if (el) el.innerHTML = "";
-
-    const methods = { tarjeta: true, yape: true, billetera: false, bancaMovil: false, agente: false, cuotealo: false };
-
-    culqiRef.current = new window.CulqiCheckout(pk, {
-      settings: { title: "DeParraSpitz", currency: "PEN", amount: Math.round(amount * 100) },
-      client: { email: user?.email || "cliente@email.com" },
-      options: { lang: "auto", installments: false, modal: false, container: `#${containerId}`, paymentMethods: methods, paymentMethodsSort: Object.keys(methods) },
-      appearance: {
-        theme: isDark ? "dark" : "default",
-        hiddenCulqiLogo: true, menuType: "sidebar",
-        buttonCardPayText: "Pagar Ahora",
-        defaultStyle: { bannerColor: "#C9974A", buttonBackground: "#C9974A", menuColor: "#C9974A", linksColor: "#C9974A", buttonTextColor: isDark ? "#FFF" : "#1a1a1a", priceColor: "#C9974A" },
-      },
-    });
-
-    const handleCulqiCallback = () => {
-      const token = culqiRef.current?.token || (typeof window !== "undefined" ? window.Culqi?.token : null);
-      if (token?.id) {
-        const tokenId = token.id;
-        // 🔥 Quema inmediata en el cliente: nulificar antes de enviar para evitar dobles lecturas
-        if (culqiRef.current) culqiRef.current.token = null;
-        if (typeof window !== "undefined" && window.Culqi) window.Culqi.token = null;
-        handlePayment(tokenId);
-      } else if (culqiRef.current?.order || (typeof window !== "undefined" && window.Culqi?.order)) {
-        culqiRef.current?.close();
-        setStep("completado");
-        setTimeout(() => location.replace("/user/profile"), 2500);
-      } else if (culqiRef.current?.error || (typeof window !== "undefined" && window.Culqi?.error)) {
-        const err = culqiRef.current?.error || window.Culqi?.error;
-        toast.error(err?.user_message || "Error al procesar la tarjeta", { id: "pay" });
-        culqiRef.current?.close();
+  }, []);
+  const reservations = useQuery({
+    queryKey: ['user-reservations', user?.id],
+    queryFn: getUserReservations,
+    enabled: !!user,
+  });
+  const reservation = reservations.data?.find(
+    (item) => String(item.id) === reservationId,
+  );
+  const amount = Number(order?.totalAmount ?? reservation?.totalAmount ?? 0);
+  useEffect(() => {
+    if (step !== 'completado') return;
+    const timer = window.setTimeout(
+      () => window.location.assign('/user/profile'),
+      2500,
+    );
+    return () => window.clearTimeout(timer);
+  }, [step]);
+  const prepare = async () => {
+    if (lock.current || !reservation || reservation.status !== 'approved')
+      return;
+    lock.current = true;
+    setCreating(true);
+    setError('');
+    try {
+      let current = order;
+      if (!current) {
+        const existing = (await getOrders(reservation.id)).find((item) =>
+          ['pending', 'failed'].includes(item.status),
+        );
+        current = existing
+          ? await getOrder(existing.id)
+          : await createOrder({ reservationId: Number(reservation.id) });
       }
-    };
-
-    culqiRef.current.culqi = handleCulqiCallback;
-    if (typeof window !== "undefined") {
-      window.culqi = handleCulqiCallback;
-      window.culqi3ds = handleCulqiCallback;
+      if (
+        !Number.isFinite(Number(current.totalAmount)) ||
+        Number(current.totalAmount) <= 0
+      )
+        throw new Error('Importe inválido');
+      setOrder(current);
+      setStep('pago');
+    } catch (failure) {
+      setError(getErrorMessage(failure, 'No se pudo preparar la orden'));
+    } finally {
+      lock.current = false;
+      setCreating(false);
     }
-
-    culqiRef.current.open();
   };
-
-  // ─── Sin reservationId ───
-  if (!reservationId) {
+  if (reservations.isPending)
     return (
-      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-6 text-center">
+      <div
+        role="status"
+        className="flex min-h-[60vh] items-center justify-center text-muted-foreground"
+      >
+        Cargando tu reserva...
+      </div>
+    );
+  if (reservations.isError)
+    return (
+      <div
+        role="alert"
+        className="mx-auto max-w-2xl px-4 py-12 text-center text-destructive"
+      >
+        No se pudo cargar tu reserva.{' '}
+        <button
+          className="underline"
+          onClick={() => void reservations.refetch()}
+        >
+          Reintentar
+        </button>
+      </div>
+    );
+  if (!reservation)
+    return (
+      <div className="flex min-h-[60vh] flex-col items-center justify-center text-center space-y-4">
         <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center">
           <X className="size-10 text-muted-foreground/40" />
         </div>
-        <h2 className="text-2xl font-bold text-foreground">No se encontró la reserva</h2>
-        <p className="text-muted-foreground">La información de la reserva no está disponible.</p>
-        <a href="/user/profile" className="inline-flex items-center gap-2 rounded-xl bg-ember hover:brightness-110 text-char-deep px-6 py-3 font-bold transition-all">
+        <h2 className="text-2xl font-bold text-foreground">
+          No se encontró la reserva
+        </h2>
+        <p className="text-muted-foreground">
+          La información de la reserva no está disponible.
+        </p>
+        <a
+          href="/user/profile"
+          className="inline-flex items-center gap-2 rounded-xl bg-ember hover:brightness-110 text-char-deep px-6 py-3 font-bold transition-all"
+        >
           <ArrowLeft size={16} /> Volver a Mi Perfil
         </a>
       </div>
     );
-  }
-
   return (
     <AnimatePresence mode="wait">
       {/* ─── COMPLETADO ─── */}
-      {step === "completado" && (
-        <motion.div key="done" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex min-h-[60vh] items-center justify-center">
+      {step === 'completado' && (
+        <motion.div
+          key="done"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="flex min-h-[60vh] items-center justify-center"
+        >
           <div className="space-y-6 text-center">
-            <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 200, delay: 0.1 }}>
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: 'spring', stiffness: 200, delay: 0.1 }}
+            >
               <div className="w-24 h-24 bg-emerald-500/10 border border-emerald-500/20 rounded-full flex items-center justify-center mx-auto">
                 <CheckCircle className="size-12 text-emerald-500" />
               </div>
             </motion.div>
-            <h2 className="text-3xl font-display font-bold text-foreground">¡Pago Exitoso!</h2>
-            <p className="text-muted-foreground text-lg">Tu reserva ha sido confirmada. Redirigiendo a tu perfil...</p>
+            <h2 className="text-3xl font-display font-bold text-foreground">
+              ¡Pago Exitoso!
+            </h2>
+            <p className="text-muted-foreground text-lg">
+              Tu reserva ha sido confirmada. Redirigiendo a tu perfil...
+            </p>
             <div className="mx-auto h-1.5 w-48 overflow-hidden rounded-full bg-muted">
-              <motion.div className="h-full rounded-full bg-emerald-500" animate={{ width: "100%" }} transition={{ duration: 2.5, ease: "easeInOut" }} />
+              <motion.div
+                className="h-full rounded-full bg-emerald-500"
+                animate={{ width: '100%' }}
+                transition={{ duration: 2.5, ease: 'easeInOut' }}
+              />
             </div>
           </div>
         </motion.div>
       )}
 
       {/* ─── RESUMEN ─── */}
-      {step === "resumen" && (
-        <motion.div key="summary" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mx-auto max-w-2xl px-4 py-12 sm:px-6">
+      {step === 'resumen' && (
+        <motion.div
+          key="summary"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mx-auto max-w-2xl px-4 py-12 sm:px-6"
+        >
           <div className="rounded-2xl border border-border bg-card p-6 sm:p-8 shadow-xl">
             <div className="mb-8 space-y-2 text-center">
               <div className="w-14 h-14 rounded-2xl bg-ember/10 border border-ember/20 flex items-center justify-center mx-auto mb-4">
                 <CreditCard className="w-7 h-7 text-ember" />
               </div>
-              <h1 className="font-display text-3xl font-bold text-foreground">Pagar Reserva</h1>
-              <p className="text-muted-foreground">Revisa los detalles antes de continuar con el pago</p>
+              <h1 className="font-display text-3xl font-bold text-foreground">
+                Pagar Reserva
+              </h1>
+              <p className="text-muted-foreground">
+                Revisa los detalles antes de continuar con el pago
+              </p>
             </div>
 
+            {error && (
+              <p role="alert" className="mb-5 text-destructive">
+                {error}
+              </p>
+            )}
+            {reservation.status !== 'approved' && (
+              <p role="status" className="mb-5 text-muted-foreground">
+                Esta reserva todavía no admite pagos.
+              </p>
+            )}
             {/* Detalles */}
             <div className="mb-6 space-y-4 rounded-xl border border-border bg-muted/30 p-5">
-              <DetailRow icon={Hash} label="Reserva" value={`RES-${reservationId.padStart(5, "0")}`} />
+              <DetailRow
+                icon={Hash}
+                label="Reserva"
+                value={`RES-${reservationId.padStart(5, '0')}`}
+              />
               <hr className="border-border" />
-              <DetailRow icon={CreditCard} label="Monto a Pagar" value={`S/ ${amount.toFixed(2)}`} highlight />
+              <DetailRow
+                icon={CreditCard}
+                label="Monto a Pagar"
+                value={`S/ ${amount.toFixed(2)}`}
+                highlight
+              />
             </div>
 
             {/* Email */}
             <div className="mb-8 rounded-xl border border-border bg-muted/20 p-4">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1">Email de confirmación</p>
-              <p className="text-sm font-medium text-foreground">{user?.email || "email@ejemplo.com"}</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1">
+                Email de confirmación
+              </p>
+              <p className="text-sm font-medium text-foreground">
+                {user?.email || '—'}
+              </p>
             </div>
 
             {/* Botones */}
             <div className="flex flex-col gap-3 sm:flex-row">
-              <a href="/user/profile" className="inline-flex items-center justify-center gap-2 rounded-xl border border-border px-6 py-3 text-sm font-bold text-muted-foreground transition-colors hover:border-ember/30 hover:text-foreground">
+              <a
+                href="/user/profile"
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-border px-6 py-3 text-sm font-bold text-muted-foreground transition-colors hover:border-ember/30 hover:text-foreground"
+              >
                 <ArrowLeft size={16} /> Volver
               </a>
               <button
                 type="button"
-                onClick={handleContinuar}
-                disabled={isCreatingOrder}
+                onClick={() => void prepare()}
+                disabled={creating || reservation.status !== 'approved'}
                 className={cn(
-                  "inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-ember to-amber-600 px-6 py-3 font-bold text-char-deep shadow-lg transition-all hover:brightness-110 active:scale-[0.98]",
-                  isCreatingOrder && "opacity-60 cursor-not-allowed pointer-events-none"
+                  'inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-ember to-amber-600 px-6 py-3 font-bold text-char-deep shadow-lg transition-all hover:brightness-110 active:scale-[0.98]',
+                  creating &&
+                    'opacity-60 cursor-not-allowed pointer-events-none',
                 )}
               >
-                {isCreatingOrder ? <Loader2 className="size-5 animate-spin" /> : <CreditCard className="size-5" />}
-                {isCreatingOrder ? "Preparando pago..." : "Confirmar y Pagar"}
+                {creating ? (
+                  <Loader2 className="size-5 animate-spin" />
+                ) : (
+                  <CreditCard className="size-5" />
+                )}
+                {creating ? 'Preparando pago...' : 'Confirmar y Pagar'}
                 <ArrowRight className="size-5" />
               </button>
             </div>
 
             <div className="mt-6 flex items-center justify-center gap-2 text-[10px] text-muted-foreground">
-              <ShieldCheck className="size-3.5 text-emerald-500" /> Pago seguro procesado por Culqi
+              <ShieldCheck className="size-3.5 text-emerald-500" /> Pago seguro
+              procesado por Culqi
             </div>
           </div>
         </motion.div>
       )}
 
-      {/* ─── PAGO ─── */}
-      {step === "pago" && (
-        <div className={cn("fixed inset-0 top-[80px] z-40 flex flex-col", isDark ? "bg-[#0b0806]" : "bg-stone-50")}>
-          <div className={cn("flex shrink-0 items-center justify-between border-b px-6 py-4 backdrop-blur-sm", isDark ? "border-[#3d2c1f] bg-[#140d0b]/95" : "border-stone-200 bg-white/95")}>
-            <button
-              type="button"
-              onClick={() => {
-                if (isBackendProcessing) return;
-                culqiRef.current?.close();
-                setStep("resumen");
-                setOrderId("");
-              }}
-              disabled={isBackendProcessing}
-              className={cn(
-                "inline-flex items-center gap-2 text-sm transition-colors",
-                isDark ? "text-zinc-400 hover:text-white" : "text-stone-500 hover:text-stone-900",
-                isBackendProcessing && "opacity-40 cursor-not-allowed pointer-events-none"
-              )}
-            >
-              <ArrowLeft size={16} /> Volver
-            </button>
-            <div className="text-right">
-              <p className={cn("text-xs", isDark ? "text-zinc-500" : "text-stone-400")}>Monto a pagar</p>
-              <p className="text-lg font-bold text-ember">S/ {amount.toFixed(2)}</p>
-            </div>
-          </div>
-          <div id={containerId} className="flex-1 overflow-auto" style={{ display: "flex", flexDirection: "column" }} />
-
-          <AnimatePresence>
-            {isBackendProcessing && (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/90 backdrop-blur-md pointer-events-auto">
-                <div className="mx-4 max-w-sm rounded-2xl border border-ember/20 bg-card p-8 text-center shadow-2xl">
-                  <Loader2 className="mx-auto mb-4 size-12 animate-spin text-ember" />
-                  <h3 className="mb-2 text-xl font-bold text-foreground">Validando Transacción</h3>
-                  <div className="mb-4 h-1.5 overflow-hidden rounded-full bg-muted">
-                    <motion.div className="h-full rounded-full bg-gradient-to-r from-ember to-amber-600"
-                      animate={{ width: ["0%", "100%"] }} transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }} />
-                  </div>
-                  <p className="text-sm text-muted-foreground">Estamos procesando tu pago con Culqi. Por favor, no cierres esta ventana ni recargues la página.</p>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+      {step === 'pago' && order && user && (
+        <CulqiPayment
+          presentation="fullscreen"
+          orderId={order.id}
+          amount={Number(order.totalAmount)}
+          userEmail={user.email}
+          isOpen
+          onClose={() =>
+            setStep((current) =>
+              current === 'completado' ? current : 'resumen',
+            )
+          }
+          onSuccessCallback={() => setStep('completado')}
+        />
       )}
     </AnimatePresence>
   );
 }
-
-const DetailRow = ({ icon: Icon, label, value, highlight }: { icon: any; label: string; value: string; highlight?: boolean }) => (
+const DetailRow = ({
+  icon: Icon,
+  label,
+  value,
+  highlight,
+}: {
+  icon: LucideIcon;
+  label: string;
+  value: string;
+  highlight?: boolean;
+}) => (
   <div className="flex items-center justify-between">
     <div className="flex items-center gap-2 text-muted-foreground">
       <Icon size={14} />
-      <span className="text-[10px] font-bold uppercase tracking-widest">{label}</span>
+      <span className="text-[10px] font-bold uppercase tracking-widest">
+        {label}
+      </span>
     </div>
-    <span className={cn("font-bold", highlight ? "text-2xl font-black text-ember font-mono" : "text-foreground font-mono text-sm")}>{value}</span>
+    <span
+      className={cn(
+        'font-bold',
+        highlight
+          ? 'text-2xl font-black text-ember font-mono'
+          : 'text-foreground font-mono text-sm',
+      )}
+    >
+      {value}
+    </span>
   </div>
 );
 
 export default function PaymentReservationPage() {
   return (
-    <QueryClientProvider client={queryClient}>
+    <QueryProvider>
       <PaymentReservationContent />
-    </QueryClientProvider>
+    </QueryProvider>
   );
 }

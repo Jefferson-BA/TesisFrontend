@@ -1,36 +1,39 @@
 // src/modules/superadmin/components/SuperadminDashboardView.tsx
 
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
-  ShieldAlert,
-  Users,
-  DollarSign,
   Activity,
-  Power,
-  Key,
-  CreditCard,
-  RotateCcw,
-  Sliders,
-  ChevronRight,
-  TrendingUp,
-  Server,
   CheckCircle2,
+  ChevronRight,
+  CreditCard,
+  DollarSign,
+  Server,
+  ShieldAlert,
+  Sliders,
+  Users,
 } from 'lucide-react';
 
-import { useSuperadminUsers } from '../hooks/useSuperadminUsers';
-import { useSuperadminFinance } from '../hooks/useSuperadminFinance';
 import { useSuperadminAudit } from '../hooks/useSuperadminAudit';
 import { useSuperadminConfig } from '../hooks/useSuperadminConfig';
+import { useSuperadminFinance } from '../hooks/useSuperadminFinance';
+import { useSuperadminUsers } from '../hooks/useSuperadminUsers';
 
 export function SuperadminDashboardView() {
   const { stats, isLoading: loadingUsers } = useSuperadminUsers({ limit: 1 });
   const { report, isLoading: loadingFinance } = useSuperadminFinance({});
-  const { meta: auditMeta, isLoading: loadingAudit } = useSuperadminAudit({ limit: 5 });
-  const { maintenance, isLoadingMaintenance } = useSuperadminConfig();
+  const { meta: auditMeta, isLoading: loadingAudit } = useSuperadminAudit({
+    limit: 5,
+  });
+  const { maintenance } = useSuperadminConfig();
 
   const isMaintenance = maintenance?.maintenanceMode ?? false;
   const summary = report?.summary;
@@ -62,24 +65,37 @@ export function SuperadminDashboardView() {
               Panel de Control Maestro
             </h1>
             <p className="text-muted-foreground text-sm max-w-2xl leading-relaxed">
-              Supervisión integral de usuarios y roles, intervenciones financieras con Culqi, trazabilidad mediante bitácora de auditoría y configuración de credenciales del sistema.
+              Supervisión integral de usuarios y roles, intervenciones
+              financieras con Culqi, trazabilidad mediante bitácora de auditoría
+              y configuración de credenciales del sistema.
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-2.5">
-            <Button asChild className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-lg text-xs h-9">
+            <Button
+              asChild
+              className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-lg text-xs h-9"
+            >
               <a href="/superadmin/manage-admins">
                 <Users className="h-4 w-4 mr-1.5" />
                 Gestionar Usuarios
               </a>
             </Button>
-            <Button asChild variant="outline" className="border-border bg-card hover:bg-muted text-foreground text-xs h-9">
+            <Button
+              asChild
+              variant="outline"
+              className="border-border bg-card hover:bg-muted text-foreground text-xs h-9"
+            >
               <a href="/superadmin/finance">
                 <CreditCard className="h-4 w-4 mr-1.5 text-emerald-500" />
                 Finanzas & Culqi
               </a>
             </Button>
-            <Button asChild variant="outline" className="border-border bg-card hover:bg-muted text-foreground text-xs h-9">
+            <Button
+              asChild
+              variant="outline"
+              className="border-border bg-card hover:bg-muted text-foreground text-xs h-9"
+            >
               <a href="/superadmin/settings">
                 <Sliders className="h-4 w-4 mr-1.5 text-cyan-500" />
                 Configuración
@@ -94,15 +110,22 @@ export function SuperadminDashboardView() {
         {/* Pilar 1: Usuarios y Admins */}
         <Card className="bg-card border-border text-card-foreground">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Administradores</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Total Administradores
+            </CardTitle>
             <Users className="h-5 w-5 text-purple-500" />
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-extrabold text-purple-600 dark:text-purple-400">
-              {loadingUsers ? <Skeleton className="h-8 w-14 bg-muted" /> : stats?.admin ?? 0}
+              {loadingUsers ? (
+                <Skeleton className="h-8 w-14 bg-muted" />
+              ) : (
+                (stats?.admin ?? 0)
+              )}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              +{stats?.superadmin ?? 0} Superadmins | {stats?.user ?? 0} Clientes
+              +{stats?.superadmin ?? 0} Superadmins | {stats?.user ?? 0}{' '}
+              Clientes
             </p>
           </CardContent>
         </Card>
@@ -110,7 +133,9 @@ export function SuperadminDashboardView() {
         {/* Pilar 2: Ingresos Totales */}
         <Card className="bg-card border-border text-card-foreground">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Recaudación Global</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Recaudación Global
+            </CardTitle>
             <DollarSign className="h-5 w-5 text-emerald-500" />
           </CardHeader>
           <CardContent>
@@ -130,21 +155,31 @@ export function SuperadminDashboardView() {
         {/* Pilar 3: Auditoría */}
         <Card className="bg-card border-border text-card-foreground">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Eventos de Auditoría</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Eventos de Auditoría
+            </CardTitle>
             <Activity className="h-5 w-5 text-cyan-500" />
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-extrabold text-cyan-600 dark:text-cyan-400">
-              {loadingAudit ? <Skeleton className="h-8 w-16 bg-muted" /> : auditMeta?.total ?? 0}
+              {loadingAudit ? (
+                <Skeleton className="h-8 w-16 bg-muted" />
+              ) : (
+                (auditMeta?.total ?? 0)
+              )}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">Acciones críticas registradas</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Acciones críticas registradas
+            </p>
           </CardContent>
         </Card>
 
         {/* Pilar 4: Estado del Sistema */}
         <Card className="bg-card border-border text-card-foreground">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Estado de Servidor</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Estado de Servidor
+            </CardTitle>
             <Server className="h-5 w-5 text-emerald-500" />
           </CardHeader>
           <CardContent>
@@ -152,7 +187,9 @@ export function SuperadminDashboardView() {
               <CheckCircle2 className="h-6 w-6 text-emerald-500" />
               Óptimo
             </div>
-            <p className="text-xs text-muted-foreground mt-1">Conexión con NestJS y DB Neon activa</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Conexión con NestJS y DB Neon activa
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -167,15 +204,22 @@ export function SuperadminDashboardView() {
               Gestión Avanzada de Usuarios y Roles
             </CardTitle>
             <CardDescription className="text-muted-foreground text-xs">
-              Promueve o degrada roles entre comensales y administradores, y suspende cuentas sospechosas con validación de contraseña.
+              Promueve o degrada roles entre comensales y administradores, y
+              suspende cuentas sospechosas con validación de contraseña.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between text-xs text-muted-foreground p-3 rounded-lg bg-muted/40 border border-border">
               <span>Superadmins con acceso maestro:</span>
-              <span className="font-bold text-foreground">{stats?.superadmin ?? 0}</span>
+              <span className="font-bold text-foreground">
+                {stats?.superadmin ?? 0}
+              </span>
             </div>
-            <Button asChild variant="outline" className="w-full border-border bg-card hover:bg-muted text-foreground text-xs justify-between">
+            <Button
+              asChild
+              variant="outline"
+              className="w-full border-border bg-card hover:bg-muted text-foreground text-xs justify-between"
+            >
               <a href="/superadmin/manage-admins">
                 <span>Ir al Directorio de Usuarios</span>
                 <ChevronRight className="h-4 w-4" />
@@ -192,15 +236,22 @@ export function SuperadminDashboardView() {
               Permisos Financieros y Reembolsos Culqi
             </CardTitle>
             <CardDescription className="text-muted-foreground text-xs">
-              Ejecuta devoluciones bancarias directas con la API Culqi v2, reajusta montos por reclamos y anula órdenes forzosamente.
+              Ejecuta devoluciones bancarias directas con la API Culqi v2,
+              reajusta montos por reclamos y anula órdenes forzosamente.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between text-xs text-muted-foreground p-3 rounded-lg bg-muted/40 border border-border">
               <span>Pagos procesados con tarjeta:</span>
-              <span className="font-bold text-foreground">S/ {(methods?.card ?? 0).toFixed(2)}</span>
+              <span className="font-bold text-foreground">
+                S/ {(methods?.card ?? 0).toFixed(2)}
+              </span>
             </div>
-            <Button asChild variant="outline" className="w-full border-border bg-card hover:bg-muted text-foreground text-xs justify-between">
+            <Button
+              asChild
+              variant="outline"
+              className="w-full border-border bg-card hover:bg-muted text-foreground text-xs justify-between"
+            >
               <a href="/superadmin/finance">
                 <span>Ir al Panel Financiero y Reembolsos</span>
                 <ChevronRight className="h-4 w-4" />
@@ -217,15 +268,22 @@ export function SuperadminDashboardView() {
               Bitácora de Auditoría (Audit Trail)
             </CardTitle>
             <CardDescription className="text-muted-foreground text-xs">
-              Inspección forense de diferencias JSON en tiempo real con registro de IPs, timestamps y usuarios que autorizaron cambios.
+              Inspección forense de diferencias JSON en tiempo real con registro
+              de IPs, timestamps y usuarios que autorizaron cambios.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between text-xs text-muted-foreground p-3 rounded-lg bg-muted/40 border border-border">
               <span>Últimas acciones registradas:</span>
-              <span className="font-bold text-foreground">{auditMeta?.total ?? 0} eventos</span>
+              <span className="font-bold text-foreground">
+                {auditMeta?.total ?? 0} eventos
+              </span>
             </div>
-            <Button asChild variant="outline" className="w-full border-border bg-card hover:bg-muted text-foreground text-xs justify-between">
+            <Button
+              asChild
+              variant="outline"
+              className="w-full border-border bg-card hover:bg-muted text-foreground text-xs justify-between"
+            >
               <a href="/superadmin/audit">
                 <span>Inspeccionar Bitácora de Auditoría</span>
                 <ChevronRight className="h-4 w-4" />
@@ -242,17 +300,24 @@ export function SuperadminDashboardView() {
               Configuración Crítica y Modo Mantenimiento
             </CardTitle>
             <CardDescription className="text-muted-foreground text-xs">
-              Modifica llaves API enmascaradas (Culqi, OpenAI, etc.) y activa el interruptor de bloqueo global por mantenimiento.
+              Modifica llaves API enmascaradas (Culqi, OpenAI, etc.) y activa el
+              interruptor de bloqueo global por mantenimiento.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between text-xs text-muted-foreground p-3 rounded-lg bg-muted/40 border border-border">
               <span>Estado del modo mantenimiento:</span>
-              <span className={`font-bold ${isMaintenance ? 'text-rose-500' : 'text-emerald-500'}`}>
+              <span
+                className={`font-bold ${isMaintenance ? 'text-rose-500' : 'text-emerald-500'}`}
+              >
                 {isMaintenance ? 'ACTIVADO' : 'DESACTIVADO'}
               </span>
             </div>
-            <Button asChild variant="outline" className="w-full border-border bg-card hover:bg-muted text-foreground text-xs justify-between">
+            <Button
+              asChild
+              variant="outline"
+              className="w-full border-border bg-card hover:bg-muted text-foreground text-xs justify-between"
+            >
               <a href="/superadmin/settings">
                 <span>Configurar Sistema y Llaves API</span>
                 <ChevronRight className="h-4 w-4" />

@@ -1,10 +1,10 @@
 ---
 // src/layouts/UserLayout.astro
-import { ClientRouter } from "astro:transitions";
-import { PublicNavbar } from "@/modules/user/shared/components/PublicNavbar";
-import ChatbotWidget from "@/modules/user/chatbot/components/ChatbotWidget";
-import { Toaster } from "sonner";
-import "@/styles/globals.css";
+import { ClientRouter } from 'astro:transitions';
+import { PublicNavbar } from '@/modules/user/shared/components/PublicNavbar';
+import ChatbotWidget from '@/modules/user/chatbot/components/ChatbotWidget';
+import { Toaster } from 'sonner';
+import '@/styles/globals.css';
 
 interface Props {
   title?: string;
@@ -13,18 +13,18 @@ interface Props {
 }
 
 const {
-  title = "DeParraSpitz - Catering & Eventos",
-  description = "Experiencias gastronómicas premium. Catering, eventos y parrillas.",
-  image = "/og-default.jpg",
+  title = 'DeParraSpitz - Catering & Eventos',
+  description = 'Experiencias gastronómicas premium. Catering, eventos y parrillas.',
+  image = '/og-default.jpg',
 } = Astro.props;
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    
+
     <ClientRouter />
 
     <!-- SEO -->
@@ -35,43 +35,48 @@ const {
     <meta property="og:image" content={image} />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
-    
+
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    
+
     <!-- View Transitions API nativa -->
     <meta name="view-transition" content="same-origin" />
 
     <!-- Tema inicial y sincronización (evita flash y persiste en transiciones / pestañas) -->
     <script is:inline>
-      (function() {
+      (function () {
         function resolveTheme() {
           try {
-            const rawZustand = localStorage.getItem("deparraspitz-theme");
+            const rawZustand = localStorage.getItem('deparraspitz-theme');
             if (rawZustand) {
               const parsed = JSON.parse(rawZustand);
-              if (parsed?.state?.theme === "light" || parsed?.state?.theme === "dark") {
+              if (
+                parsed?.state?.theme === 'light' ||
+                parsed?.state?.theme === 'dark'
+              ) {
                 return parsed.state.theme;
               }
             }
-            const rawSimple = localStorage.getItem("theme");
-            if (rawSimple === "light" || rawSimple === "dark") {
+            const rawSimple = localStorage.getItem('theme');
+            if (rawSimple === 'light' || rawSimple === 'dark') {
               return rawSimple;
             }
           } catch (e) {}
 
           // Por defecto dark, o según preferencia del sistema
-          return window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+          return window.matchMedia('(prefers-color-scheme: light)').matches
+            ? 'light'
+            : 'dark';
         }
 
         function applyTheme(theme) {
-          const isDark = theme === "dark";
+          const isDark = theme === 'dark';
           if (isDark) {
-            document.documentElement.classList.add("dark");
-            document.documentElement.style.colorScheme = "dark";
+            document.documentElement.classList.add('dark');
+            document.documentElement.style.colorScheme = 'dark';
           } else {
-            document.documentElement.classList.remove("dark");
-            document.documentElement.style.colorScheme = "light";
+            document.documentElement.classList.remove('dark');
+            document.documentElement.style.colorScheme = 'light';
           }
         }
 
@@ -80,13 +85,13 @@ const {
         applyTheme(currentTheme);
 
         // 2. Persistir tema tras la navegación de Astro (ClientRouter / View Transitions)
-        document.addEventListener("astro:after-swap", function() {
+        document.addEventListener('astro:after-swap', function () {
           applyTheme(resolveTheme());
         });
 
         // 3. Sincronizar instantáneamente si el usuario cambia el tema en otra pestaña
-        window.addEventListener("storage", function(e) {
-          if (e.key === "deparraspitz-theme" || e.key === "theme") {
+        window.addEventListener('storage', function (e) {
+          if (e.key === 'deparraspitz-theme' || e.key === 'theme') {
             applyTheme(resolveTheme());
           }
         });
@@ -96,12 +101,22 @@ const {
     <!-- Transiciones entre páginas -->
     <style is:global>
       @keyframes page-in {
-        from { opacity: 0; transform: translateY(6px); }
-        to { opacity: 1; transform: translateY(0); }
+        from {
+          opacity: 0;
+          transform: translateY(6px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
       @keyframes page-out {
-        from { opacity: 1; }
-        to { opacity: 0; }
+        from {
+          opacity: 1;
+        }
+        to {
+          opacity: 0;
+        }
       }
       ::view-transition-old(root) {
         animation: page-out 0.12s ease-out forwards;
@@ -119,15 +134,20 @@ const {
   </head>
 
   <body class="bg-background text-foreground antialiased min-h-screen flex flex-col transition-colors duration-300">
-    <div id="route-loader" class="pointer-events-none fixed inset-0 z-[9999] hidden items-center justify-center bg-background/80 backdrop-blur-sm transition-opacity duration-300 ease-out opacity-0">
+    <div
+      id="route-loader"
+      class="pointer-events-none fixed inset-0 z-[9999] hidden items-center justify-center bg-background/80 backdrop-blur-sm transition-opacity duration-300 ease-out opacity-0"
+    >
       <div class="flex flex-col items-center gap-3">
         <div class="h-12 w-12 animate-spin rounded-full border-4 border-amber-500/20 border-t-amber-500"></div>
-        <span class="text-xs font-bold uppercase tracking-[0.3em] text-amber-500">Cargando</span>
+        <span class="text-xs font-bold uppercase tracking-[0.3em] text-amber-500">
+          Cargando
+        </span>
       </div>
     </div>
 
     <PublicNavbar client:load transition:persist />
-    
+
     <div class="flex-1">
       <slot />
     </div>
@@ -137,25 +157,25 @@ const {
   </body>
 
   <script is:inline>
-    document.addEventListener("astro:before-preparation", () => {
-      const loader = document.getElementById("route-loader");
+    document.addEventListener('astro:before-preparation', () => {
+      const loader = document.getElementById('route-loader');
       if (!loader) return;
-      loader.classList.remove("hidden");
-      loader.classList.add("flex");
+      loader.classList.remove('hidden');
+      loader.classList.add('flex');
       requestAnimationFrame(() => {
-        loader.classList.remove("opacity-0");
-        loader.classList.add("opacity-100");
+        loader.classList.remove('opacity-0');
+        loader.classList.add('opacity-100');
       });
     });
 
-    document.addEventListener("astro:page-load", () => {
-      const loader = document.getElementById("route-loader");
+    document.addEventListener('astro:page-load', () => {
+      const loader = document.getElementById('route-loader');
       if (!loader) return;
-      loader.classList.remove("opacity-100");
-      loader.classList.add("opacity-0");
+      loader.classList.remove('opacity-100');
+      loader.classList.add('opacity-0');
       setTimeout(() => {
-        loader.classList.add("hidden");
-        loader.classList.remove("flex");
+        loader.classList.add('hidden');
+        loader.classList.remove('flex');
       }, 250);
     });
   </script>

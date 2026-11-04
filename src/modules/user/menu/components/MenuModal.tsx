@@ -1,11 +1,24 @@
+import { getImageUrl } from '@/lib/assets';
 // src/modules/user/menu/components/MenuModal.tsx
 
-import { X, ShoppingCart, Flame, Tag, ShieldCheck, Clock, Users } from "lucide-react";
-import { formatPrice } from "./AnimatedPrice";
-import type { Product } from "../interfaces/product.interface";
-import type { Promotion } from "@/modules/admin/promociones/interfaces/promotion.interface";
-import { findPromoForProduct, getPromoLabel, calcDiscountedPrice } from "@/modules/admin/promociones/utils/promoUtils";
-import { cn } from "@/lib/utils";
+import { cn } from '@/lib/utils';
+import type { Product } from '@/modules/catalog/interfaces/product.interface';
+import type { Promotion } from '@/modules/promotions/interfaces/promotion.interface';
+import {
+  calcDiscountedPrice,
+  findPromoForProduct,
+  getPromoLabel,
+} from '@/modules/promotions/utils/promoUtils';
+import {
+  Clock,
+  Flame,
+  ShieldCheck,
+  ShoppingCart,
+  Tag,
+  Users,
+  X,
+} from 'lucide-react';
+import { formatPrice } from './AnimatedPrice';
 
 interface MenuModalProps {
   selected: Product | null;
@@ -14,18 +27,27 @@ interface MenuModalProps {
   onConfirm: () => void;
 }
 
-export const MenuModal = ({ selected, activePromos = [], onClose, onConfirm }: MenuModalProps) => {
+export const MenuModal = ({
+  selected,
+  activePromos = [],
+  onClose,
+  onConfirm,
+}: MenuModalProps) => {
   if (!selected) return null;
 
   // Resolve category ID
   const categoryId: string | undefined =
-    (selected as any).categoryId ??
-    (typeof (selected as any).category === "object" && (selected as any).category !== null
-      ? (selected as any).category?.id
+    selected.categoryId ??
+    (typeof selected.category === 'object' && selected.category !== null
+      ? selected.category?.id
       : undefined);
 
   // Find applicable promotion
-  const applicablePromo = findPromoForProduct(activePromos, selected.id, categoryId);
+  const applicablePromo = findPromoForProduct(
+    activePromos,
+    selected.id,
+    categoryId,
+  );
   const promoLabel = applicablePromo ? getPromoLabel(applicablePromo) : null;
 
   const originalPrice = Number(selected.price);
@@ -33,14 +55,15 @@ export const MenuModal = ({ selected, activePromos = [], onClose, onConfirm }: M
     ? calcDiscountedPrice(originalPrice, applicablePromo)
     : null;
 
-  const savings = discountedPrice !== null ? originalPrice - discountedPrice : 0;
+  const savings =
+    discountedPrice !== null ? originalPrice - discountedPrice : 0;
 
   const categoryName =
-    typeof (selected as any).category === "object" && (selected as any).category !== null
-      ? (selected as any).category?.name
-      : (selected as any).category;
+    typeof selected.category === 'object' && selected.category !== null
+      ? selected.category?.name
+      : selected.category;
 
-  const isAvailable = (selected as any).isAvailable !== false && (selected as any).stock !== 0;
+  const isAvailable = selected.isAvailable !== false && selected.stock !== 0;
 
   return (
     <div
@@ -49,9 +72,9 @@ export const MenuModal = ({ selected, activePromos = [], onClose, onConfirm }: M
     >
       <div
         className={cn(
-          "relative w-full max-w-4xl rounded-2xl overflow-hidden md:grid md:grid-cols-12 animate-fade-in-scale",
-          "bg-[#fffdf9] border-[#e0d5c5] dark:bg-char-deep dark:border-char",
-          "border shadow-2xl"
+          'relative w-full max-w-4xl rounded-2xl overflow-hidden md:grid md:grid-cols-12 animate-fade-in-scale',
+          'bg-[#fffdf9] border-[#e0d5c5] dark:bg-char-deep dark:border-char',
+          'border shadow-2xl',
         )}
         onClick={(e) => e.stopPropagation()}
       >
@@ -67,7 +90,7 @@ export const MenuModal = ({ selected, activePromos = [], onClose, onConfirm }: M
         {/* Image column */}
         <div className="md:col-span-5 h-64 md:h-auto overflow-hidden relative">
           <img
-            src={(selected as any).imageUrl || "https://placehold.co/600x400"}
+            src={getImageUrl(selected.imageUrl || selected.image)}
             alt={selected.name}
             className="w-full h-full object-cover"
           />
@@ -94,7 +117,7 @@ export const MenuModal = ({ selected, activePromos = [], onClose, onConfirm }: M
             {/* Category + quality badge */}
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-ember text-[10px] font-black tracking-widest uppercase">
-                {categoryName || "Especial"}
+                {categoryName || 'Especial'}
               </span>
               <span className="inline-flex items-center gap-1 text-[9px] uppercase tracking-widest font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/5 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-500/10">
                 <ShieldCheck size={9} /> Alta Cocina
@@ -125,52 +148,78 @@ export const MenuModal = ({ selected, activePromos = [], onClose, onConfirm }: M
                   </div>
                 </div>
               ) : (
-                <p className="text-3xl font-black text-ember font-mono">{formatPrice(originalPrice)}</p>
+                <p className="text-3xl font-black text-ember font-mono">
+                  {formatPrice(originalPrice)}
+                </p>
               )}
             </div>
 
             {/* Promo details */}
             {applicablePromo && (
               <div className="p-3 bg-amber-500/5 border border-amber-500/20 rounded-xl text-xs text-amber-700 dark:text-amber-300 space-y-1">
-                <p className="font-bold flex items-center gap-1.5"><Flame size={11} /> Promoción activa: {applicablePromo.title}</p>
-                <p className="text-muted-foreground">{applicablePromo.description}</p>
+                <p className="font-bold flex items-center gap-1.5">
+                  <Flame size={11} /> Promoción activa: {applicablePromo.title}
+                </p>
+                <p className="text-muted-foreground">
+                  {applicablePromo.description}
+                </p>
               </div>
             )}
 
             {/* Description */}
             <div className="space-y-1">
-              <p className="text-xs font-bold text-foreground uppercase tracking-wider">Descripción</p>
+              <p className="text-xs font-bold text-foreground uppercase tracking-wider">
+                Descripción
+              </p>
               <p className="text-muted-foreground text-sm font-light leading-relaxed">
-                {(selected as any).description || "Insumos premium para banquetes y eventos corporativos. Preparado con técnicas de alta cocina y los mejores ingredientes seleccionados."}
+                {selected.description ||
+                  'Insumos premium para banquetes y eventos corporativos. Preparado con técnicas de alta cocina y los mejores ingredientes seleccionados.'}
               </p>
             </div>
 
             {/* Extra details grid */}
             <div className="grid grid-cols-2 gap-3 mt-2">
-              {(selected as any).preparationTime && (
+              {selected.preparationTime && (
                 <div className="flex items-center gap-2 p-2.5 bg-muted/40 rounded-xl border border-border/50">
                   <Clock size={13} className="text-muted-foreground shrink-0" />
                   <div>
-                    <p className="text-[9px] uppercase tracking-widest text-muted-foreground font-bold">Preparación</p>
-                    <p className="text-xs font-semibold text-foreground">{(selected as any).preparationTime} min</p>
+                    <p className="text-[9px] uppercase tracking-widest text-muted-foreground font-bold">
+                      Preparación
+                    </p>
+                    <p className="text-xs font-semibold text-foreground">
+                      {selected.preparationTime} min
+                    </p>
                   </div>
                 </div>
               )}
-              {(selected as any).minPeople && (
+              {selected.minPeople && (
                 <div className="flex items-center gap-2 p-2.5 bg-muted/40 rounded-xl border border-border/50">
                   <Users size={13} className="text-muted-foreground shrink-0" />
                   <div>
-                    <p className="text-[9px] uppercase tracking-widest text-muted-foreground font-bold">Min. personas</p>
-                    <p className="text-xs font-semibold text-foreground">{(selected as any).minPeople} pers.</p>
+                    <p className="text-[9px] uppercase tracking-widest text-muted-foreground font-bold">
+                      Min. personas
+                    </p>
+                    <p className="text-xs font-semibold text-foreground">
+                      {selected.minPeople} pers.
+                    </p>
                   </div>
                 </div>
               )}
               <div className="flex items-center gap-2 p-2.5 bg-muted/40 rounded-xl border border-border/50">
                 <ShieldCheck size={13} className="text-emerald-500 shrink-0" />
                 <div>
-                  <p className="text-[9px] uppercase tracking-widest text-muted-foreground font-bold">Estado</p>
-                  <p className={cn("text-xs font-bold", isAvailable ? "text-emerald-600 dark:text-emerald-400" : "text-red-500")}>
-                    {isAvailable ? "Disponible" : "Agotado"}
+                  <p className="text-[9px] uppercase tracking-widest text-muted-foreground font-bold">
+                    Estado
+                  </p>
+                  <p
+                    className={cn(
+                      'text-xs font-bold',
+                      isAvailable
+                        ? 'text-emerald-600 dark:text-emerald-400'
+                        : 'text-red-500',
+                    )}
+                  >
+                    {isAvailable ? 'Disponible' : 'Agotado'}
                   </p>
                 </div>
               </div>
@@ -185,7 +234,7 @@ export const MenuModal = ({ selected, activePromos = [], onClose, onConfirm }: M
               className="w-full h-12 font-bold uppercase tracking-widest text-xs rounded-xl bg-ember hover:brightness-110 text-char-deep active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:pointer-events-none"
             >
               <ShoppingCart size={14} />
-              {isAvailable ? "Confirmar cotización" : "No disponible"}
+              {isAvailable ? 'Confirmar cotización' : 'No disponible'}
             </button>
             {discountedPrice !== null && (
               <p className="text-center text-[10px] text-muted-foreground mt-2">

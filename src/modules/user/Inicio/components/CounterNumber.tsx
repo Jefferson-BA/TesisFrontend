@@ -1,6 +1,4 @@
-"use client";
-
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from 'react';
 
 interface CounterNumberProps {
   value: number;
@@ -31,12 +29,16 @@ export function CounterNumber({ value, className }: CounterNumberProps) {
         raf = requestAnimationFrame(step);
         return () => cancelAnimationFrame(raf);
       },
-      { threshold: 0.4 }
+      { threshold: 0.4 },
     );
 
     observer.observe(node);
     return () => observer.disconnect();
   }, [value]);
 
-  return <span ref={ref} className={className}>{count}</span>;
+  return (
+    <span ref={ref} className={className}>
+      {count}
+    </span>
+  );
 }

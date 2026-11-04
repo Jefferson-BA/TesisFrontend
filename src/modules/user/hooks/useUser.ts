@@ -1,76 +1,51 @@
-// src/modules/user/hooks/useUser.ts
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
-import { extractRole } from "@/lib/auth-utils";
-
-type User = {
-  id?: string | number;
-  name?: string;
-  email?: string;
-  role?: any;
-};
+import { extractRole } from '@/lib/auth-utils';
+import { getErrorMessage } from '@/lib/errors';
+import { useAuthStore } from '@/modules/auth/store/authStore';
+import type { SessionUser } from '@/modules/auth/types/auth.types';
+import { useEffect } from 'react';
+import { toast } from 'sonner';
 
 export const useUser = () => {
-  const [user, setUserState] = useState<User | null>(null);
-  const [loadingUser, setLoadingUser] = useState(true);
-
+  const user = useAuthStore((state) => state.user);
+  const loadingUser = useAuthStore((state) => state.loading);
+  const sessionError = useAuthStore((state) => state.error);
   useEffect(() => {
-    try {
-      const savedUser = localStorage.getItem("user");
-      if (savedUser) {
-        setUserState(JSON.parse(savedUser));
-      }
-    } catch {
-      localStorage.removeItem("user");
-    } finally {
-      setLoadingUser(false);
-    }
-  }, []);
-
-  const setUser = (newUser: User) => {
-    localStorage.setItem("user", JSON.stringify(newUser));
-    setUserState(newUser);
-  };
-
-  const updateLocalUser = (newData: Partial<User>) => {
-    const updatedUser = {
-      ...user,
-      ...newData,
+    const syncSession = () => {
+      void useAuthStore.getState().loadSession();
     };
-    localStorage.setItem("user", JSON.stringify(updatedUser));
-    setUserState(updatedUser);
+    syncSession();
+    window.addEventListener('focus', syncSession);
+    return () => window.removeEventListener('focus', syncSession);
+  }, []);
+  const setUser = (next: SessionUser) => useAuthStore.getState().setUser(next);
+  const updateLocalUser = (data: Partial<SessionUser>) => {
+    const current = useAuthStore.getState().user;
+    if (current) setUser({ ...current, ...data });
   };
-
-  const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    localStorage.removeItem("cart");
-    localStorage.removeItem("promos");
-
-    document.cookie =
-      "user-role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-
-    toast.success("Sesión cerrada correctamente");
-
-    setTimeout(() => {
-      window.location.href = "/login";
-    }, 700);
+  const logout = async () => {
+    try {
+      await useAuthStore.getState().logout();
+      window.location.assign('/login');
+    } catch (error) {
+      toast.error(
+        getErrorMessage(
+          error,
+          'No se pudo cerrar la sesión. Intenta de nuevo.',
+        ),
+      );
+    }
   };
-
-  const userRole = extractRole(user);
-  const isLoggedIn = !!user;
-  const isSuperAdmin = userRole === "superadmin";
-  const isAdmin = userRole === "admin" || isSuperAdmin;
-
+  const role = extractRole(user);
   return {
     user,
-    role: userRole,
+    role,
     setUser,
     updateLocalUser,
     logout,
     loadingUser,
-    isLoggedIn,
-    isAdmin,
-    isSuperAdmin,
+    sessionError,
+    isLoggedIn: !!user,
+    isAdmin: role === 'admin' || role === 'superadmin',
+    isSuperAdmin: role === 'superadmin',
   };
 };

@@ -2,19 +2,21 @@
 // src/pages/user/profile.astro
 export const prerender = false;
 
-import UserLayout from "@/layouts/UserLayout.astro";
-import UserOrders from "@/modules/user/components/UserOrders";
-import UserProfileCard from "@/modules/user/components/UserProfileCard";
+import UserLayout from '@/layouts/UserLayout.astro';
+import UserOrders from '@/modules/user/components/UserOrders';
+import UserProfileCard from '@/modules/user/components/UserProfileCard';
 ---
 
-<UserLayout 
+<UserLayout
   title="Mi Perfil | DeParraSpitz"
   description="Gestiona tu perfil y revisa tu historial de reservas."
 >
   <main class="max-w-7xl mx-auto px-6 pb-20">
     <div class="mb-10">
       <h1 class="text-5xl font-serif font-bold text-foreground">Mi Perfil</h1>
-      <p class="text-muted-foreground mt-3">Gestiona tu información personal y revisa el historial de tus reservas.</p>
+      <p class="text-muted-foreground mt-3">
+        Gestiona tu información personal y revisa el historial de tus reservas.
+      </p>
     </div>
 
     <section class="grid grid-cols-1 lg:grid-cols-3 gap-8">

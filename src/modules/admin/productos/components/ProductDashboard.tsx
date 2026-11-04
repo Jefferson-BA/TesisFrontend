@@ -1,32 +1,23 @@
-import { useEffect, useState } from "react";
-import { Loader2, PlusCircle, ChevronUp } from "lucide-react";
-import { ProductForm } from "./ProductForm";
-import ProductTable from "./ProductTable";
-import { getProducts } from "@/modules/admin/productos/services/product.service";
-import { categoryService } from "@/modules/admin/categorias/services/category.service";
+import type { Category } from '@/modules/catalog/interfaces/category.interface';
+import type { Product } from '@/modules/catalog/interfaces/product.interface';
+import { categoryService } from '@/modules/catalog/services/category.service';
+import { getProducts } from '@/modules/catalog/services/product.service';
+import { ChevronUp, Loader2, PlusCircle } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { ProductForm } from './ProductForm';
+import ProductTable from './ProductTable';
 
 export default function ProductDashboard() {
-  const [products, setProducts] = useState<any[]>([]);
-  const [categories, setCategories] = useState<any[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
 
   const fetchProducts = async () => {
     try {
-      const responseData: any = await getProducts();
-      let cleanProductsList: any[] = [];
-
-      if (Array.isArray(responseData)) {
-        cleanProductsList = responseData;
-      } else if (responseData && Array.isArray(responseData.products)) {
-        cleanProductsList = responseData.products;
-      } else if (responseData && Array.isArray(responseData.data)) {
-        cleanProductsList = responseData.data;
-      }
-
-      setProducts(cleanProductsList);
+      setProducts(await getProducts());
     } catch (error) {
-      console.error("Error al cargar el catálogo de productos:", error);
+      console.error('Error al cargar el catálogo de productos:', error);
     } finally {
       setLoading(false);
     }
@@ -35,7 +26,7 @@ export default function ProductDashboard() {
   const fetchCategories = async () => {
     try {
       const res = await categoryService.getAll();
-      setCategories(Array.isArray(res) ? res : (res as any).data || []);
+      setCategories(res);
     } catch {
       // silencioso: si falla categorías, la tabla sigue funcionando
     }
@@ -58,7 +49,6 @@ export default function ProductDashboard() {
 
   return (
     <div className="flex flex-col gap-6">
-
       {/* BOTÓN TOGGLE – solo aparece si ya hay productos */}
       {hasProducts && (
         <div className="flex justify-end">
@@ -67,16 +57,21 @@ export default function ProductDashboard() {
             className={`
               inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm
               transition-all duration-200 shadow-sm border
-              ${isFormVisible
-                ? "bg-secondary border-border text-secondary-foreground hover:bg-secondary/80"
-                : "bg-primary border-primary/30 text-primary-foreground hover:bg-primary/90 shadow-primary/20"
+              ${
+                isFormVisible
+                  ? 'bg-secondary border-border text-secondary-foreground hover:bg-secondary/80'
+                  : 'bg-primary border-primary/30 text-primary-foreground hover:bg-primary/90 shadow-primary/20'
               }
             `}
           >
             {isFormVisible ? (
-              <><ChevronUp className="w-4 h-4" /> Ocultar formulario</>
+              <>
+                <ChevronUp className="w-4 h-4" /> Ocultar formulario
+              </>
             ) : (
-              <><PlusCircle className="w-4 h-4" /> Agregar producto</>
+              <>
+                <PlusCircle className="w-4 h-4" /> Agregar producto
+              </>
             )}
           </button>
         </div>
@@ -86,7 +81,7 @@ export default function ProductDashboard() {
       <div
         className={`
           overflow-hidden transition-all duration-300 ease-in-out
-          ${isFormVisible ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0 pointer-events-none"}
+          ${isFormVisible ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0 pointer-events-none'}
         `}
       >
         <ProductForm
@@ -99,16 +94,19 @@ export default function ProductDashboard() {
       {loading ? (
         <div className="flex flex-col items-center justify-center p-12 bg-card border border-border rounded-2xl shadow-xl">
           <Loader2 className="h-8 w-8 animate-spin text-primary mb-2" />
-          <p className="text-muted-foreground text-sm font-medium">Conectando con el catálogo...</p>
+          <p className="text-muted-foreground text-sm font-medium">
+            Conectando con el catálogo...
+          </p>
         </div>
       ) : (
         <ProductTable
           products={products}
           categories={categories}
-          onRefresh={() => { fetchProducts(); }}
+          onRefresh={() => {
+            fetchProducts();
+          }}
         />
       )}
-
     </div>
   );
 }

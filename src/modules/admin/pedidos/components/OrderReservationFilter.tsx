@@ -1,57 +1,26 @@
-import { useEffect, useState } from "react";
-import { getActiveAdminReservations } from "@/modules/admin/pedidos/services/order.service";
+import type { Reservation } from '@/modules/reservations/interfaces/reservation.interface';
+import { useEffect, useState } from 'react';
 
 interface OrderReservationFilterProps {
+  reservations: Reservation[];
   selectedReservationId?: string | number | null;
-  onSelectReservation: (reservation: any | null) => void;
+  onSelectReservation: (reservation: Reservation | null) => void;
 }
 
 export default function OrderReservationFilter({
+  reservations,
   selectedReservationId,
   onSelectReservation,
 }: OrderReservationFilterProps) {
-  const [reservations, setReservations] = useState<any[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [selectedValue, setSelectedValue] = useState<string>("");
+  const [selectedValue, setSelectedValue] = useState<string>('');
 
   useEffect(() => {
     if (selectedReservationId !== undefined) {
-      setSelectedValue(selectedReservationId ? String(selectedReservationId) : "");
+      setSelectedValue(
+        selectedReservationId ? String(selectedReservationId) : '',
+      );
     }
   }, [selectedReservationId]);
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const urlId = params.get("reservationId");
-    if (urlId && selectedReservationId === undefined) {
-      setSelectedValue(urlId);
-    }
-  }, []);
-
-  useEffect(() => {
-    const fetchReservations = async () => {
-      try {
-        const data = await getActiveAdminReservations();
-        const list = Array.isArray(data) ? data : data.data || [];
-        setReservations(list);
-
-        const params = new URLSearchParams(window.location.search);
-        const urlId = params.get("reservationId");
-
-        if (urlId) {
-          const found = list.find((r: any) => String(r.id) === String(urlId));
-          if (found) {
-            onSelectReservation(found);
-          }
-        }
-      } catch (error) {
-        console.error("Error cargando filtro de reservas:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchReservations();
-  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const val = e.target.value;
@@ -73,13 +42,18 @@ export default function OrderReservationFilter({
       <select
         value={selectedValue}
         onChange={handleChange}
-        disabled={loading}
+        disabled={reservations.length === 0}
         className="w-full bg-background border border-input text-foreground rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-ring focus:border-transparent outline-none transition-all cursor-pointer disabled:opacity-50"
       >
         <option value="">Ver todos los pedidos</option>
         {reservations.map((res) => (
           <option key={res.id} value={res.id}>
-            Reserva #{res.id} - {res.user?.name || res.customerName || res.clientName || `Ref: #${res.id}`} ({res.guestsCount || 0} PAX)
+            Reserva #{res.id} -{' '}
+            {res.user?.name ||
+              res.customerName ||
+              res.clientName ||
+              `Ref: #${res.id}`}{' '}
+            ({res.guestsCount || 0} PAX)
           </option>
         ))}
       </select>

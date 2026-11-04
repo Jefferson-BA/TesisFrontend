@@ -1,13 +1,14 @@
-import { useEffect, useState } from "react";
+import type { Category } from '@/modules/catalog/interfaces/category.interface';
 import {
   createCategory,
-  getCategories,
   deleteCategory,
-} from "@/modules/admin/productos/services/category.service";
+  getCategories,
+} from '@/modules/catalog/services/category.service';
+import { useEffect, useState } from 'react';
 
 export default function CategoryForm() {
-  const [name, setName] = useState("");
-  const [categories, setCategories] = useState<any[]>([]);
+  const [name, setName] = useState('');
+  const [categories, setCategories] = useState<Category[]>([]);
 
   const loadCategories = async () => {
     try {
@@ -15,7 +16,7 @@ export default function CategoryForm() {
       setCategories(data);
     } catch (error) {
       console.error(error);
-      alert("Error al cargar categorías");
+      alert('Error al cargar categorías');
     }
   };
 
@@ -23,39 +24,39 @@ export default function CategoryForm() {
     loadCategories();
   }, []);
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!name.trim()) {
-      alert("Escribe el nombre de la categoría");
+      alert('Escribe el nombre de la categoría');
       return;
     }
 
     try {
       await createCategory({ name });
 
-      alert("Categoría creada correctamente");
+      alert('Categoría creada correctamente');
 
-      setName("");
+      setName('');
       loadCategories();
     } catch (error) {
       console.error(error);
-      alert("Error al crear categoría");
+      alert('Error al crear categoría');
     }
   };
 
   const handleDelete = async (id: string) => {
-    const confirmDelete = confirm("¿Eliminar esta categoría?");
+    const confirmDelete = confirm('¿Eliminar esta categoría?');
 
     if (!confirmDelete) return;
 
     try {
       await deleteCategory(id);
-      alert("Categoría eliminada");
+      alert('Categoría eliminada');
       loadCategories();
     } catch (error) {
       console.error(error);
-      alert("Error al eliminar categoría");
+      alert('Error al eliminar categoría');
     }
   };
 
@@ -98,9 +99,7 @@ export default function CategoryForm() {
               className="bg-muted/50 border border-border rounded-xl p-4 flex justify-between items-center"
             >
               <div>
-                <p className="text-primary font-bold">
-                  {category.name}
-                </p>
+                <p className="text-primary font-bold">{category.name}</p>
 
                 <p className="text-muted-foreground text-sm break-all">
                   ID: {category.id}
